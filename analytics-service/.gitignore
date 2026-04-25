@@ -6,20 +6,22 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
 
 # IDE
 .idea/
-*.iml
 .vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Build
 .classpath
 .project
 .settings/
+bin/
 
-# OS
-.DS_Store
-Thumbs.db
-.kiro
-
+# jqwik
+.jqwik-database

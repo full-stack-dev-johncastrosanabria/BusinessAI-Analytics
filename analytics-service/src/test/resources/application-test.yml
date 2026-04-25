@@ -1,9 +1,15 @@
+server:
+  port: 8084
+
 spring:
+  application:
+    name: analytics-service
+  
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
-    username: sa
-    password: 
+    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
+    username: sa
+    password:
   
   jpa:
     hibernate:
@@ -12,9 +18,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
 
 logging:
   level:
-    com.businessai.sales: INFO
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
+    com.businessai.analytics: DEBUG
+    org.springframework.web: INFO

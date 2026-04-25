@@ -144,7 +144,7 @@ The implementation follows a bottom-up approach: database → microservices → 
 - [x] 5. Checkpoint - Ensure Product and Customer services are working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 6. Implement Sales Service microservice
+- [ ] 6. Implement Sales Service microservice
   - [x] 6.1 Create Spring Boot Sales Service project structure
     - Set up Spring Boot dependencies (Web, JPA, MySQL)
     - Configure application.yml with port 8083 and database connection
@@ -182,42 +182,42 @@ The implementation follows a bottom-up approach: database → microservices → 
     - **Validates: Requirements 3.2**
     - Test that transactions with invalid references are rejected
   
-  - [~] 6.7 Write property test for sales transaction total calculation
+  - [x] 6.7 Write property test for sales transaction total calculation
     - **Property 6: Sales Transaction Total Calculation**
     - **Validates: Requirements 3.3**
     - Test that total amount equals quantity × price for all valid inputs
   
-  - [~] 6.8 Write property test for sales transaction filtering
+  - [x] 6.8 Write property test for sales transaction filtering
     - **Property 7: Sales Transaction Filtering Correctness**
     - **Validates: Requirements 3.5**
     - Test that filtered results match specified criteria (date, customer, product)
   
-  - [~] 6.9 Implement Sales REST controller
+  - [x] 6.9 Implement Sales REST controller
     - POST /api/sales - Create sales transaction
     - GET /api/sales/{id} - Retrieve transaction by ID
     - GET /api/sales - List transactions with optional filters
     - _Requirements: 3.2, 3.3, 3.4, 3.5_
   
-  - [~] 6.10 Write integration tests for Sales Service
+  - [x] 6.10 Write integration tests for Sales Service
     - Test inter-service communication with Product and Customer services
     - Test end-to-end transaction creation flow
     - Test validation error scenarios
 
-- [~] 7. Implement Analytics Service microservice
-  - [~] 7.1 Create Spring Boot Analytics Service project structure
+- [ ] 7. Implement Analytics Service microservice
+  - [x] 7.1 Create Spring Boot Analytics Service project structure
     - Set up Spring Boot dependencies (Web, JPA, MySQL)
     - Configure application.yml with port 8084 and database connection
     - Create main application class
     - _Requirements: 21.1, 21.4, 21.5, 21.7_
   
-  - [~] 7.2 Create BusinessMetric entity and repository
+  - [x] 7.2 Create BusinessMetric entity and repository
     - Define BusinessMetric JPA entity with fields: id, month, year, totalSales, totalCosts, totalExpenses, profit, timestamps
     - Add unique constraint on (month, year) combination
     - Create MetricsRepository with date range query methods
     - Add index on (year, month)
     - _Requirements: 4.1_
   
-  - [~] 7.3 Implement Analytics service layer with calculations
+  - [x] 7.3 Implement Analytics service layer with calculations
     - Create AnalyticsService with CRUD business logic
     - Implement profit calculation: profit = totalSales - totalCosts - totalExpenses
     - Implement date range filtering for metrics
@@ -225,48 +225,48 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Implement dashboard summary calculations (best/worst months, top products)
     - _Requirements: 4.2, 4.3, 4.4, 5.2, 5.3_
   
-  - [~] 7.4 Write property test for business metric profit calculation
+  - [x] 7.4 Write property test for business metric profit calculation
     - **Property 8: Business Metric Profit Calculation**
     - **Validates: Requirements 4.2**
     - Test that profit equals totalSales - totalCosts - totalExpenses
   
-  - [~] 7.5 Write property test for business metric date range filtering
+  - [x] 7.5 Write property test for business metric date range filtering
     - **Property 9: Business Metric Date Range Filtering**
     - **Validates: Requirements 4.3**
     - Test that filtered metrics fall within specified date range
   
-  - [~] 7.6 Write property test for sales aggregation accuracy
+  - [x] 7.6 Write property test for sales aggregation accuracy
     - **Property 10: Sales Aggregation Accuracy**
     - **Validates: Requirements 4.4**
     - Test that aggregated sales equal sum of transaction amounts for a month
   
-  - [~] 7.7 Write property test for dashboard best/worst month identification
+  - [x] 7.7 Write property test for dashboard best/worst month identification
     - **Property 11: Dashboard Best and Worst Month Identification**
     - **Validates: Requirements 5.2**
     - Test that best month has max profit and worst month has min profit
   
-  - [~] 7.8 Write property test for dashboard top products ranking
+  - [x] 7.8 Write property test for dashboard top products ranking
     - **Property 12: Dashboard Top Products Ranking**
     - **Validates: Requirements 5.3**
     - Test that top 5 products are correctly sorted by revenue
   
-  - [~] 7.9 Implement Analytics REST controller
+  - [x] 7.9 Implement Analytics REST controller
     - POST /api/analytics/metrics - Create business metric
     - GET /api/analytics/metrics - List metrics with date range filter
     - GET /api/analytics/dashboard - Get dashboard summary
     - POST /api/analytics/aggregate - Trigger sales data aggregation
     - _Requirements: 4.2, 4.3, 5.1, 5.2, 5.3_
   
-  - [~] 7.10 Write unit tests for Analytics controller endpoints
+  - [x] 7.10 Write unit tests for Analytics controller endpoints
     - Test metric CRUD operations
     - Test dashboard summary calculations
     - Test aggregation endpoint
 
-- [~] 8. Checkpoint - Ensure Sales and Analytics services are working
+- [ ] 8. Checkpoint - Ensure Sales and Analytics services are working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 9. Implement Document Service microservice
-  - [~] 9.1 Create Spring Boot Document Service project structure
+- [ ] 9. Implement Document Service microservice
+  - [x] 9.1 Create Spring Boot Document Service project structure
     - Set up Spring Boot dependencies (Web, JPA, MySQL)
     - Add Apache POI dependencies for DOCX and XLSX extraction
     - Add Apache PDFBox dependency for PDF extraction
@@ -274,14 +274,14 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Create main application class
     - _Requirements: 21.1, 21.4, 21.5, 21.7_
   
-  - [~] 9.2 Create Document entity and repository
+  - [x] 9.2 Create Document entity and repository
     - Define Document JPA entity with fields: id, filename, uploadDate, fileSize, fileType, extractedText, extractionStatus, errorMessage
     - Add indexes on fileType and extractionStatus
     - Add fulltext index on extractedText
     - Create DocumentRepository extending JpaRepository
     - _Requirements: 6.5_
   
-  - [~] 9.3 Implement text extraction component
+  - [x] 9.3 Implement text extraction component
     - Create TextExtractor component with methods for each file type
     - Implement TXT extraction using Java I/O
     - Implement DOCX extraction using Apache POI XWPFDocument
@@ -290,7 +290,7 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Add error handling and status tracking (PENDING, SUCCESS, FAILED)
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
   
-  - [~] 9.4 Implement Document service layer with validation
+  - [x] 9.4 Implement Document service layer with validation
     - Create DocumentService with upload and retrieval logic
     - Validate file format against allowed types (TXT, DOCX, PDF, XLSX)
     - Validate file size (max 50MB)
@@ -298,17 +298,17 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Handle extraction failures gracefully
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 7.6_
   
-  - [~] 9.5 Write property test for document format validation
+  - [x] 9.5 Write property test for document format validation
     - **Property 13: Document Format Validation**
     - **Validates: Requirements 6.1, 6.2**
     - Test that allowed formats are accepted and others are rejected
   
-  - [~] 9.6 Write property test for document metadata preservation
+  - [x] 9.6 Write property test for document metadata preservation
     - **Property 14: Document Metadata Preservation**
     - **Validates: Requirements 6.5**
     - Test that filename, file size, and file type are preserved after upload
   
-  - [~] 9.7 Implement Document REST controller
+  - [x] 9.7 Implement Document REST controller
     - POST /api/documents/upload - Upload document (multipart/form-data)
     - GET /api/documents/{id} - Retrieve document metadata
     - GET /api/documents - List all documents
@@ -316,26 +316,26 @@ The implementation follows a bottom-up approach: database → microservices → 
     - DELETE /api/documents/{id} - Delete document
     - _Requirements: 6.2, 6.3, 6.4_
   
-  - [~] 9.8 Write integration tests for document extraction
+  - [x] 9.8 Write integration tests for document extraction
     - Test text extraction for each file format with sample files
     - Test error handling for corrupted files
     - Test file size validation
 
-- [~] 10. Implement AI Service with forecasting and chatbot
-  - [~] 10.1 Create FastAPI AI Service project structure
+- [ ] 10. Implement AI Service with forecasting and chatbot
+  - [x] 10.1 Create FastAPI AI Service project structure
     - Set up Python project with FastAPI, PyTorch, TensorFlow, MySQL connector
     - Create main.py with FastAPI application
     - Configure to run on port 8000
     - Add CORS middleware for frontend access
     - _Requirements: 21.8_
   
-  - [~] 10.2 Implement database connection and query utilities
+  - [x] 10.2 Implement database connection and query utilities
     - Create MySQL connection pool
     - Implement query functions for business metrics, products, customers, sales
     - Implement document search function using fulltext search
     - _Requirements: 11.3, 12.1, 12.2, 12.3, 13.1_
   
-  - [~] 10.3 Implement PyTorch LSTM sales forecasting model
+  - [x] 10.3 Implement PyTorch LSTM sales forecasting model
     - Create SalesForecastModel class with 2-layer LSTM (64 units each)
     - Implement training function with 80/20 train/validation split
     - Implement data preprocessing and normalization
@@ -343,7 +343,7 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Save and load model weights
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.6, 15.1, 15.2, 15.3, 15.4, 15.5_
   
-  - [~] 10.4 Implement TensorFlow LSTM cost forecasting model
+  - [x] 10.4 Implement TensorFlow LSTM cost forecasting model
     - Create cost forecast model with 2-layer LSTM (64 units each)
     - Implement training function with 80/20 train/validation split
     - Implement data preprocessing and normalization
@@ -351,49 +351,49 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Save and load model weights
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.6, 15.1, 15.2, 15.3, 15.4, 15.5_
   
-  - [~] 10.5 Write property test for training data split ratio
+  - [x] 10.5 Write property test for training data split ratio
     - **Property 19: Training Data Split Ratio**
     - **Validates: Requirements 15.5**
     - Test that 80/20 split produces correct training and validation set sizes
   
-  - [~] 10.6 Implement profit forecasting calculation
+  - [x] 10.6 Implement profit forecasting calculation
     - Create function to calculate profit from sales and cost forecasts
     - Implement endpoint to return 12-month profit predictions
     - _Requirements: 10.1, 10.2, 10.3_
   
-  - [~] 10.7 Write property test for profit forecast calculation
+  - [x] 10.7 Write property test for profit forecast calculation
     - **Property 16: Profit Forecast Calculation**
     - **Validates: Requirements 10.1**
     - Test that profit[month] = sales[month] - cost[month] for all months
   
-  - [~] 10.8 Write property test for forecast response structure
+  - [x] 10.8 Write property test for forecast response structure
     - **Property 15: Forecast Response Structure Completeness**
     - **Validates: Requirements 8.4, 9.4, 10.3**
     - Test that forecast responses contain exactly 12 predictions with month and value
   
-  - [~] 10.9 Implement chatbot intent classification
+  - [x] 10.9 Implement chatbot intent classification
     - Create intent classifier using keyword matching
     - Classify intents: sales_metrics, product_info, customer_info, document_search, mixed
     - _Requirements: 11.2_
   
-  - [~] 10.10 Write property test for chatbot intent classification
+  - [x] 10.10 Write property test for chatbot intent classification
     - **Property 17: Chatbot Intent Classification Consistency**
     - **Validates: Requirements 11.2**
     - Test that questions with domain keywords are classified to correct intent
   
-  - [~] 10.11 Implement chatbot query processor
+  - [x] 10.11 Implement chatbot query processor
     - Create query processing function that routes to appropriate data source
     - Implement database query handlers for each intent
     - Implement document search handler with keyword extraction
     - Implement response formatting for natural language answers
     - _Requirements: 11.1, 11.3, 11.4, 11.5, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 13.1, 13.3, 13.4, 13.5, 13.6_
   
-  - [~] 10.12 Write property test for document search result ranking
+  - [x] 10.12 Write property test for document search result ranking
     - **Property 18: Document Search Result Ranking**
     - **Validates: Requirements 13.2**
     - Test that search results are ordered by relevance score (descending)
   
-  - [~] 10.13 Implement AI Service REST endpoints
+  - [x] 10.13 Implement AI Service REST endpoints
     - POST /api/ai/forecast/sales - Generate sales forecast
     - POST /api/ai/forecast/costs - Generate cost forecast
     - POST /api/ai/forecast/profit - Generate profit forecast
@@ -401,14 +401,14 @@ The implementation follows a bottom-up approach: database → microservices → 
     - POST /api/ai/train - Trigger model training (admin endpoint)
     - _Requirements: 8.2, 9.2, 10.2, 11.1, 15.2_
   
-  - [~] 10.14 Write unit tests for AI Service endpoints
+  - [x] 10.14 Write unit tests for AI Service endpoints
     - Test forecast generation with mocked models
     - Test chatbot query processing with mocked database
     - Test error handling for insufficient training data
     - Test model loading errors
 
-- [~] 11. Create model training script
-  - [~] 11.1 Create standalone Python training script
+- [ ] 11. Create model training script
+  - [x] 11.1 Create standalone Python training script
     - Load historical business metrics from database
     - Train PyTorch sales forecasting model
     - Train TensorFlow cost forecasting model
@@ -416,10 +416,10 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Save trained model files to disk
     - _Requirements: 15.1, 15.2, 15.3, 15.5, 15.6_
 
-- [~] 12. Checkpoint - Ensure all backend services are working
+- [ ] 12. Checkpoint - Ensure all backend services are working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 13. Implement React TypeScript frontend application
+- [ ] 13. Implement React TypeScript frontend application
   - [~] 13.1 Create React TypeScript project with Vite
     - Initialize project with Vite template
     - Install dependencies: react-router-dom, axios, recharts
@@ -534,33 +534,33 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Show loading states for all async operations
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
 
-- [~] 14. Checkpoint - Ensure frontend is working with all backend services
+- [ ] 14. Checkpoint - Ensure frontend is working with all backend services
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 15. Integration and end-to-end testing
-  - [~] 15.1 Write integration tests for microservices communication
+- [ ] 15. Integration and end-to-end testing
+  - [x] 15.1 Write integration tests for microservices communication
     - Test API Gateway routing to each microservice
     - Test Sales Service calls to Product and Customer services
     - Test end-to-end transaction creation flow
   
-  - [~] 15.2 Write integration tests for AI Service
+  - [x] 15.2 Write integration tests for AI Service
     - Test model loading on service startup
     - Test forecast generation with real database data
     - Test chatbot queries with real database and documents
   
-  - [~] 15.3 Write integration tests for document extraction
+  - [x] 15.3 Write integration tests for document extraction
     - Test text extraction for each file format with sample files
     - Verify extracted text content accuracy
   
-  - [~] 15.4 Write end-to-end tests for critical user workflows
+  - [x] 15.4 Write end-to-end tests for critical user workflows
     - Test complete product management workflow
     - Test complete sales transaction creation workflow
     - Test dashboard load and metric display
     - Test document upload and chatbot query workflow
     - Test forecast generation workflow
 
-- [~] 16. Create comprehensive documentation
-  - [~] 16.1 Create main README.md with setup instructions
+- [x] 16. Create comprehensive documentation
+  - [x] 16.1 Create main README.md with setup instructions
     - Document required software: Java 17, Node.js 18+, Python 3.9+, MySQL 8.0
     - Document port numbers for all services
     - Provide step-by-step setup instructions for database
@@ -572,20 +572,20 @@ The implementation follows a bottom-up approach: database → microservices → 
     - Document how to start all services
     - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5, 20.6_
   
-  - [~] 16.2 Create architecture documentation
+  - [x] 16.2 Create architecture documentation
     - Document microservices architecture with diagrams
     - Document API Gateway routing configuration
     - Document inter-service communication patterns
     - Document database schema and relationships
     - Store in .kiro/specs/business-ai-analytics/docs/architecture.md
   
-  - [~] 16.3 Create API documentation
+  - [x] 16.3 Create API documentation
     - Document all REST endpoints for each microservice
     - Document request/response formats with examples
     - Document error responses and status codes
     - Store in .kiro/specs/business-ai-analytics/docs/api.md
 
-- [~] 17. Final checkpoint - Complete system verification
+- [x] 17. Final checkpoint - Complete system verification
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all services start successfully
   - Verify end-to-end workflows function correctly

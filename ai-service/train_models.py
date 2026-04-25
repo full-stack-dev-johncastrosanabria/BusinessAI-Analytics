@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""
+Standalone training script for AI forecasting models.
+
+This script:
+1. Loads historical business metrics from the database
+2. Trains PyTorch sales forecasting model
+3. Trains TensorFlow cost forecasting model
+4. Evaluates models and prints MAPE metrics
+5. Saves trained model files to disk
+
+Usage:
+    python train_models.py
+"""
+
+import logging
+import sys
+import os
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from database import DatabaseConnection
+from models.sales_forecast import SalesForecastModel
+from models.cost_forecast import CostForecastModel
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+def main():
+    """Main training function"""
+    logger.info("=" * 60)
+    logger.info("Starting AI Model Training")
+    logger.info("=" * 60)
+
+    try:
+        # Connect to database
+        logger.info("Connecting to database...")
+        db = DatabaseConnection(
+            host="localhost",
+            user="root",
+            password="",
+            database="businessai"
+        )
+
+        # Load historical data
+        logger.info("Loading historical business metrics...")
+        sales_data = db.get_business_metrics()
+        cost_data = db.get_cost_metrics()
+
+        if len(sales_data) < 24:
+            logger.error(
+                f"Insufficient data for training. "
+                f"Need at least 24 months, got {len(sales_data)}"
+            )
+            return False
+
+        logger.info(f"Loaded {len(sales_data)} months of sales data")
+        logger.info(f"Loaded {len(cost_data)} months of cost data")
+
+        # Create models directory if it doesn't exist
+        models_dir = Path(__file__).parent / "trained_models"
+        models_dir.mkdir(exist_ok=True)
+        logger.info(f"Models will be saved to: {models_dir}")
+
+        # Train sales forecasting model
+        logger.info("-" * 60)
+        logger.info("Training Sales Forecasting Model (PyTorch LSTM)...")
+        logger.info("-" * 60)
+        sales_model = SalesForecastModel(
+            input_size=1,
+            hidden_size=64,
+            num_layers=2,
+            output_size=1,
+            sequence_length=12
+        )
+
+        sales_mape = sales_model.train_model(
+            sales_data,
+            epochs=50,
+            batch_size=16,
+            learning_rate=0.001
+        )
+
+        logger.info(f"Sales Model Training Complete")
+        logger.info(f"Sales Model Validation MAPE: {sales_mape:.4f}%")
+
+        if sales_mape < 20:
+            logger.info("✓ Sales model meets MAPE requirement (< 20%)")
+        else:
+            logger.warning(
+                f"⚠ Sales model MAPE {sales_mape:.4f}% exceeds "
+                f"target of 20%"
+            )
+
+        # Save sales model
+        sales_model_path = models_dir / "sales_forecast_model.pt"
+        sales_model.save_model(str(sales_model_path))
+        logger.info(f"Sales model saved to: {sales_model_path}")
+
+        # Train cost forecasting model
+        logger.info("-" * 60)
+        logger.info("Training Cost Forecasting Model (TensorFlow LSTM)...")
+        logger.info("-" * 60)
+        cost_model = CostForecastModel(
+            input_size=1,
+            hidden_size=64,
+            num_layers=2,
+            output_size=1,
+            sequence_length=12
+        )
+
+        cost_mape = cost_model.train_model(
+            cost_data,
+            epochs=50,
+            batch_size=16
+        )
+
+        logger.info(f"Cost Model Training Complete")
+        logger.info(f"Cost Model Validation MAPE: {cost_mape:.4f}%")
+
+        if cost_mape < 20:
+            logger.info("✓ Cost model meets MAPE requirement (< 20%)")
+        else:
+            logger.warning(
+                f"⚠ Cost model MAPE {cost_mape:.4f}% exceeds "
+                f"target of 20%"
+            )
+
+        # Save cost model
+        cost_model_path = models_dir / "cost_forecast_model.h5"
+        cost_model.save_model(str(cost_model_path))
+        logger.info(f"Cost model saved to: {cost_model_path}")
+
+        # Print summary
+        logger.info("=" * 60)
+        logger.info("Training Summary")
+        logger.info("=" * 60)
+        logger.info(f"Sales Model MAPE: {sales_mape:.4f}%")
+        logger.info(f"Cost Model MAPE: {cost_mape:.4f}%")
+        logger.info(f"Models saved to: {models_dir}")
+        logger.info("=" * 60)
+
+        # Close database connection
+        db.close()
+
+        logger.info("✓ Training completed successfully!")
+        return True
+
+    except Exception as e:
+        logger.error(f"Training failed with error: {e}", exc_info=True)
+        return False
+
+
+if __name__ == "__main__":
+    success = main()
+    sys.exit(0 if success else 1)

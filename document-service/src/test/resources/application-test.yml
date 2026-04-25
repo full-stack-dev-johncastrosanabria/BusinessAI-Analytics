@@ -1,0 +1,31 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: document-service
+  
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+logging:
+  level:
+    com.businessai.documents: DEBUG
+    org.springframework.web: INFO
+
+document:
+  upload:
+    max-file-size: 52428800
+    allowed-types: TXT,DOCX,PDF,XLSX
