@@ -1,0 +1,122 @@
+server:
+  port: 0  # Random port for testing
+
+spring:
+  application:
+    name: api-gateway-test
+  
+  cloud:
+    gateway:
+      routes:
+        # Product Service routes
+        - id: product-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        
+        # Customer Service routes
+        - id: customer-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        
+        # Sales Service routes
+        - id: sales-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/sales/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        
+        # Analytics Service routes
+        - id: analytics-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        
+        # Document Service routes
+        - id: document-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/documents/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+        
+        # AI Service routes
+        - id: ai-service
+          uri: http://localhost:8000
+          predicates:
+            - Path=/api/ai/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 1000ms
+                  factor: 2
+                  basedOnPreviousValue: false
+      
+      # Global timeout configuration
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 30s
+
+# Logging configuration for tests
+logging:
+  level:
+    root: WARN
+    org.springframework.cloud.gateway: INFO
