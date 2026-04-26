@@ -1,269 +1,237 @@
 # BusinessAI-Analytics Platform
 
-A comprehensive business intelligence platform combining microservices architecture, AI-powered forecasting, and conversational interfaces for business data management and analytics.
+Plataforma de inteligencia empresarial con arquitectura de microservicios, pronósticos con IA y asistente conversacional bilingüe (inglés/español).
 
-## System Architecture
+## Arquitectura
 
-The platform consists of:
+```
+Frontend (5173)
+    └── API Gateway (8080)
+            ├── Product Service   (8081)
+            ├── Customer Service  (8082)
+            ├── Sales Service     (8083)
+            ├── Analytics Service (8084)
+            ├── Document Service  (8085)
+            └── AI Service        (8000)
+                    └── MySQL (3306)
+```
 
-- **Frontend**: React TypeScript SPA (port 5173)
-- **API Gateway**: Spring Cloud Gateway (port 8080)
-- **Microservices**: 5 independent Spring Boot services (ports 8081-8085)
-  - Product Service (8081)
-  - Customer Service (8082)
-  - Sales Service (8083)
-  - Analytics Service (8084)
-  - Document Service (8085)
-- **AI Service**: Python FastAPI (port 8000)
-- **Database**: MySQL 8.0
+## Requisitos
 
-## Prerequisites
+| Herramienta | Versión mínima |
+|-------------|----------------|
+| Java        | 17             |
+| Maven       | 3.6            |
+| Node.js     | 18             |
+| Python      | 3.9            |
+| MySQL       | 8.0            |
 
-- Java 17
-- Node.js 18+
-- Python 3.9+
-- MySQL 8.0
+## Inicio rápido
 
-## Quick Start
-
-### 1. Database Setup
+### Primera vez
 
 ```bash
-# Create database and schema
+# 1. Crear base de datos y cargar esquema
 mysql -u root -p < database/schema.sql
 
-# Load synthetic data
-mysql -u root -p businessai < database/seed_data.sql
+# 2. Generar datos sintéticos
+python3 database/generate_seed_data.py
+
+# 3. Exportar contraseña de MySQL
+export MYSQL_PASSWORD=tu_contraseña
+
+# 4. Iniciar todo el sistema
+./start-system.sh
 ```
 
-### 2. Backend Services
+La aplicación estará disponible en **http://localhost:5173**
 
-Each microservice can be started independently:
+### Uso diario
 
 ```bash
-# Product Service
-cd product-service
-mvn spring-boot:run
+export MYSQL_PASSWORD=tu_contraseña
 
-# Customer Service
-cd customer-service
-mvn spring-boot:run
-
-# Sales Service
-cd sales-service
-mvn spring-boot:run
-
-# Analytics Service
-cd analytics-service
-mvn spring-boot:run
-
-# Document Service
-cd document-service
-mvn spring-boot:run
-
-# API Gateway
-cd api-gateway
-mvn spring-boot:run
+./start-system.sh      # Iniciar
+./check-system.sh      # Ver estado
+./stop-system.sh       # Detener
+./stop-system.sh --force  # Forzar detención
 ```
 
-### 3. AI Service
+## Puertos de servicios
 
-```bash
-cd ai-service
+| Servicio           | Puerto | URL                    |
+|--------------------|--------|------------------------|
+| Frontend           | 5173   | http://localhost:5173  |
+| API Gateway        | 8080   | http://localhost:8080  |
+| Product Service    | 8081   | http://localhost:8081  |
+| Customer Service   | 8082   | http://localhost:8082  |
+| Sales Service      | 8083   | http://localhost:8083  |
+| Analytics Service  | 8084   | http://localhost:8084  |
+| Document Service   | 8085   | http://localhost:8085  |
+| AI Service         | 8000   | http://localhost:8000  |
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Train models
-python train_models.py
-
-# Start service
-python main.py
-```
-
-### 4. Frontend
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
-## Features
+## Funcionalidades
 
 ### Dashboard
-- View total sales, costs, and profit metrics
-- Identify best and worst performing months
-- See top 5 products by revenue
-- Interactive charts for trend analysis
-- Date range filtering
+- Métricas de ventas, costos y ganancias por período
+- Identificación del mejor y peor mes
+- Top 5 productos por ingresos
+- Gráficos de tendencias con filtro de fechas
 
-### Forecasting
-- 12-month sales forecast using PyTorch LSTM
-- 12-month cost forecast using TensorFlow LSTM
-- Profit forecast calculated from sales and cost predictions
-- MAPE metrics for model accuracy
+### Pronósticos (AI)
+- Pronóstico de ventas a 12 meses — modelo PyTorch LSTM
+- Pronóstico de costos a 12 meses — modelo TensorFlow LSTM
+- Pronóstico de ganancias calculado automáticamente
+- Métrica de precisión MAPE
 
-### Document Management
-- Upload documents (TXT, DOCX, PDF, XLSX)
-- Automatic text extraction
-- Document search and retrieval
+### Asistente empresarial (Chatbot)
+- Consultas en lenguaje natural en inglés y español
+- Acceso directo a base de datos (ventas, productos, clientes)
+- Búsqueda en documentos subidos
+- Soporte para preguntas por mes, trimestre, año, comparaciones y tendencias
 
-### Chatbot
-- Natural language query processing
-- Database query capability
-- Document search integration
-- Conversation history
+**Ejemplos de preguntas:**
+```
+¿Cuánto vendimos en total en 2024?
+¿Cuál fue nuestro mes más rentable?
+¿Qué categoría de productos genera más ingresos?
+¿Qué clientes son del segmento Enterprise?
+Compare sales between January and June 2024
+What was our worst performing month ever?
+Who are our top customers by number of orders?
+```
 
-### Data Management
-- Product CRUD operations
-- Customer management with email validation
-- Sales transaction recording
-- Business metrics tracking
+### Gestión de documentos
+- Subida de archivos TXT, DOCX, PDF, XLSX (máx. 50 MB)
+- Extracción automática de texto
+- Búsqueda full-text en contenido
 
-## API Documentation
+### Gestión de datos
+- CRUD de productos, clientes y transacciones de ventas
+- Validación de email único en clientes
+- Cálculo automático de totales en transacciones
 
-See [API Documentation](./docs/api.md) for detailed endpoint specifications.
+## Scripts de automatización
 
-## Architecture Documentation
+| Script              | Descripción                                      |
+|---------------------|--------------------------------------------------|
+| `start-system.sh`   | Inicia todos los servicios en orden correcto     |
+| `stop-system.sh`    | Detiene todos los servicios (graceful o forzado) |
+| `check-system.sh`   | Muestra estado de cada servicio y puerto         |
+| `setup-database.sh` | Crea la base de datos, esquema y datos semilla   |
 
-See [Architecture Documentation](./docs/architecture.md) for system design details.
+Todos los logs se guardan en `./logs/`.
 
-## Testing
+## Base de datos
 
-### Run All Tests
+Esquema con 5 tablas principales:
 
+| Tabla                | Registros | Descripción                              |
+|----------------------|-----------|------------------------------------------|
+| `products`           | 30        | Catálogo: Electronics, Furniture, etc.   |
+| `customers`          | 100       | Segmentos: Enterprise, SMB, Startup      |
+| `sales_transactions` | 5 000     | 5 años de transacciones con tendencias   |
+| `business_metrics`   | 60        | Métricas mensuales agregadas             |
+| `documents`          | Variable  | Documentos subidos con texto extraído    |
+
+Para regenerar datos sintéticos:
 ```bash
-# Backend services
-cd [service-name]
-mvn test
-
-# Frontend
-cd frontend
-npm run test
-
-# AI Service
-cd ai-service
-pytest
+python3 database/generate_seed_data.py
 ```
 
-### Integration Tests
+## Configuración de base de datos
 
-```bash
-# Run integration tests for all services
-mvn verify
-```
-
-## Project Structure
-
-```
-.
-├── api-gateway/              # Spring Cloud Gateway
-├── product-service/          # Product microservice
-├── customer-service/         # Customer microservice
-├── sales-service/            # Sales microservice
-├── analytics-service/        # Analytics microservice
-├── document-service/         # Document microservice
-├── ai-service/               # Python FastAPI service
-├── frontend/                 # React TypeScript SPA
-├── database/                 # Database schema and seed data
-├── docs/                     # Documentation
-└── README.md                 # This file
-```
-
-## Configuration
-
-### Database Connection
-
-Update database credentials in each service's `application.yml`:
-
+Cada microservicio Java usa `application.yml`:
 ```yaml
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/businessai
     username: root
-    password: your_password
+    password: ${MYSQL_PASSWORD:}
 ```
 
-### AI Service Configuration
-
-Update database connection in `ai-service/database.py`:
-
-```python
-db = DatabaseConnection(
-    host="localhost",
-    user="root",
-    password="your_password",
-    database="businessai"
-)
+El AI Service lee la contraseña desde la variable de entorno:
+```bash
+export MYSQL_PASSWORD=tu_contraseña
 ```
 
-### Frontend API Configuration
-
-The frontend is configured to connect to the API Gateway at `http://localhost:8080`. Update in `frontend/src/services/api.ts` if needed.
-
-## Troubleshooting
-
-### Port Already in Use
-
-If a port is already in use, you can change the port in the service configuration:
-
-- **Frontend**: Update `frontend/vite.config.ts`
-- **Backend Services**: Update `application.yml` in each service
-- **AI Service**: Update `main.py`
-
-### Database Connection Issues
-
-Ensure MySQL is running and the database exists:
+## Tests
 
 ```bash
-mysql -u root -p
-CREATE DATABASE IF NOT EXISTS businessai;
+# Microservicios Java (desde cada directorio)
+mvn test
+
+# AI Service
+cd ai-service && pytest
+
+# Frontend
+cd frontend && npm test
 ```
 
-### Model Training Issues
+| Servicio           | Tests |
+|--------------------|-------|
+| Product Service    | 56    |
+| Customer Service   | 55    |
+| Sales Service      | 78    |
+| Analytics Service  | 32    |
+| Document Service   | 25    |
+| API Gateway        | 69    |
+| AI Service         | 105   |
+| Frontend           | 82    |
+| **Total**          | **502** |
 
-Ensure you have at least 24 months of historical data:
+## Solución de problemas
 
+**Puerto en uso:**
+```bash
+lsof -i :8080
+./stop-system.sh --force
+./start-system.sh
+```
+
+**Base de datos inaccesible:**
+```bash
+mysql -u root -p -e "SHOW DATABASES;"
+mysql -u root -p < database/schema.sql
+```
+
+**AI Service no inicia:**
+```bash
+tail -50 logs/ai-service.log
+# Verificar que MYSQL_PASSWORD esté exportado
+export MYSQL_PASSWORD=tu_contraseña
+```
+
+**Modelos de IA no entrenados:**
 ```bash
 cd ai-service
+source .venv/bin/activate
 python train_models.py
 ```
 
-## Performance Considerations
+**Frontend no compila:**
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
 
-- API Gateway implements request logging and error handling
-- Sales Service validates references synchronously with Product and Customer services
-- Analytics Service aggregates sales data into monthly metrics
-- AI Service uses LSTM models for forecasting with 80/20 train/validation split
-- Frontend uses React hooks for efficient state management
+## Estructura del proyecto
 
-## Security Notes
-
-- Email validation for customer records
-- Foreign key constraints on sales transactions
-- Input validation on all API endpoints
-- Error handling with appropriate HTTP status codes
-
-## Future Enhancements
-
-- Authentication and authorization
-- Real-time data updates with WebSockets
-- Advanced analytics and reporting
-- Mobile application
-- Containerization with Docker
-- Kubernetes deployment
-
-## Support
-
-For issues or questions, please refer to the documentation in the `docs/` directory or check individual service README files.
-
-## License
-
-This project is part of the BusinessAI Analytics platform.
+```
+BusinessAI-Analytics/
+├── start-system.sh
+├── stop-system.sh
+├── check-system.sh
+├── setup-database.sh
+├── database/              # Esquema SQL y generador de datos
+├── api-gateway/           # Spring Cloud Gateway
+├── product-service/       # Microservicio productos
+├── customer-service/      # Microservicio clientes
+├── sales-service/         # Microservicio ventas
+├── analytics-service/     # Microservicio analítica
+├── document-service/      # Microservicio documentos
+├── ai-service/            # FastAPI + modelos LSTM
+├── frontend/              # React TypeScript SPA
+└── logs/                  # Logs en tiempo de ejecución
+```

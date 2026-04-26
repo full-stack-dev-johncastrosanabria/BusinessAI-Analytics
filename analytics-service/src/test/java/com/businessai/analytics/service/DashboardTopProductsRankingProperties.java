@@ -164,8 +164,8 @@ public class DashboardTopProductsRankingProperties {
             @ForAll @IntRange(min = 1, max = 4) Integer productCount,
             @ForAll @IntRange(min = 1, max = 50) Integer transactionCount) {
 
-        // Create transactions for products
-        List<SalesTransaction> transactions = createRandomTransactions(productCount, transactionCount);
+        // Create transactions ensuring every product gets at least one transaction
+        List<SalesTransaction> transactions = createTransactionsWithAllProducts(productCount, transactionCount);
 
         // Calculate revenue per product
         Map<Long, BigDecimal> productRevenue = aggregateProductRevenue(transactions);
@@ -174,8 +174,12 @@ public class DashboardTopProductsRankingProperties {
         List<ProductRevenue> topProducts = getTopProducts(productRevenue, 5);
 
         // Verify all products are returned when fewer than 5
-        assert topProducts.size() == productCount :
-            String.format("Expected %d products but got %d", productCount, topProducts.size());
+        assert topProducts.size() == productRevenue.size() :
+            String.format("Expected %d products but got %d", productRevenue.size(), topProducts.size());
+
+        // Also verify we don't exceed productCount
+        assert topProducts.size() <= productCount :
+            String.format("Expected at most %d products but got %d", productCount, topProducts.size());
     }
 
     /**
@@ -188,6 +192,30 @@ public class DashboardTopProductsRankingProperties {
         for (int i = 0; i < transactionCount; i++) {
             long productId = (long) (random.nextInt(productCount) + 1);
             BigDecimal amount = BigDecimal.valueOf(Math.random() * 10000);
+            transactions.add(new SalesTransaction(productId, amount));
+        }
+
+        return transactions;
+    }
+
+    /**
+     * Helper method to create transactions ensuring every product gets at least one transaction
+     */
+    private List<SalesTransaction> createTransactionsWithAllProducts(Integer productCount, Integer transactionCount) {
+        List<SalesTransaction> transactions = new ArrayList<>();
+        Random random = new Random();
+
+        // First, ensure each product gets at least one transaction
+        for (long productId = 1; productId <= productCount; productId++) {
+            BigDecimal amount = BigDecimal.valueOf(1000 + random.nextInt(9000));
+            transactions.add(new SalesTransaction(productId, amount));
+        }
+
+        // Add remaining random transactions (only if transactionCount > productCount)
+        int remaining = transactionCount - productCount;
+        for (int i = 0; i < remaining; i++) {
+            long productId = (long) (random.nextInt(productCount) + 1);
+            BigDecimal amount = BigDecimal.valueOf(1000 + random.nextInt(9000));
             transactions.add(new SalesTransaction(productId, amount));
         }
 

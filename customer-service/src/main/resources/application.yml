@@ -6,9 +6,9 @@ spring:
     name: customer-service
   
   datasource:
-    url: jdbc:mysql://localhost:3306/businessai_analytics?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/businessai?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password: ${MYSQL_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
   
   jpa:

@@ -616,9 +616,14 @@ describe('End-to-End Workflow Tests', () => {
     });
 
     it('should verify forecast contains exactly 12 months', async () => {
+      // Generate 12 months starting from 2024-02 through 2025-01
+      const months = [
+        '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07',
+        '2024-08', '2024-09', '2024-10', '2024-11', '2024-12', '2025-01'
+      ];
       const forecast = {
-        predictions: Array.from({ length: 12 }, (_, i) => ({
-          month: `2024-${String(i + 2).padStart(2, '0')}`,
+        predictions: months.map((month, i) => ({
+          month,
           value: 50000 + i * 1000
         }))
       };
@@ -630,7 +635,7 @@ describe('End-to-End Workflow Tests', () => {
       const result = await mockedAxios.post('/api/ai/forecast/sales', {});
       expect(result.data.predictions).toHaveLength(12);
       expect(result.data.predictions[0].month).toBe('2024-02');
-      expect(result.data.predictions[11].month).toBe('2024-01');
+      expect(result.data.predictions[11].month).toBe('2025-01');
     });
   });
 

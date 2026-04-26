@@ -1,14 +1,18 @@
 package com.businessai.analytics.service;
 
-import com.businessai.analytics.entity.BusinessMetric;
-import net.jqwik.api.*;
-import net.jqwik.api.constraints.BigRange;
-import net.jqwik.api.constraints.IntRange;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import com.businessai.analytics.entity.BusinessMetric;
+
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Report;
+import net.jqwik.api.Reporting;
+import net.jqwik.api.Tag;
+import net.jqwik.api.constraints.IntRange;
 
 /**
  * Property 11: Dashboard Best and Worst Month Identification
@@ -115,7 +119,10 @@ public class DashboardBestWorstMonthProperties {
                 .count() > 1;
 
         if (profitsDiffer) {
-            assert !bestMonth.getId().equals(worstMonth.getId()) :
+            // Compare by month/year since IDs are not set (objects not persisted)
+            boolean sameMonth = bestMonth.getMonth().equals(worstMonth.getMonth())
+                    && bestMonth.getYear().equals(worstMonth.getYear());
+            assert !sameMonth :
                 "Best and worst months should be different when profits vary";
         }
     }

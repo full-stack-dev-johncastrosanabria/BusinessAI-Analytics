@@ -127,6 +127,12 @@
                 <version>3.2.2</version>
                 <configuration>
                     <argLine>-Dnet.bytebuddy.experimental=true</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/*TestCase.java</include>
+                        <include>**/*Properties.java</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>

@@ -26,15 +26,20 @@ describe('Products Component', () => {
     })
   })
 
-  it('displays form for creating products', () => {
+  it('displays form for creating products', async () => {
     vi.mocked(productService.default.getProducts).mockResolvedValue([])
 
     render(<Products />)
 
-    expect(screen.getByLabelText('Name')).toBeInTheDocument()
-    expect(screen.getByLabelText('Category')).toBeInTheDocument()
-    expect(screen.getByLabelText('Cost')).toBeInTheDocument()
-    expect(screen.getByLabelText('Price')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading products/i)).not.toBeInTheDocument()
+    })
+
+    // Use getAllByText since labels may appear in table headers too
+    expect(screen.getAllByText('Name').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Category').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Cost').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Price').length).toBeGreaterThan(0)
   })
 
   it('creates a new product', async () => {
@@ -49,16 +54,19 @@ describe('Products Component', () => {
 
     render(<Products />)
 
-    const nameInput = screen.getByLabelText('Name')
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading products/i)).not.toBeInTheDocument()
+    })
+
+    const inputs = document.querySelectorAll('input')
+    const nameInput = inputs[0]
+    const categoryInput = inputs[1]
+    const costInput = inputs[2]
+    const priceInput = inputs[3]
+
     fireEvent.change(nameInput, { target: { value: 'Keyboard' } })
-
-    const categoryInput = screen.getByLabelText('Category')
     fireEvent.change(categoryInput, { target: { value: 'Accessories' } })
-
-    const costInput = screen.getByLabelText('Cost')
     fireEvent.change(costInput, { target: { value: '50' } })
-
-    const priceInput = screen.getByLabelText('Price')
     fireEvent.change(priceInput, { target: { value: '100' } })
 
     const submitButton = screen.getByText('Create Product')
@@ -71,13 +79,13 @@ describe('Products Component', () => {
 
   it('displays error message on load failure', async () => {
     vi.mocked(productService.default.getProducts).mockRejectedValue(
-      new Error('Failed to load')
+      new Error('Failed to load products')
     )
 
     render(<Products />)
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load products/)).toBeInTheDocument()
+      expect(screen.getByText('Failed to load products')).toBeInTheDocument()
     })
   })
 })

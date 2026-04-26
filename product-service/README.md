@@ -1,111 +1,57 @@
 # Product Service
 
-The Product Service is a Spring Boot microservice that manages product CRUD operations for the BusinessAI-Analytics platform.
+Microservicio para gestión del catálogo de productos.
 
-## Overview
+## Stack
 
-- **Port**: 8081
-- **Technology**: Java 17, Spring Boot 3.2.0, Spring Data JPA, MySQL
-- **Purpose**: Manage product information including name, category, cost, and price
+- Java 17 · Spring Boot 3.2.0 · Spring Data JPA · MySQL 8.0
+- Puerto: **8081**
 
-## Prerequisites
-
-- Java 17 or higher
-- Maven 3.9+
-- MySQL 8.0+ running on localhost:3306
-- Database `businessai_analytics` created and schema initialized
-
-## Configuration
-
-The service connects to MySQL using the following default configuration (see `application.yml`):
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/businessai_analytics
-    username: root
-    password: root
-```
-
-Update these values in `src/main/resources/application.yml` if your database configuration differs.
-
-## Running the Service
-
-### Using Maven
+## Ejecución
 
 ```bash
-# From the product-service directory
+cd product-service
 mvn spring-boot:run
 ```
 
-### Using Java
+Health check: `http://localhost:8081/actuator/health`
 
-```bash
-# Build the project
-mvn clean package
+## API
 
-# Run the JAR
-java -jar target/product-service-1.0.0.jar
+| Método | Ruta                   | Descripción              |
+|--------|------------------------|--------------------------|
+| POST   | `/api/products`        | Crear producto           |
+| GET    | `/api/products`        | Listar todos             |
+| GET    | `/api/products/{id}`   | Obtener por ID           |
+| PUT    | `/api/products/{id}`   | Actualizar producto      |
+| DELETE | `/api/products/{id}`   | Eliminar producto        |
+
+### Ejemplo de entidad
+
+```json
+{
+  "id": 1,
+  "name": "Laptop Pro 15",
+  "category": "Electronics",
+  "cost": 800.00,
+  "price": 1200.00
+}
 ```
 
-The service will start on port 8081. You can verify it's running by accessing:
-- Health check: http://localhost:8081/actuator/health
+## Validaciones
 
-## API Endpoints
+- `name`: requerido, no vacío
+- `category`: requerido
+- `cost`, `price`: ≥ 0
 
-The Product Service will expose the following REST endpoints (to be implemented in subsequent tasks):
-
-- `POST /api/products` - Create a new product
-- `GET /api/products/{id}` - Retrieve a product by ID
-- `GET /api/products` - List all products
-- `PUT /api/products/{id}` - Update a product
-- `DELETE /api/products/{id}` - Delete a product
-
-## Testing
-
-Run the tests using Maven:
+## Tests
 
 ```bash
 mvn test
 ```
 
-## Project Structure
+56 tests — unitarios y property-based (jqwik).
 
-```
-product-service/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/businessai/product/
-│   │   │       └── ProductServiceApplication.java
-│   │   └── resources/
-│   │       └── application.yml
-│   └── test/
-│       └── java/
-│           └── com/businessai/product/
-│               └── ProductServiceApplicationTests.java
-├── pom.xml
-└── README.md
-```
+## Categorías de productos en datos semilla
 
-## Dependencies
-
-Key dependencies include:
-- Spring Boot Starter Web - REST API support
-- Spring Boot Starter Data JPA - Database persistence
-- MySQL Connector - MySQL database driver
-- Spring Boot Starter Validation - Input validation
-- Spring Boot Starter Actuator - Health checks and monitoring
-
-## Related Services
-
-- **API Gateway** (port 8080) - Routes requests to this service
-- **Database** - MySQL database storing product data
-
-## Requirements Satisfied
-
-This service structure satisfies the following requirements:
-- **21.1**: Independent Spring Boot microservice
-- **21.4**: Own package structure
-- **21.5**: Connects to MySQL database
-- **21.7**: Independently deployable and runnable
+Electronics · Furniture · Clothing · Food · Books

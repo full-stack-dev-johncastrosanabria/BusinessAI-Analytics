@@ -45,7 +45,7 @@ def main():
         db = DatabaseConnection(
             host="localhost",
             user="root",
-            password="",
+            password=None,  # Will use MYSQL_PASSWORD env var
             database="businessai"
         )
 
@@ -116,34 +116,42 @@ def main():
             sequence_length=12
         )
 
-        cost_mape = cost_model.train_model(
-            cost_data,
-            epochs=50,
-            batch_size=16
-        )
-
-        logger.info(f"Cost Model Training Complete")
-        logger.info(f"Cost Model Validation MAPE: {cost_mape:.4f}%")
-
-        if cost_mape < 20:
-            logger.info("✓ Cost model meets MAPE requirement (< 20%)")
-        else:
-            logger.warning(
-                f"⚠ Cost model MAPE {cost_mape:.4f}% exceeds "
-                f"target of 20%"
+        try:
+            cost_mape = cost_model.train_model(
+                cost_data,
+                epochs=50,
+                batch_size=16
             )
 
-        # Save cost model
-        cost_model_path = models_dir / "cost_forecast_model.h5"
-        cost_model.save_model(str(cost_model_path))
-        logger.info(f"Cost model saved to: {cost_model_path}")
+            logger.info(f"Cost Model Training Complete")
+            logger.info(f"Cost Model Validation MAPE: {cost_mape:.4f}%")
+
+            if cost_mape < 20:
+                logger.info("✓ Cost model meets MAPE requirement (< 20%)")
+            else:
+                logger.warning(
+                    f"⚠ Cost model MAPE {cost_mape:.4f}% exceeds "
+                    f"target of 20%"
+                )
+
+            # Save cost model
+            cost_model_path = models_dir / "cost_forecast_model.h5"
+            cost_model.save_model(str(cost_model_path))
+            logger.info(f"Cost model saved to: {cost_model_path}")
+        except ImportError as e:
+            logger.warning(f"⚠ Cost model training skipped: {e}")
+            logger.warning("⚠ TensorFlow is not available. Only sales forecasting will work.")
+            cost_mape = None
 
         # Print summary
         logger.info("=" * 60)
         logger.info("Training Summary")
         logger.info("=" * 60)
         logger.info(f"Sales Model MAPE: {sales_mape:.4f}%")
-        logger.info(f"Cost Model MAPE: {cost_mape:.4f}%")
+        if cost_mape is not None:
+            logger.info(f"Cost Model MAPE: {cost_mape:.4f}%")
+        else:
+            logger.info("Cost Model: Not trained (TensorFlow unavailable)")
         logger.info(f"Models saved to: {models_dir}")
         logger.info("=" * 60)
 

@@ -7,6 +7,7 @@ from mysql.connector import Error
 import logging
 from typing import List, Dict, Any, Optional
 import numpy as np
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -14,17 +15,21 @@ logger = logging.getLogger(__name__)
 class DatabaseConnection:
     """MySQL database connection pool and query utilities"""
     
-    def __init__(self, host="localhost", user="root", password="", database="businessai"):
+    def __init__(self, host="localhost", user="root", password=None, database="businessai"):
         """
         Initialize database connection
         
         Args:
             host: MySQL host
             user: MySQL user
-            password: MySQL password
+            password: MySQL password (defaults to MYSQL_PASSWORD env var)
             database: Database name
         """
         try:
+            # Use environment variable if password not provided
+            if password is None:
+                password = os.getenv("MYSQL_PASSWORD", "")
+            
             self.connection = mysql.connector.connect(
                 host=host,
                 user=user,
@@ -303,4 +308,199 @@ class DatabaseConnection:
             return results
         except Exception as e:
             logger.error(f"Error retrieving top products: {e}")
+            raise
+
+    def get_top_customers(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Get top customers by purchase amount
+        
+        Args:
+            limit: Maximum number of customers to return
+        
+        Returns:
+            List of top customers with purchase information
+        """
+        try:
+            query = """
+            SELECT 
+                c.id,
+                c.name,
+                c.segment,
+                c.country,
+                SUM(st.total_amount) as total_purchases,
+                COUNT(st.id) as transaction_count
+            FROM customers c
+            JOIN sales_transactions st ON c.id = st.customer_id
+            GROUP BY c.id, c.name, c.segment, c.country
+            ORDER BY total_purchases DESC
+            LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info(f"Retrieved {len(results)} top customers")
+            return results
+        except Error as e:
+            logger.error(f"Error getting top customers: {e}")
+            raise
+    
+    def get_sales_for_period(self, year: int, month: int) -> Optional[Dict[str, Any]]:
+        """
+        Get sales metrics for a specific period
+        
+        Args:
+            year: Year
+            month: Month (1-12)
+        
+        Returns:
+            Sales metrics for the period or None if not found
+        """
+        try:
+            query = """
+            SELECT year, month, total_sales, total_costs, profit
+            FROM business_metrics
+            WHERE year = %s AND month = %s
+            """
+            results = self.execute_query(query, (year, month))
+            if results:
+                logger.info(f"Retrieved sales for {month}/{year}")
+                return results[0]
+            logger.info(f"No sales data found for {month}/{year}")
+            return None
+        except Error as e:
+            logger.error(f"Error getting sales for period: {e}")
+            raise
+    
+    def get_product_by_name(self, name_pattern: str) -> List[Dict[str, Any]]:
+        """
+        Search products by name pattern
+        
+        Args:
+            name_pattern: Pattern to search for in product names
+        
+        Returns:
+            List of matching products
+        """
+        try:
+            query = """
+            SELECT id, name, category, price
+            FROM products
+            WHERE LOWER(name) LIKE LOWER(%s)
+            LIMIT 10
+            """
+            pattern = f"%{name_pattern}%"
+            results = self.execute_query(query, (pattern,))
+            logger.info(f"Found {len(results)} products matching '{name_pattern}'")
+            return results
+        except Error as e:
+            logger.error(f"Error searching products: {e}")
+            raise
+
+    def get_all_sales_metrics(self) -> List[Dict[str, Any]]:
+        """Get all business metrics (no limit) for aggregate calculations."""
+        try:
+            query = """
+                SELECT month, year, total_sales, total_costs, profit
+                FROM business_metrics
+                ORDER BY year DESC, month DESC
+            """
+            results = self.execute_query(query)
+            logger.info("Retrieved %d total sales metrics", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving all sales metrics: %s", e)
+            raise
+
+    def get_transaction_count(self, year: int = None, month: int = None) -> int:
+        """Count sales transactions, optionally filtered by period."""
+        try:
+            if year and month:
+                query = """
+                    SELECT COUNT(*) as cnt FROM sales_transactions
+                    WHERE YEAR(transaction_date) = %s AND MONTH(transaction_date) = %s
+                """
+                results = self.execute_query(query, (year, month))
+            elif year:
+                query = """
+                    SELECT COUNT(*) as cnt FROM sales_transactions
+                    WHERE YEAR(transaction_date) = %s
+                """
+                results = self.execute_query(query, (year,))
+            else:
+                query = "SELECT COUNT(*) as cnt FROM sales_transactions"
+                results = self.execute_query(query)
+            return int(results[0]['cnt']) if results else 0
+        except Error as e:
+            logger.error("Error counting transactions: %s", e)
+            raise
+
+    def get_revenue_by_category(self) -> List[Dict[str, Any]]:
+        """Get total revenue grouped by product category."""
+        try:
+            query = """
+                SELECT
+                    p.category,
+                    SUM(st.total_amount) as total_revenue,
+                    COUNT(st.id) as transaction_count
+                FROM products p
+                JOIN sales_transactions st ON p.id = st.product_id
+                GROUP BY p.category
+                ORDER BY total_revenue DESC
+            """
+            results = self.execute_query(query)
+            logger.info("Retrieved revenue for %d categories", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving revenue by category: %s", e)
+            raise
+
+    def get_customers_by_country(self, country: str) -> List[Dict[str, Any]]:
+        """Get customers filtered by country."""
+        try:
+            query = """
+                SELECT id, name, email, segment, country
+                FROM customers
+                WHERE LOWER(country) = LOWER(%s)
+                ORDER BY name
+            """
+            results = self.execute_query(query, (country,))
+            logger.info("Found %d customers from %s", len(results), country)
+            return results
+        except Error as e:
+            logger.error("Error retrieving customers by country: %s", e)
+            raise
+
+    def get_customers_by_segment(self, segment: str) -> List[Dict[str, Any]]:
+        """Get customers filtered by segment."""
+        try:
+            query = """
+                SELECT id, name, email, segment, country
+                FROM customers
+                WHERE LOWER(segment) = LOWER(%s)
+                ORDER BY name
+            """
+            results = self.execute_query(query, (segment,))
+            logger.info("Found %d customers in segment %s", len(results), segment)
+            return results
+        except Error as e:
+            logger.error("Error retrieving customers by segment: %s", e)
+            raise
+
+    def get_top_customers_by_orders(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get top customers ranked by number of transactions."""
+        try:
+            query = """
+                SELECT
+                    c.id, c.name, c.segment, c.country,
+                    COUNT(st.id) as transaction_count,
+                    SUM(st.total_amount) as total_purchases
+                FROM customers c
+                JOIN sales_transactions st ON c.id = st.customer_id
+                GROUP BY c.id, c.name, c.segment, c.country
+                ORDER BY transaction_count DESC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved top %d customers by orders", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving top customers by orders: %s", e)
             raise

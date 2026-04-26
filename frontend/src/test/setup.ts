@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { expect, afterEach, vi } from 'vitest'
+import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 // Cleanup after each test
@@ -21,3 +21,16 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 })
+
+// Mock scrollIntoView (not implemented in jsdom)
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+
+// Mock window.confirm
+window.confirm = vi.fn(() => true)
+
+// Mock ResizeObserver (used by recharts, not implemented in jsdom)
+globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))

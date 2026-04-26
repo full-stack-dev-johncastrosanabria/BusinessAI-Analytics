@@ -1,77 +1,62 @@
 # Customer Service
 
-The Customer Service is a Spring Boot microservice that manages customer CRUD operations for the BusinessAI-Analytics platform.
+Microservicio para gestión de clientes con validación de email.
 
-## Overview
+## Stack
 
-- **Port**: 8082
-- **Database**: businessai_analytics (MySQL)
-- **Technology**: Java 17, Spring Boot 3.2.0, Spring Data JPA
+- Java 17 · Spring Boot 3.2.0 · Spring Data JPA · MySQL 8.0
+- Puerto: **8082**
 
-## Features
-
-- Create, read, update, and delete customers
-- Email format validation
-- Unique email constraint enforcement
-- RESTful API endpoints
-
-## API Endpoints
-
-- `POST /api/customers` - Create a new customer
-- `GET /api/customers/{id}` - Retrieve customer by ID
-- `GET /api/customers` - List all customers
-- `PUT /api/customers/{id}` - Update customer
-- `DELETE /api/customers/{id}` - Delete customer
-
-## Running the Service
-
-### Prerequisites
-
-- Java 17
-- MySQL 8.0 running on localhost:3306
-- Database `businessai_analytics` created and schema applied
-
-### Start the Service
+## Ejecución
 
 ```bash
 cd customer-service
 mvn spring-boot:run
 ```
 
-The service will start on port 8082.
+Health check: `http://localhost:8082/actuator/health`
 
-### Run Tests
+## API
+
+| Método | Ruta                    | Descripción              |
+|--------|-------------------------|--------------------------|
+| POST   | `/api/customers`        | Crear cliente            |
+| GET    | `/api/customers`        | Listar todos             |
+| GET    | `/api/customers/{id}`   | Obtener por ID           |
+| PUT    | `/api/customers/{id}`   | Actualizar cliente       |
+| DELETE | `/api/customers/{id}`   | Eliminar cliente         |
+
+### Ejemplo de entidad
+
+```json
+{
+  "id": 1,
+  "name": "Christopher Miller",
+  "email": "christopher.miller@example.com",
+  "segment": "SMB",
+  "country": "Australia"
+}
+```
+
+## Validaciones
+
+- `name`: requerido, no vacío
+- `email`: requerido, formato válido, **único** en toda la tabla
+- `segment`: requerido (Enterprise / SMB / Startup)
+- `country`: requerido
+
+## Tests
 
 ```bash
 mvn test
 ```
 
-## Configuration
+55 tests — unitarios y property-based (jqwik).
 
-Configuration is in `src/main/resources/application.yml`:
+## Segmentos disponibles
 
-- Server port: 8082
-- Database connection: localhost:3306/businessai_analytics
-- JPA settings: ddl-auto=none (schema managed externally)
+Enterprise · SMB · Startup
 
-## Customer Entity
+## Países en datos semilla
 
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "segment": "Enterprise",
-  "country": "USA",
-  "createdAt": "2024-01-15T10:30:00",
-  "updatedAt": "2024-01-15T10:30:00"
-}
-```
-
-## Validation Rules
-
-- **name**: Required, not empty
-- **email**: Required, valid email format (contains @ and domain)
-- **segment**: Required, not empty
-- **country**: Required, not empty
-- **email uniqueness**: Email must be unique across all customers
+USA · Canada · UK · Germany · France · Japan · Australia · Brazil · India · Singapore

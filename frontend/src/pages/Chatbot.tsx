@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import aiService, { ChatbotResponse } from '../services/aiService'
+import aiService from '../services/aiService'
 import './Chatbot.css'
 
 interface Message {

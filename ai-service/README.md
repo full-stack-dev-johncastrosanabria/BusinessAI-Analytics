@@ -1,140 +1,159 @@
 # AI Service
 
-FastAPI-based AI service for the BusinessAI-Analytics platform providing forecasting and chatbot capabilities.
+Servicio Python (FastAPI) que provee pronósticos con modelos LSTM y un asistente empresarial bilingüe con acceso a base de datos y documentos.
 
-## Features
+## Stack
 
-- **Sales Forecasting**: PyTorch LSTM model for 12-month sales predictions
-- **Cost Forecasting**: TensorFlow LSTM model for 12-month cost predictions
-- **Profit Forecasting**: Calculated from sales and cost forecasts
-- **Chatbot**: Intent-based query processor with database and document search capabilities
+- Python 3.9+ · FastAPI · PyTorch · MySQL 8.0
+- Puerto: **8000**
 
-## Requirements
+## Instalación
 
-- Python 3.9+
-- FastAPI 0.104.1
-- PyTorch 2.1.1
-- TensorFlow 2.14.0
-- MySQL 8.0
-
-## Installation
-
-1. Create a virtual environment:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-2. Install dependencies:
-```bash
+cd ai-service
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Configuration
+## Configuración
 
-Update database connection settings in `main.py`:
-```python
-db_connection = DatabaseConnection(
-    host="localhost",
-    user="root",
-    password="",
-    database="businessai"
-)
-```
+La contraseña de MySQL se lee desde la variable de entorno:
 
-## Running the Service
-
-1. Train models (first time only):
 ```bash
-python -c "from main import *; import asyncio; asyncio.run(train_models())"
+export MYSQL_PASSWORD=tu_contraseña
 ```
 
-2. Start the service:
+## Ejecución
+
 ```bash
-python main.py
+# Primera vez: entrenar modelos
+source .venv/bin/activate
+python train_models.py
+
+# Iniciar servicio
+MYSQL_PASSWORD=tu_contraseña .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-The service will run on `http://localhost:8000`
+## Endpoints
 
-## API Endpoints
+### Pronósticos
 
-### Forecasting
-
-- `POST /api/ai/forecast/sales` - Generate 12-month sales forecast
-- `POST /api/ai/forecast/costs` - Generate 12-month cost forecast
-- `POST /api/ai/forecast/profit` - Generate 12-month profit forecast
+| Método | Ruta                      | Descripción                        |
+|--------|---------------------------|------------------------------------|
+| POST   | `/api/ai/forecast/sales`  | Pronóstico de ventas a 12 meses    |
+| POST   | `/api/ai/forecast/costs`  | Pronóstico de costos a 12 meses    |
+| POST   | `/api/ai/forecast/profit` | Pronóstico de ganancias a 12 meses |
+| POST   | `/api/ai/train`           | Entrenar modelos (admin)           |
 
 ### Chatbot
 
-- `POST /api/ai/chatbot/query` - Process natural language question
+| Método | Ruta                      | Descripción                        |
+|--------|---------------------------|------------------------------------|
+| POST   | `/api/ai/chatbot/query`   | Consulta en lenguaje natural       |
 
-### Training
-
-- `POST /api/ai/train` - Train forecasting models
+**Ejemplo:**
+```bash
+curl -X POST http://localhost:8000/api/ai/chatbot/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "¿Cuál fue nuestro mes más rentable?"}'
+```
 
 ### Health
 
-- `GET /health` - Health check endpoint
-
-## Testing
-
-Run tests with pytest:
 ```bash
-pytest tests/
+GET /health
 ```
 
-Run property-based tests:
-```bash
-pytest tests/ -m pbt
-```
+## Chatbot — Capacidades
 
-## Project Structure
+El asistente entiende preguntas en **inglés y español** y consulta la base de datos en tiempo real.
+
+### Tipos de consultas soportadas
+
+| Categoría       | Ejemplos                                                        |
+|-----------------|-----------------------------------------------------------------|
+| Ventas/ingresos | "¿Cuánto vendimos en 2024?", "Sales for Q3 2023"               |
+| Mes específico  | "¿Cuánto fue la ganancia en marzo 2024?"                        |
+| Trimestre       | "Show me sales performance for Q3 2023"                         |
+| Año completo    | "What is our total revenue for 2024?"                           |
+| Comparación     | "Compare sales between January and June 2024"                   |
+| Tendencias      | "¿Cuál es la tendencia de ventas de los últimos 6 meses?"       |
+| Mejor/peor mes  | "¿Cuál fue nuestro mes más rentable?", "Worst performing month" |
+| Margen promedio | "What is our average profit margin across all months?"          |
+| Productos       | "¿Cuál es nuestro producto más vendido?", "Top products"        |
+| Categorías      | "¿Qué categoría genera más ingresos?"                           |
+| Clientes        | "Who is our best customer?", "¿Quién es nuestro mejor cliente?" |
+| Por segmento    | "¿Qué clientes son del segmento Enterprise?"                    |
+| Por país        | "Which customers are from the USA?"                             |
+| Por pedidos     | "Top customers by number of orders"                             |
+| Documentos      | "¿Qué documentos tenemos sobre contratos?"                      |
+
+## Modelos de IA
+
+### Sales Forecast (PyTorch LSTM)
+- Arquitectura: 2 capas LSTM, 64 unidades cada una
+- Entrenamiento: split 80/20 train/validación
+- Secuencia de entrada: 12 meses
+- Métrica objetivo: MAPE < 20%
+- Modelo guardado en: `trained_models/sales_forecast_model.pt`
+
+### Cost Forecast (TensorFlow LSTM)
+- Misma arquitectura que el modelo de ventas
+- Nota: TensorFlow no es compatible con Python 3.14 — el modelo de costos requiere Python ≤ 3.12
+
+## Estructura
 
 ```
 ai-service/
-├── main.py                 # FastAPI application
-├── database.py             # Database connection and queries
-├── models/
-│   ├── sales_forecast.py   # PyTorch LSTM sales model
-│   └── cost_forecast.py    # TensorFlow LSTM cost model
+├── main.py                          # Aplicación FastAPI y endpoints
+├── database.py                      # Conexión MySQL y queries
+├── train_models.py                  # Script de entrenamiento
 ├── chatbot/
-│   ├── intent_classifier.py # Intent classification
-│   └── query_processor.py   # Query processing and routing
-├── tests/
-│   ├── test_training_data_split.py
-│   ├── test_profit_forecast.py
-│   ├── test_forecast_response_structure.py
-│   ├── test_chatbot_intent_classification.py
-│   └── test_document_search_ranking.py
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+│   ├── intent_classifier.py         # Clasificador de intención bilingüe (1 485 líneas)
+│   └── advanced_query_processor.py  # Procesador de consultas con acceso a BD
+├── models/
+│   ├── sales_forecast.py            # Modelo LSTM PyTorch
+│   └── cost_forecast.py             # Modelo LSTM TensorFlow
+├── trained_models/
+│   └── sales_forecast_model.pt      # Pesos del modelo entrenado
+├── tests/                           # 105 tests (pytest)
+├── requirements.txt
+└── pytest.ini
 ```
 
-## Model Training
+## Tests
 
-Models are trained on historical business metrics data with:
-- 80/20 train/validation split
-- 12-month sequence length
-- 2-layer LSTM architecture (64 units each)
-- Target MAPE < 20%
+```bash
+source .venv/bin/activate
+pytest tests/
+pytest tests/ -m pbt   # Solo property-based tests
+```
 
-## Chatbot Intent Classification
+| Archivo de test                          | Tests |
+|------------------------------------------|-------|
+| test_unit_endpoints.py                   | 17    |
+| test_forecast_response_structure.py      | 9     |
+| test_chatbot_intent_classification.py    | 4     |
+| test_document_search_ranking.py          | 4     |
+| test_profit_forecast.py                  | 8     |
+| test_training_data_split.py              | 4     |
+| test_ai_service_integration.py           | Variable |
+| **Total**                                | **105+** |
 
-The chatbot classifies questions into:
-- `sales_metrics` - Questions about sales, revenue, profit
-- `product_info` - Questions about products and inventory
-- `customer_info` - Questions about customers and segments
-- `document_search` - Questions about uploaded documents
-- `mixed` - Questions combining multiple domains
+## Solución de problemas
 
-## Error Handling
+**Servicio no inicia:**
+```bash
+tail -50 logs/ai-service.log
+# Verificar que MYSQL_PASSWORD esté exportado
+```
 
-All endpoints return appropriate HTTP status codes:
-- 200: Success
-- 400: Bad request (validation error, insufficient data)
-- 500: Server error
-- 503: Service unavailable (models not loaded)
+**Modelos no entrenados:**
+```bash
+source .venv/bin/activate
+python train_models.py
+```
 
-## Logging
-
-All operations are logged to console with timestamps and log levels.
+**TensorFlow no disponible (Python 3.14):**
+El pronóstico de costos no funcionará. El pronóstico de ventas (PyTorch) sí es compatible.

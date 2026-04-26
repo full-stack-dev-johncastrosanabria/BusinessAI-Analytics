@@ -25,14 +25,6 @@ import os
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Mock torch and tensorflow before importing models
-sys.modules['torch'] = MagicMock()
-sys.modules['torch.nn'] = MagicMock()
-sys.modules['torch.optim'] = MagicMock()
-sys.modules['tensorflow'] = MagicMock()
-sys.modules['tensorflow.keras'] = MagicMock()
-sys.modules['tensorflow.keras.layers'] = MagicMock()
-
 from database import DatabaseConnection
 
 

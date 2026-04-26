@@ -89,10 +89,12 @@ function Forecasts() {
           </div>
           {salesForecast ? (
             <>
-              <div className="forecast-metric">
-                <span>MAPE:</span>
-                <strong>{salesForecast.mape.toFixed(2)}%</strong>
-              </div>
+              {salesForecast.mape !== null && (
+                <div className="forecast-metric">
+                  <span>MAPE:</span>
+                  <strong>{salesForecast.mape.toFixed(2)}%</strong>
+                </div>
+              )}
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={salesForecast.predictions}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -118,10 +120,12 @@ function Forecasts() {
           </div>
           {costForecast ? (
             <>
-              <div className="forecast-metric">
-                <span>MAPE:</span>
-                <strong>{costForecast.mape.toFixed(2)}%</strong>
-              </div>
+              {costForecast.mape !== null && (
+                <div className="forecast-metric">
+                  <span>MAPE:</span>
+                  <strong>{costForecast.mape.toFixed(2)}%</strong>
+                </div>
+              )}
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={costForecast.predictions}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -147,10 +151,12 @@ function Forecasts() {
           </div>
           {profitForecast ? (
             <>
-              <div className="forecast-metric">
-                <span>MAPE:</span>
-                <strong>{profitForecast.mape.toFixed(2)}%</strong>
-              </div>
+              {profitForecast.mape !== null && (
+                <div className="forecast-metric">
+                  <span>MAPE:</span>
+                  <strong>{profitForecast.mape.toFixed(2)}%</strong>
+                </div>
+              )}
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={profitForecast.predictions}>
                   <CartesianGrid strokeDasharray="3 3" />

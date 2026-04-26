@@ -1,8 +1,8 @@
 package com.businessai.gateway;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.function.Consumer;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,9 +50,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/products")
             .exchange()
-            .expectStatus().value(status -> 
-                status >= 200 && status < 600  // Accept any response that shows routing occurred
-            );
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -72,7 +70,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(productJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -92,7 +90,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(productJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -101,7 +99,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.delete()
             .uri("/api/products/1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Customer Service Routing Tests ====================
@@ -112,7 +110,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/customers")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -132,7 +130,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(customerJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -152,7 +150,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(customerJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -161,7 +159,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.delete()
             .uri("/api/customers/1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Sales Service Routing Tests ====================
@@ -172,7 +170,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/sales")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -192,7 +190,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(transactionJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -201,7 +199,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/sales?dateFrom=2024-01-01&dateTo=2024-01-31&customerId=1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Analytics Service Routing Tests ====================
@@ -212,7 +210,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/analytics/metrics")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -233,7 +231,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(metricJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -242,7 +240,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/analytics/dashboard")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -253,7 +251,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Document Service Routing Tests ====================
@@ -264,7 +262,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/documents")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -273,7 +271,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/documents/1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -282,7 +280,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/documents/1/content")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -291,7 +289,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.delete()
             .uri("/api/documents/1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== AI Service Routing Tests ====================
@@ -304,7 +302,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -315,7 +313,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -326,7 +324,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -343,7 +341,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(queryJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Routing Path Prefix Tests ====================
@@ -354,7 +352,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/products/123/details")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -363,7 +361,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/customers/456/profile")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -372,7 +370,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/sales/789/details")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -381,7 +379,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/analytics/metrics/summary")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -390,7 +388,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/documents/101/metadata")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -401,7 +399,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== HTTP Status Code Tests ====================
@@ -423,7 +421,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{}")
             .exchange()
-            .expectStatus().value(status -> status == 405 || status >= 500);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status == 405 || status >= 500));
     }
 
     // ==================== Content Type Tests ====================
@@ -445,7 +443,7 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(productJson)
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Multiple Service Routing Tests ====================
@@ -458,25 +456,25 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/products")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
 
         // Request to Customer Service
         webTestClient.get()
             .uri("/api/customers")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
 
         // Request to Sales Service
         webTestClient.get()
             .uri("/api/sales")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
 
         // Request to Analytics Service
         webTestClient.get()
             .uri("/api/analytics/metrics")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Query Parameter Routing Tests ====================
@@ -487,7 +485,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/sales?dateFrom=2024-01-01&dateTo=2024-01-31")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     @Test
@@ -496,7 +494,7 @@ class MicroservicesRoutingIntegrationTest {
         webTestClient.get()
             .uri("/api/analytics/metrics?year=2024&month=1")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 
     // ==================== Error Handling in Routing Tests ====================
@@ -509,6 +507,6 @@ class MicroservicesRoutingIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{ invalid json }")
             .exchange()
-            .expectStatus().value(status -> status >= 200 && status < 600);
+            .expectStatus().value((Consumer<Integer>) status -> assertTrue(status >= 200 && status < 600));
     }
 }

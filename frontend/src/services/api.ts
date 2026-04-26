@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios'
 // Create axios instance with base URL pointing to API Gateway
 const api: AxiosInstance = axios.create({
   baseURL: 'http://localhost:8080',
-  timeout: 10000,
+  timeout: 30000, // Increased to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   },

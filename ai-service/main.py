@@ -3,8 +3,7 @@ FastAPI AI Service for BusinessAI-Analytics Platform
 Provides forecasting and chatbot capabilities
 """
 
-from fastapi import FastAPI, HTTPException, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
@@ -14,8 +13,9 @@ from datetime import datetime
 from database import DatabaseConnection
 from models.sales_forecast import SalesForecastModel
 from models.cost_forecast import CostForecastModel
-from chatbot.intent_classifier import IntentClassifier
+from chatbot.intent_classifier import IntentClassifier, AdvancedIntentClassifier
 from chatbot.query_processor import QueryProcessor
+from chatbot.advanced_query_processor import AdvancedQueryProcessor
 
 # Configure logging
 logging.basicConfig(
@@ -31,14 +31,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware for frontend access
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8080"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Note: CORS is handled by API Gateway, not needed here
 
 # Initialize components
 db_connection = None
@@ -46,6 +39,8 @@ sales_model = None
 cost_model = None
 intent_classifier = None
 query_processor = None
+advanced_classifier = None
+advanced_query_processor = None
 
 
 # Request/Response Models
@@ -85,6 +80,7 @@ class TrainingResponse(BaseModel):
 async def startup_event():
     """Initialize database connection and load models on startup"""
     global db_connection, sales_model, cost_model, intent_classifier, query_processor
+    global advanced_classifier, advanced_query_processor
     
     try:
         logger.info("Initializing AI Service...")
@@ -110,10 +106,15 @@ async def startup_event():
         else:
             logger.warning("Cost model not found, will need training")
         
-        # Initialize chatbot components
+        # Initialize chatbot components (both standard and advanced)
         intent_classifier = IntentClassifier()
         query_processor = QueryProcessor(db_connection)
-        logger.info("Chatbot components initialized")
+        
+        # Initialize advanced multilingual components
+        advanced_classifier = AdvancedIntentClassifier()
+        advanced_query_processor = AdvancedQueryProcessor(db_connection)
+        
+        logger.info("Chatbot components initialized (standard + advanced multilingual)")
         
         logger.info("AI Service startup complete")
     except Exception as e:
@@ -200,8 +201,15 @@ async def forecast_costs():
                 detail="Insufficient training data. Need at least 24 months of historical data."
             )
         
-        # Generate forecast
-        predictions, mape = cost_model.forecast(historical_data)
+        # Try to generate forecast
+        try:
+            predictions, mape = cost_model.forecast(historical_data)
+        except ImportError as ie:
+            # TensorFlow not available - return simple projection based on historical average
+            logger.warning(f"TensorFlow not available, using simple projection: {ie}")
+            avg_cost = sum(historical_data) / len(historical_data)
+            predictions = [avg_cost * 1.02 ** i for i in range(12)]  # 2% growth projection
+            mape = None
         
         # Format response
         forecast_data = []
@@ -245,9 +253,17 @@ async def forecast_profit():
                 detail="Insufficient training data. Need at least 24 months of historical data."
             )
         
-        # Generate forecasts
+        # Generate sales forecast
         sales_predictions, _ = sales_model.forecast(historical_data)
-        cost_predictions, _ = cost_model.forecast(historical_data)
+        
+        # Generate cost forecast with fallback for TensorFlow unavailability
+        try:
+            cost_predictions, _ = cost_model.forecast(historical_data)
+        except ImportError as ie:
+            # TensorFlow not available - use simple projection
+            logger.warning(f"TensorFlow not available for cost forecast, using simple projection: {ie}")
+            avg_cost = sum(historical_data) / len(historical_data)
+            cost_predictions = [avg_cost * 1.02 ** i for i in range(12)]  # 2% growth projection
         
         # Calculate profit
         profit_predictions = sales_predictions - cost_predictions
@@ -277,6 +293,7 @@ async def forecast_profit():
 async def process_chatbot_query(request: ChatbotQueryRequest):
     """
     Process a natural language question and return an answer
+    Supports both English and Spanish with automatic language detection
     
     Args:
         request: ChatbotQueryRequest with the question
@@ -287,14 +304,14 @@ async def process_chatbot_query(request: ChatbotQueryRequest):
     try:
         start_time = datetime.now()
         
-        if query_processor is None:
+        if advanced_query_processor is None:
             raise HTTPException(
                 status_code=503,
                 detail="Chatbot not initialized"
             )
         
-        # Process query
-        answer, sources = await query_processor.process_query(request.question)
+        # Process query with advanced multilingual processor
+        answer, sources = await advanced_query_processor.process_query(request.question)
         
         processing_time = (datetime.now() - start_time).total_seconds()
         
