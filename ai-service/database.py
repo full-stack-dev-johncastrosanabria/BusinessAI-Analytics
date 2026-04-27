@@ -504,3 +504,195 @@ class DatabaseConnection:
         except Error as e:
             logger.error("Error retrieving top customers by orders: %s", e)
             raise
+
+    def get_highest_transaction(self) -> Optional[Dict[str, Any]]:
+        """Get the highest single transaction"""
+        try:
+            query = """
+                SELECT st.id, st.customer_id, st.product_id, st.transaction_date,
+                       st.quantity, st.total_amount,
+                       c.name as customer_name, p.name as product_name
+                FROM sales_transactions st
+                JOIN customers c ON st.customer_id = c.id
+                JOIN products p ON st.product_id = p.id
+                ORDER BY st.total_amount DESC
+                LIMIT 1
+            """
+            results = self.execute_query(query)
+            return results[0] if results else None
+        except Error as e:
+            logger.error("Error retrieving highest transaction: %s", e)
+            return None
+
+    def get_top_products_by_revenue(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get top products by total revenue"""
+        try:
+            query = """
+                SELECT p.id, p.name, p.category, p.price, p.cost,
+                       COALESCE(SUM(st.quantity), 0) as total_units,
+                       COALESCE(SUM(st.total_amount), 0) as total_revenue,
+                       COALESCE(SUM(st.quantity * (p.price - p.cost)), 0) as estimated_profit,
+                       CASE WHEN p.price > 0 THEN ((p.price - p.cost) / p.price) * 100 ELSE 0 END as margin_percentage
+                FROM products p
+                LEFT JOIN sales_transactions st ON st.product_id = p.id
+                GROUP BY p.id, p.name, p.category, p.price, p.cost
+                ORDER BY total_revenue DESC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved top %d products by revenue", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving top products by revenue: %s", e)
+            return []
+
+    def get_top_products_by_quantity(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get top products by quantity sold"""
+        try:
+            query = """
+                SELECT p.id, p.name, p.category, p.price, p.cost,
+                       COALESCE(SUM(st.quantity), 0) as total_units,
+                       COALESCE(SUM(st.total_amount), 0) as total_revenue,
+                       COALESCE(SUM(st.quantity * (p.price - p.cost)), 0) as estimated_profit,
+                       CASE WHEN p.price > 0 THEN ((p.price - p.cost) / p.price) * 100 ELSE 0 END as margin_percentage
+                FROM products p
+                LEFT JOIN sales_transactions st ON st.product_id = p.id
+                GROUP BY p.id, p.name, p.category, p.price, p.cost
+                ORDER BY total_units DESC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved top %d products by quantity", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving top products by quantity: %s", e)
+            return []
+
+    def get_low_margin_high_volume_products(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get products with high volume but low margin"""
+        try:
+            query = """
+                SELECT p.id, p.name, p.category, p.price, p.cost,
+                       COALESCE(SUM(st.quantity), 0) as total_units,
+                       COALESCE(SUM(st.total_amount), 0) as total_revenue,
+                       COALESCE(SUM(st.quantity * (p.price - p.cost)), 0) as estimated_profit,
+                       CASE WHEN p.price > 0 THEN ((p.price - p.cost) / p.price) * 100 ELSE 0 END as margin_percentage
+                FROM products p
+                LEFT JOIN sales_transactions st ON st.product_id = p.id
+                GROUP BY p.id, p.name, p.category, p.price, p.cost
+                HAVING SUM(st.quantity) > 0
+                ORDER BY total_units DESC, margin_percentage ASC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved %d low-margin high-volume products", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving low-margin high-volume products: %s", e)
+            return []
+
+    def get_top_customers_by_revenue(self, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get top customers by total revenue"""
+        try:
+            query = """
+                SELECT c.id, c.name, c.segment, c.country,
+                       COUNT(st.id) as transaction_count,
+                       COALESCE(SUM(st.total_amount), 0) as total_revenue,
+                       COALESCE(SUM(st.quantity), 0) as total_quantity,
+                       COALESCE(AVG(st.total_amount), 0) as avg_transaction_value
+                FROM customers c
+                LEFT JOIN sales_transactions st ON st.customer_id = c.id
+                GROUP BY c.id, c.name, c.segment, c.country
+                ORDER BY total_revenue DESC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved top %d customers by revenue", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving top customers by revenue: %s", e)
+            return []
+
+    def get_sales_by_day(self) -> List[Dict[str, Any]]:
+        """Get sales aggregated by day"""
+        try:
+            query = """
+                SELECT DATE(transaction_date) as sale_date,
+                       COUNT(*) as transaction_count,
+                       SUM(total_amount) as daily_revenue,
+                       SUM(quantity) as daily_units
+                FROM sales_transactions
+                GROUP BY DATE(transaction_date)
+                ORDER BY daily_revenue DESC
+                LIMIT 10
+            """
+            results = self.execute_query(query)
+            logger.info("Retrieved sales by day")
+            return results
+        except Error as e:
+            logger.error("Error retrieving sales by day: %s", e)
+            return []
+
+    def get_sales_by_month(self) -> List[Dict[str, Any]]:
+        """Get sales aggregated by month"""
+        try:
+            query = """
+                SELECT YEAR(transaction_date) as year,
+                       MONTH(transaction_date) as month,
+                       COUNT(*) as transaction_count,
+                       SUM(total_amount) as monthly_revenue,
+                       SUM(quantity) as monthly_units
+                FROM sales_transactions
+                GROUP BY YEAR(transaction_date), MONTH(transaction_date)
+                ORDER BY year DESC, month DESC
+            """
+            results = self.execute_query(query)
+            logger.info("Retrieved sales by month")
+            return results
+        except Error as e:
+            logger.error("Error retrieving sales by month: %s", e)
+            return []
+
+    def get_small_transactions(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Get smallest transactions"""
+        try:
+            query = """
+                SELECT st.id, st.customer_id, st.product_id, st.transaction_date,
+                       st.quantity, st.total_amount,
+                       c.name as customer_name, p.name as product_name
+                FROM sales_transactions st
+                JOIN customers c ON st.customer_id = c.id
+                JOIN products p ON st.product_id = p.id
+                ORDER BY st.total_amount ASC
+                LIMIT %s
+            """
+            results = self.execute_query(query, (limit,))
+            logger.info("Retrieved %d smallest transactions", len(results))
+            return results
+        except Error as e:
+            logger.error("Error retrieving small transactions: %s", e)
+            return []
+
+    def get_segment_revenue_analysis(self) -> List[Dict[str, Any]]:
+        """Get revenue analysis by customer segment"""
+        try:
+            query = """
+                SELECT c.segment,
+                       COUNT(DISTINCT c.id) as customer_count,
+                       COUNT(st.id) as transaction_count,
+                       COALESCE(SUM(st.total_amount), 0) as total_revenue,
+                       COALESCE(AVG(st.total_amount), 0) as avg_transaction_value,
+                       CASE WHEN COUNT(DISTINCT c.id) > 0 
+                            THEN COALESCE(SUM(st.total_amount), 0) / COUNT(DISTINCT c.id)
+                            ELSE 0 END as avg_revenue_per_customer
+                FROM customers c
+                LEFT JOIN sales_transactions st ON st.customer_id = c.id
+                GROUP BY c.segment
+                ORDER BY avg_revenue_per_customer DESC
+            """
+            results = self.execute_query(query)
+            logger.info("Retrieved segment revenue analysis")
+            return results
+        except Error as e:
+            logger.error("Error retrieving segment revenue analysis: %s", e)
+            return []

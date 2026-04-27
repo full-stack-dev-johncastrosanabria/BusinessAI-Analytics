@@ -11,8 +11,7 @@ import os
 from datetime import datetime
 
 from database import DatabaseConnection
-from models.sales_forecast import SalesForecastModel
-from models.cost_forecast import CostForecastModel
+from models.hybrid_forecast import HybridForecastModel
 from chatbot.intent_classifier import IntentClassifier, AdvancedIntentClassifier
 from chatbot.query_processor import QueryProcessor
 from chatbot.advanced_query_processor import AdvancedQueryProcessor
@@ -90,18 +89,18 @@ async def startup_event():
         logger.info("Database connection initialized")
         
         # Load or initialize models
-        sales_model = SalesForecastModel()
-        cost_model = CostForecastModel()
+        sales_model = HybridForecastModel(sequence_length=12)
+        cost_model = HybridForecastModel(sequence_length=12)
         
         # Try to load pre-trained models
-        if os.path.exists("models/sales_model.pth"):
-            sales_model.load_model("models/sales_model.pth")
+        if os.path.exists("trained_models/sales_forecast_model.pt"):
+            sales_model.load_model("trained_models/sales_forecast_model.pt")
             logger.info("Sales model loaded from disk")
         else:
             logger.warning("Sales model not found, will need training")
         
-        if os.path.exists("models/cost_model.h5"):
-            cost_model.load_model("models/cost_model.h5")
+        if os.path.exists("trained_models/cost_forecast_model.pt"):
+            cost_model.load_model("trained_models/cost_forecast_model.pt")
             logger.info("Cost model loaded from disk")
         else:
             logger.warning("Cost model not found, will need training")
@@ -361,8 +360,8 @@ async def train_models(request: TrainingRequest = None):
             )
         
         # Train models
-        sales_mape = sales_model.train(historical_data)
-        cost_mape = cost_model.train(historical_data)
+        sales_mape = sales_model.train_model(historical_data)
+        cost_mape = cost_model.train_model(historical_data)
         
         # Save models
         os.makedirs("models", exist_ok=True)

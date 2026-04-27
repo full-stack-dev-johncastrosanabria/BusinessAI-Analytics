@@ -1,17 +1,17 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import ErrorBoundary from '../ErrorBoundary'
+import { ReactErrorBoundary } from '../ReactErrorBoundary'
 
 const ThrowError = () => {
   throw new Error('Test error')
 }
 
-describe('ErrorBoundary Component', () => {
+describe('ReactErrorBoundary Component', () => {
   it('renders children when there is no error', () => {
     render(
-      <ErrorBoundary>
+      <ReactErrorBoundary>
         <div>Test content</div>
-      </ErrorBoundary>
+      </ReactErrorBoundary>
     )
 
     expect(screen.getByText('Test content')).toBeInTheDocument()
@@ -22,24 +22,23 @@ describe('ErrorBoundary Component', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
 
     render(
-      <ErrorBoundary>
+      <ReactErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>
+      </ReactErrorBoundary>
     )
 
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-    expect(screen.getByText('Test error')).toBeInTheDocument()
+    expect(screen.getByText(/Something went wrong/i)).toBeInTheDocument()
   })
 
-  it('displays reload button', () => {
+  it('displays go home button', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
 
     render(
-      <ErrorBoundary>
+      <ReactErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>
+      </ReactErrorBoundary>
     )
 
-    expect(screen.getByText('Reload Page')).toBeInTheDocument()
+    expect(screen.getByText('Go Home')).toBeInTheDocument()
   })
 })

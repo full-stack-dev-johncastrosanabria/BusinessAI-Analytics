@@ -21,10 +21,13 @@ function Customers() {
   const fetchCustomers = async () => {
     try {
       setLoading(true)
+      setError(null)
       const data = await customerService.getCustomers()
-      setCustomers(data)
+      setCustomers(Array.isArray(data) ? data : [])
     } catch (err) {
+      console.error('Error fetching customers:', err)
       setError(err instanceof Error ? err.message : 'Failed to load customers')
+      setCustomers([]) // Set empty array on error
     } finally {
       setLoading(false)
     }

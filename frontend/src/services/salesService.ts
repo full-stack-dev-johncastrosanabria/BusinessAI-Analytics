@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface SalesTransaction {
   id: number
@@ -26,26 +26,23 @@ export interface SalesFilter {
 const salesService = {
   // Get all sales transactions with optional filters
   getSalesTransactions: async (filter?: SalesFilter): Promise<SalesTransaction[]> => {
-    const params = new URLSearchParams()
-    if (filter?.dateFrom) params.append('dateFrom', filter.dateFrom)
-    if (filter?.dateTo) params.append('dateTo', filter.dateTo)
-    if (filter?.customerId) params.append('customerId', filter.customerId.toString())
-    if (filter?.productId) params.append('productId', filter.productId.toString())
+    const params: Record<string, string> = {}
+    if (filter?.dateFrom) params.dateFrom = filter.dateFrom
+    if (filter?.dateTo) params.dateTo = filter.dateTo
+    if (filter?.customerId) params.customerId = filter.customerId.toString()
+    if (filter?.productId) params.productId = filter.productId.toString()
 
-    const response = await api.get('/api/sales', { params })
-    return response.data
+    return await api.get<SalesTransaction[]>('/api/sales', { params })
   },
 
   // Get sales transaction by ID
   getSalesTransaction: async (id: number): Promise<SalesTransaction> => {
-    const response = await api.get(`/api/sales/${id}`)
-    return response.data
+    return await api.get<SalesTransaction>(`/api/sales/${id}`)
   },
 
   // Create sales transaction
   createSalesTransaction: async (transaction: CreateSalesTransactionRequest): Promise<SalesTransaction> => {
-    const response = await api.post('/api/sales', transaction)
-    return response.data
+    return await api.post<SalesTransaction>('/api/sales', transaction)
   },
 }
 

@@ -15,10 +15,13 @@ function Documents() {
   const fetchDocuments = async () => {
     try {
       setLoading(true)
+      setError(null)
       const data = await documentService.getDocuments()
-      setDocuments(data)
+      setDocuments(Array.isArray(data) ? data : [])
     } catch (err) {
+      console.error('Error fetching documents:', err)
       setError(err instanceof Error ? err.message : 'Failed to load documents')
+      setDocuments([]) // Set empty array on error
     } finally {
       setLoading(false)
     }

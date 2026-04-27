@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface BusinessMetric {
   id: number
@@ -45,19 +45,16 @@ const analyticsService = {
     if (filter?.dateTo) params.append('dateTo', filter.dateTo)
 
     const response = await api.get('/api/analytics/metrics', { params })
-    return response.data
   },
 
   // Get dashboard summary
   getDashboardSummary: async (): Promise<DashboardSummary> => {
     const response = await api.get('/api/analytics/dashboard')
-    return response.data
   },
 
   // Trigger aggregation of sales data into metrics
   aggregateSalesData: async (): Promise<{ message: string }> => {
     const response = await api.post('/api/analytics/aggregate')
-    return response.data
   },
 }
 

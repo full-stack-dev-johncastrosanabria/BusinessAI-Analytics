@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface Document {
   id: number
@@ -15,19 +15,16 @@ const documentService = {
   // Get all documents
   getDocuments: async (): Promise<Document[]> => {
     const response = await api.get('/api/documents')
-    return response.data
   },
 
   // Get document by ID
   getDocument: async (id: number): Promise<Document> => {
     const response = await api.get(`/api/documents/${id}`)
-    return response.data
   },
 
   // Get document content (extracted text)
   getDocumentContent: async (id: number): Promise<{ content: string }> => {
     const response = await api.get(`/api/documents/${id}/content`)
-    return response.data
   },
 
   // Upload document
@@ -40,7 +37,6 @@ const documentService = {
         'Content-Type': 'multipart/form-data',
       },
     })
-    return response.data
   },
 
   // Delete document

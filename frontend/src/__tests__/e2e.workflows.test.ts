@@ -15,11 +15,9 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import axios from 'axios';
 
-// Mock axios
-vi.mock('axios');
-const mockedAxios = axios as any;
+// Mock fetch
+global.fetch = vi.fn();
 
 describe('End-to-End Workflow Tests', () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface ForecastPrediction {
   month: string
@@ -25,31 +25,26 @@ const aiService = {
   // Generate sales forecast
   getSalesForecast: async (): Promise<ForecastResponse> => {
     const response = await api.post('/api/ai/forecast/sales')
-    return response.data
   },
 
   // Generate cost forecast
   getCostForecast: async (): Promise<ForecastResponse> => {
     const response = await api.post('/api/ai/forecast/costs')
-    return response.data
   },
 
   // Generate profit forecast
   getProfitForecast: async (): Promise<ForecastResponse> => {
     const response = await api.post('/api/ai/forecast/profit')
-    return response.data
   },
 
   // Process chatbot query
   processChatbotQuery: async (query: ChatbotQuery): Promise<ChatbotResponse> => {
     const response = await api.post('/api/ai/chatbot/query', query)
-    return response.data
   },
 
   // Trigger model training (admin endpoint)
   trainModels: async (): Promise<{ message: string }> => {
     const response = await api.post('/api/ai/train')
-    return response.data
   },
 }
 

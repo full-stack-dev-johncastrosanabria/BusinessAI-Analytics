@@ -21,10 +21,13 @@ function Products() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
+      setError(null)
       const data = await productService.getProducts()
-      setProducts(data)
+      setProducts(Array.isArray(data) ? data : [])
     } catch (err) {
+      console.error('Error fetching products:', err)
       setError(err instanceof Error ? err.message : 'Failed to load products')
+      setProducts([]) // Set empty array on error
     } finally {
       setLoading(false)
     }

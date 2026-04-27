@@ -5,11 +5,14 @@ Synthetic Data Generation Script for BusinessAI-Analytics Platform
 This script generates realistic synthetic business data including:
 - 30 products across 5 categories
 - 100 customers across 3 segments and 10 countries
-- 5000 sales transactions spanning 5 years with realistic trends
-- 60 business metrics (5 years of monthly data)
+- 10,000 sales transactions spanning 8 years with realistic trends
+- 96 business metrics (8 years of monthly data)
 
-The data exhibits realistic trends including seasonality, growth patterns,
-and variability with both profitable and unprofitable months.
+The data exhibits realistic trends including:
+- Strong seasonality (Q4 peaks, Q1 dips)
+- Growth trends (8% annual growth)
+- Monthly and weekly patterns
+- Variability with both profitable and unprofitable months
 
 Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6
 """
@@ -26,7 +29,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': 'Cnzmws67',  # Will be prompted or set via environment
-    'database': 'businessai_analytics'
+    'database': 'businessai'
 }
 
 # Product categories and sample products
@@ -181,21 +184,22 @@ def generate_customers(cursor, count=100):
     return count
 
 
-def generate_sales_transactions(cursor, num_products, num_customers, count=5000):
+def generate_sales_transactions(cursor, num_products, num_customers, count=10000):
     """
-    Generate sales transactions spanning 5 years with realistic trends.
+    Generate sales transactions spanning 8 years with realistic trends.
     
-    Trends include:
-    - Overall growth trend (5% annual growth)
-    - Seasonal patterns (higher sales in Q4, lower in Q1)
+    Enhanced trends include:
+    - Overall growth trend (8% annual growth with some variability)
+    - Strong seasonal patterns (Q4 peak, Q1 dip, summer slowdown)
     - Weekly patterns (higher on weekdays)
-    - Random variability
+    - Monthly cycles within quarters
+    - Random variability with occasional spikes
     """
     print("\nGenerating sales transactions...")
     
-    # Date range: 5 years ending today
+    # Date range: 8 years ending today
     end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=5*365)
+    start_date = end_date - timedelta(days=8*365)
     
     insert_query = """
         INSERT INTO sales_transactions (customer_id, product_id, transaction_date, quantity, total_amount)
@@ -216,37 +220,61 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=5000)
         # Calculate trend multiplier based on date
         year_progress = (transaction_date - start_date).days / 365.0
         
-        # Growth trend: 5% annual growth
-        growth_factor = 1.0 + (0.05 * year_progress)
+        # Growth trend: 8% annual growth with some year-to-year variability
+        year_num = int(year_progress)
+        year_variability = random.uniform(0.95, 1.05)  # ±5% per year
+        growth_factor = (1.0 + (0.08 * year_progress)) * year_variability
         
-        # Seasonal pattern: higher in Q4 (Oct-Dec), lower in Q1 (Jan-Mar)
+        # Strong seasonal pattern
         month = transaction_date.month
-        if month in [10, 11, 12]:  # Q4
+        if month == 12:  # December peak (holiday shopping)
+            seasonal_factor = 1.8
+        elif month == 11:  # November (Black Friday)
+            seasonal_factor = 1.6
+        elif month == 10:  # October
             seasonal_factor = 1.3
-        elif month in [1, 2, 3]:  # Q1
-            seasonal_factor = 0.7
-        elif month in [7, 8]:  # Summer
-            seasonal_factor = 0.9
-        else:
+        elif month in [1, 2]:  # January-February (post-holiday slump)
+            seasonal_factor = 0.6
+        elif month == 3:  # March (recovery)
+            seasonal_factor = 0.8
+        elif month in [7, 8]:  # Summer slowdown
+            seasonal_factor = 0.85
+        elif month in [4, 5, 6]:  # Spring (moderate)
             seasonal_factor = 1.0
+        else:  # September (back-to-school)
+            seasonal_factor = 1.2
         
         # Weekly pattern: lower on weekends
         weekday = transaction_date.weekday()
         if weekday >= 5:  # Weekend
-            weekly_factor = 0.6
+            weekly_factor = 0.7
+        elif weekday == 4:  # Friday
+            weekly_factor = 1.1
         else:
             weekly_factor = 1.0
         
+        # Monthly cycle: higher at month-end (budget spending)
+        day = transaction_date.day
+        if day >= 25:
+            monthly_factor = 1.2
+        elif day <= 5:
+            monthly_factor = 0.9
+        else:
+            monthly_factor = 1.0
+        
+        # Occasional promotional spikes (5% chance)
+        promo_factor = 1.5 if random.random() < 0.05 else 1.0
+        
         # Combined probability for this date
-        probability = growth_factor * seasonal_factor * weekly_factor
+        probability = growth_factor * seasonal_factor * weekly_factor * monthly_factor * promo_factor
         
         # Random customer and product
         customer_id = random.randint(1, num_customers)
         product_id = random.randint(1, num_products)
         
         # Quantity influenced by probability (higher probability = higher quantities)
-        base_quantity = random.choices([1, 2, 3, 4, 5, 10], weights=[40, 30, 15, 10, 3, 2])[0]
-        quantity = max(1, int(base_quantity * probability * random.uniform(0.8, 1.2)))
+        base_quantity = random.choices([1, 2, 3, 4, 5, 10, 15], weights=[35, 25, 15, 12, 8, 3, 2])[0]
+        quantity = max(1, int(base_quantity * probability * random.uniform(0.7, 1.3)))
         
         # Calculate total amount
         price = product_prices[product_id]
@@ -258,7 +286,7 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=5000)
     transactions.sort(key=lambda x: x[2])
     
     cursor.executemany(insert_query, transactions)
-    print(f"  ✓ Generated {count} sales transactions spanning 5 years")
+    print(f"  ✓ Generated {count} sales transactions spanning 8 years")
     print(f"    Date range: {start_date} to {end_date}")
     
     return start_date, end_date
@@ -266,15 +294,18 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=5000)
 
 def generate_business_metrics(cursor, start_date, end_date):
     """
-    Generate 60 monthly business metrics (5 years) with realistic trends.
+    Generate monthly business metrics (8 years = 96 months) with realistic trends.
     
-    Metrics include:
+    Enhanced metrics include:
     - Total sales (aggregated from transactions)
-    - Total costs (based on product costs)
-    - Total expenses (operational expenses with variability)
+    - Total costs (based on product costs with efficiency improvements over time)
+    - Total expenses (operational expenses with seasonality and growth)
     - Profit (sales - costs - expenses)
     
-    Includes both profitable and unprofitable months.
+    Features:
+    - Clear seasonal patterns matching sales
+    - Gradual cost efficiency improvements (economies of scale)
+    - Variable profitability with realistic unprofitable months
     """
     print("\nGenerating business metrics...")
     
@@ -285,9 +316,10 @@ def generate_business_metrics(cursor, start_date, end_date):
     
     metrics = []
     
-    # Generate metrics for each month in the 5-year period
+    # Generate metrics for each month in the 8-year period
     current_date = start_date.replace(day=1)
     end_month = end_date.replace(day=1)
+    month_count = 0
     
     while current_date <= end_month:
         month = current_date.month
@@ -313,26 +345,43 @@ def generate_business_metrics(cursor, start_date, end_date):
         total_sales = float(result[0])
         total_costs = float(result[1])
         
-        # Generate operational expenses with variability
-        # Base expenses: 20-40% of sales with seasonal variation
-        base_expense_rate = 0.30
+        # Apply cost efficiency improvements over time (economies of scale)
+        # Costs decrease by 0.5% per year as business matures
+        years_elapsed = month_count / 12.0
+        efficiency_factor = 1.0 - (0.005 * years_elapsed)
+        total_costs = round(total_costs * efficiency_factor, 2)
         
-        # Seasonal variation in expenses
-        if month in [1, 2, 12]:  # Higher expenses in winter (heating, holidays)
+        # Generate operational expenses with realistic patterns
+        # Base expenses: 25-35% of sales
+        base_expense_rate = 0.28
+        
+        # Seasonal variation in expenses (matches sales seasonality)
+        if month == 12:  # December: high expenses (bonuses, parties)
+            expense_multiplier = 1.4
+        elif month == 11:  # November: moderate increase
             expense_multiplier = 1.2
-        elif month in [7, 8]:  # Higher expenses in summer (cooling, vacations)
+        elif month in [1, 2]:  # Jan-Feb: lower expenses (post-holiday)
+            expense_multiplier = 0.9
+        elif month in [7, 8]:  # Summer: moderate (vacations, cooling)
             expense_multiplier = 1.1
         else:
             expense_multiplier = 1.0
         
-        # Add random variability to create unprofitable months
-        random_factor = random.uniform(0.7, 1.5)
+        # Growth in fixed expenses over time (inflation, expansion)
+        expense_growth = 1.0 + (0.03 * years_elapsed)  # 3% annual growth
         
-        total_expenses = round(total_sales * base_expense_rate * expense_multiplier * random_factor, 2)
+        # Add controlled variability
+        random_factor = random.uniform(0.85, 1.15)
         
-        # Occasionally add unexpected high expenses (equipment failure, etc.)
-        if random.random() < 0.1:  # 10% chance
-            total_expenses += round(random.uniform(5000, 15000), 2)
+        total_expenses = round(
+            total_sales * base_expense_rate * expense_multiplier * expense_growth * random_factor,
+            2
+        )
+        
+        # Occasionally add unexpected expenses (10% chance)
+        if random.random() < 0.10:
+            unexpected_expense = round(random.uniform(3000, 12000), 2)
+            total_expenses += unexpected_expense
         
         # Calculate profit
         profit = round(total_sales - total_costs - total_expenses, 2)
@@ -341,17 +390,21 @@ def generate_business_metrics(cursor, start_date, end_date):
         
         # Move to next month
         current_date = next_month
+        month_count += 1
     
     cursor.executemany(insert_query, metrics)
     
     # Calculate statistics
     profitable_months = sum(1 for m in metrics if m[5] > 0)
     unprofitable_months = len(metrics) - profitable_months
+    total_profit = sum(m[5] for m in metrics)
+    avg_monthly_sales = sum(m[2] for m in metrics) / len(metrics)
     
-    print(f"  ✓ Generated {len(metrics)} monthly business metrics")
+    print(f"  ✓ Generated {len(metrics)} months of business metrics")
     print(f"    Profitable months: {profitable_months}")
     print(f"    Unprofitable months: {unprofitable_months}")
-    print(f"    Average profit: ${sum(m[5] for m in metrics) / len(metrics):,.2f}")
+    print(f"    Total profit over period: ${total_profit:,.2f}")
+    print(f"    Average monthly sales: ${avg_monthly_sales:,.2f}")
     
     return len(metrics)
 
@@ -449,8 +502,8 @@ def main():
         num_customers = generate_customers(cursor, count=100)
         conn.commit()
         
-        # Generate sales transactions
-        start_date, end_date = generate_sales_transactions(cursor, num_products, num_customers, count=5000)
+        # Generate sales transactions (10000 for 8 years)
+        start_date, end_date = generate_sales_transactions(cursor, num_products, num_customers, count=10000)
         conn.commit()
         
         # Generate business metrics

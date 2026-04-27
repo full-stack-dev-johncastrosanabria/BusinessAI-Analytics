@@ -95,7 +95,7 @@ spring:
         
         # AI Service routes
         - id: ai-service
-          uri: http://localhost:8000
+          uri: http://localhost:8086
           predicates:
             - Path=/api/ai/**
           filters:

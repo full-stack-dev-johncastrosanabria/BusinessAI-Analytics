@@ -22,8 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from database import DatabaseConnection
-from models.sales_forecast import SalesForecastModel
-from models.cost_forecast import CostForecastModel
+from models.hybrid_forecast import HybridForecastModel
 
 # Configure logging
 logging.basicConfig(
@@ -69,29 +68,20 @@ def main():
         models_dir.mkdir(exist_ok=True)
         logger.info(f"Models will be saved to: {models_dir}")
 
-        # Train sales forecasting model
+        # Train sales forecasting model with hybrid approach
         logger.info("-" * 60)
-        logger.info("Training Sales Forecasting Model (PyTorch LSTM)...")
+        logger.info("Training Sales Forecasting Model (Hybrid: Trend + Seasonal + LSTM)")
         logger.info("-" * 60)
-        sales_model = SalesForecastModel(
-            input_size=1,
-            hidden_size=64,
-            num_layers=2,
-            output_size=1,
-            sequence_length=12
-        )
-
-        sales_mape = sales_model.train_model(
-            sales_data,
-            epochs=50,
-            batch_size=16,
-            learning_rate=0.001
-        )
+        sales_model = HybridForecastModel(sequence_length=12)
+        
+        sales_mape = sales_model.train(sales_data, epochs=100)
 
         logger.info(f"Sales Model Training Complete")
         logger.info(f"Sales Model Validation MAPE: {sales_mape:.4f}%")
 
-        if sales_mape < 20:
+        if sales_mape < 15:
+            logger.info("✓ Sales model EXCELLENT (< 15% MAPE)")
+        elif sales_mape < 20:
             logger.info("✓ Sales model meets MAPE requirement (< 20%)")
         else:
             logger.warning(
@@ -104,29 +94,21 @@ def main():
         sales_model.save_model(str(sales_model_path))
         logger.info(f"Sales model saved to: {sales_model_path}")
 
-        # Train cost forecasting model
+        # Train cost forecasting model with hybrid approach
         logger.info("-" * 60)
-        logger.info("Training Cost Forecasting Model (TensorFlow LSTM)...")
+        logger.info("Training Cost Forecasting Model (Hybrid: Trend + Seasonal + LSTM)...")
         logger.info("-" * 60)
-        cost_model = CostForecastModel(
-            input_size=1,
-            hidden_size=64,
-            num_layers=2,
-            output_size=1,
-            sequence_length=12
-        )
-
+        cost_model = HybridForecastModel(sequence_length=12)
+        
         try:
-            cost_mape = cost_model.train_model(
-                cost_data,
-                epochs=50,
-                batch_size=16
-            )
+            cost_mape = cost_model.train(cost_data, epochs=100)
 
             logger.info(f"Cost Model Training Complete")
             logger.info(f"Cost Model Validation MAPE: {cost_mape:.4f}%")
 
-            if cost_mape < 20:
+            if cost_mape < 15:
+                logger.info("✓ Cost model EXCELLENT (< 15% MAPE)")
+            elif cost_mape < 20:
                 logger.info("✓ Cost model meets MAPE requirement (< 20%)")
             else:
                 logger.warning(
@@ -135,24 +117,36 @@ def main():
                 )
 
             # Save cost model
-            cost_model_path = models_dir / "cost_forecast_model.h5"
+            cost_model_path = models_dir / "cost_forecast_model.pt"
             cost_model.save_model(str(cost_model_path))
             logger.info(f"Cost model saved to: {cost_model_path}")
         except ImportError as e:
             logger.warning(f"⚠ Cost model training skipped: {e}")
-            logger.warning("⚠ TensorFlow is not available. Only sales forecasting will work.")
+            logger.warning("⚠ PyTorch is not available. Only sales forecasting will work.")
             cost_mape = None
 
         # Print summary
         logger.info("=" * 60)
-        logger.info("Training Summary")
+        logger.info("Training Summary - Hybrid Forecasting Model")
         logger.info("=" * 60)
         logger.info(f"Sales Model MAPE: {sales_mape:.4f}%")
         if cost_mape is not None:
             logger.info(f"Cost Model MAPE: {cost_mape:.4f}%")
+            avg_mape = (sales_mape + cost_mape) / 2
+            logger.info(f"Average MAPE: {avg_mape:.4f}%")
         else:
-            logger.info("Cost Model: Not trained (TensorFlow unavailable)")
+            logger.info("Cost Model: Not trained")
         logger.info(f"Models saved to: {models_dir}")
+        logger.info("=" * 60)
+        logger.info("Hybrid Model Approach:")
+        logger.info("  1. Trend Extraction - Linear regression for growth")
+        logger.info("  2. Seasonal Decomposition - Monthly patterns")
+        logger.info("  3. LSTM Residuals - Capture remaining patterns")
+        logger.info("  Benefits:")
+        logger.info("    • Explicit trend modeling")
+        logger.info("    • Clear seasonal patterns")
+        logger.info("    • Interpretable components")
+        logger.info("    • Better generalization")
         logger.info("=" * 60)
 
         # Close database connection

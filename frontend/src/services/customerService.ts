@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface Customer {
   id: number
@@ -18,26 +18,22 @@ export interface CreateCustomerRequest {
 const customerService = {
   // Get all customers
   getCustomers: async (): Promise<Customer[]> => {
-    const response = await api.get('/api/customers')
-    return response.data
+    return await api.get<Customer[]>('/api/customers')
   },
 
   // Get customer by ID
   getCustomer: async (id: number): Promise<Customer> => {
-    const response = await api.get(`/api/customers/${id}`)
-    return response.data
+    return await api.get<Customer>(`/api/customers/${id}`)
   },
 
   // Create customer
   createCustomer: async (customer: CreateCustomerRequest): Promise<Customer> => {
-    const response = await api.post('/api/customers', customer)
-    return response.data
+    return await api.post<Customer>('/api/customers', customer)
   },
 
   // Update customer
   updateCustomer: async (id: number, customer: CreateCustomerRequest): Promise<Customer> => {
-    const response = await api.put(`/api/customers/${id}`, customer)
-    return response.data
+    return await api.put<Customer>(`/api/customers/${id}`, customer)
   },
 
   // Delete customer

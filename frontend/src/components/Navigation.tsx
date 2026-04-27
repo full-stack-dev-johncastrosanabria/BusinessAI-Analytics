@@ -69,6 +69,22 @@ function Navigation() {
               Sales
             </Link>
           </li>
+          <li>
+            <Link
+              to="/sales-table"
+              className={`nav-link ${isActive('/sales-table') ? 'active' : ''}`}
+            >
+              Sales Table
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/sales-infinite"
+              className={`nav-link ${isActive('/sales-infinite') ? 'active' : ''}`}
+            >
+              Sales Infinite
+            </Link>
+          </li>
         </ul>
       </div>
     </nav>

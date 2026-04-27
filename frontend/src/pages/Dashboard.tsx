@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   LineChart,
   Line,
@@ -11,52 +11,41 @@ import {
   BarChart,
   Bar,
 } from 'recharts'
-import analyticsService, { DashboardSummary, BusinessMetric } from '../services/analyticsService'
+import { useDashboardSummary, useBusinessMetrics } from '../hooks/useAnalytics'
 import './Dashboard.css'
 
 function Dashboard() {
-  const [summary, setSummary] = useState<DashboardSummary | null>(null)
-  const [metrics, setMetrics] = useState<BusinessMetric[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
 
-  useEffect(() => {
-    fetchDashboardData()
-  }, [])
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const [summaryData, metricsData] = await Promise.all([
-        analyticsService.getDashboardSummary(),
-        analyticsService.getMetrics({
-          dateFrom: dateFrom || undefined,
-          dateTo: dateTo || undefined,
-        }),
-      ])
-      setSummary(summaryData)
-      setMetrics(metricsData)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Queries
+  const summaryQuery = useDashboardSummary()
+  const metricsQuery = useBusinessMetrics({
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
+  })
 
   const handleFilterChange = () => {
-    fetchDashboardData()
+    metricsQuery.refetch()
   }
 
-  if (loading) {
+  const isLoading = summaryQuery.isLoading || metricsQuery.isLoading
+  const error = summaryQuery.error || metricsQuery.error
+
+  if (isLoading) {
     return <div className="dashboard loading">Loading dashboard...</div>
   }
 
   if (error) {
-    return <div className="dashboard error">Error: {error}</div>
+    return (
+      <div className="dashboard error">
+        Error: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
+      </div>
+    )
   }
+
+  const summary = summaryQuery.data
+  const metrics = metricsQuery.data || []
 
   const chartData = metrics.map((m) => ({
     month: `${m.year}-${String(m.month).padStart(2, '0')}`,

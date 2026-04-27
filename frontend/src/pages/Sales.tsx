@@ -26,16 +26,21 @@ function Sales() {
   const fetchData = async () => {
     try {
       setLoading(true)
+      setError(null)
       const [txns, prods, custs] = await Promise.all([
         salesService.getSalesTransactions(),
         productService.getProducts(),
         customerService.getCustomers(),
       ])
-      setTransactions(txns)
-      setProducts(prods)
-      setCustomers(custs)
+      setTransactions(Array.isArray(txns) ? txns : [])
+      setProducts(Array.isArray(prods) ? prods : [])
+      setCustomers(Array.isArray(custs) ? custs : [])
     } catch (err) {
+      console.error('Error fetching sales data:', err)
       setError(err instanceof Error ? err.message : 'Failed to load data')
+      setTransactions([]) // Set empty arrays on error
+      setProducts([])
+      setCustomers([])
     } finally {
       setLoading(false)
     }

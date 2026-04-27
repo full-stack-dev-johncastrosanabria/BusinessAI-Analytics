@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../lib/api'
 
 export interface Product {
   id: number
@@ -18,26 +18,22 @@ export interface CreateProductRequest {
 const productService = {
   // Get all products
   getProducts: async (): Promise<Product[]> => {
-    const response = await api.get('/api/products')
-    return response.data
+    return await api.get<Product[]>('/api/products')
   },
 
   // Get product by ID
   getProduct: async (id: number): Promise<Product> => {
-    const response = await api.get(`/api/products/${id}`)
-    return response.data
+    return await api.get<Product>(`/api/products/${id}`)
   },
 
   // Create product
   createProduct: async (product: CreateProductRequest): Promise<Product> => {
-    const response = await api.post('/api/products', product)
-    return response.data
+    return await api.post<Product>('/api/products', product)
   },
 
   // Update product
   updateProduct: async (id: number, product: CreateProductRequest): Promise<Product> => {
-    const response = await api.put(`/api/products/${id}`, product)
-    return response.data
+    return await api.put<Product>(`/api/products/${id}`, product)
   },
 
   // Delete product
