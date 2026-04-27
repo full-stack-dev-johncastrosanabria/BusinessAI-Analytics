@@ -4,13 +4,13 @@ Enterprise-grade business analytics platform with AI-powered forecasting, real-t
 
 ## 🎬 Demo
 
-Watch the platform in action:
+Watch the platform in action (includes Dashboard, Sales, Customers, Products, **Forecasts**, Documents, and Chatbot):
 
 <div align="center">
-  <img src="./demo.gif" alt="Demo" width="100%">
+  <img src="./demo-full.gif" alt="Full Platform Demo" width="100%">
 </div>
 
-**[📥 Download full demo video (MP4, 4.1MB)](./demo.mp4)** for better quality and full length
+**[📥 Download full demo video (MP4, 4.1MB)](./demo.mp4)** for HD quality and full length
 
 ---
 
