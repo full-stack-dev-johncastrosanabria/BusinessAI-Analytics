@@ -1,5 +1,18 @@
 import { useRouteError, isRouteErrorResponse } from 'react-router-dom'
 
+// Style constants
+const ERROR_CONTAINER_MIN_HEIGHT = '100vh'
+const ERROR_CONTAINER_PADDING = '2rem'
+const ERROR_TITLE_FONT_SIZE = '4rem'
+const ERROR_DESCRIPTION_MAX_WIDTH = '500px'
+const ERROR_DESCRIPTION_COLOR = '#666'
+const BUTTON_MARGIN_TOP = '2rem'
+const BUTTON_PADDING = '0.75rem 1.5rem'
+const BUTTON_FONT_SIZE = '1rem'
+const BUTTON_BG_COLOR = '#007bff'
+const BUTTON_BORDER_RADIUS = '4px'
+const SECTION_MARGIN_TOP = '1rem'
+
 export default function ErrorBoundary() {
   const error = useRouteError()
 
@@ -21,27 +34,31 @@ export default function ErrorBoundary() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '100vh',
-      padding: '2rem',
+      minHeight: ERROR_CONTAINER_MIN_HEIGHT,
+      padding: ERROR_CONTAINER_PADDING,
       textAlign: 'center',
     }}>
-      <h1 style={{ fontSize: '4rem', margin: 0 }}>
+      <h1 style={{ fontSize: ERROR_TITLE_FONT_SIZE, margin: 0 }}>
         {errorStatus || '⚠️'}
       </h1>
-      <h2 style={{ marginTop: '1rem' }}>Oops! Something went wrong</h2>
-      <p style={{ color: '#666', maxWidth: '500px', marginTop: '1rem' }}>
+      <h2 style={{ marginTop: SECTION_MARGIN_TOP }}>Oops! Something went wrong</h2>
+      <p style={{ 
+        color: ERROR_DESCRIPTION_COLOR, 
+        maxWidth: ERROR_DESCRIPTION_MAX_WIDTH, 
+        marginTop: SECTION_MARGIN_TOP 
+      }}>
         {errorMessage}
       </p>
       <button
         onClick={() => window.location.href = '/'}
         style={{
-          marginTop: '2rem',
-          padding: '0.75rem 1.5rem',
-          fontSize: '1rem',
-          backgroundColor: '#007bff',
+          marginTop: BUTTON_MARGIN_TOP,
+          padding: BUTTON_PADDING,
+          fontSize: BUTTON_FONT_SIZE,
+          backgroundColor: BUTTON_BG_COLOR,
           color: 'white',
           border: 'none',
-          borderRadius: '4px',
+          borderRadius: BUTTON_BORDER_RADIUS,
           cursor: 'pointer',
         }}
       >

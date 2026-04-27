@@ -4,10 +4,13 @@
  * Includes timeout, retry logic, and comprehensive error handling
  */
 
+// Configuration constants
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080'
-const REQUEST_TIMEOUT = 30000 // 30 seconds
+const REQUEST_TIMEOUT_MS = 30_000 // 30 seconds
 const MAX_RETRIES = 3
-const RETRY_DELAY = 1000 // 1 second
+const RETRY_DELAY_MS = 1_000 // 1 second
+const CLIENT_ERROR_MIN = 400
+const CLIENT_ERROR_MAX = 500
 
 export class APIError extends Error {
   constructor(
@@ -39,9 +42,9 @@ function createTimeoutSignal(timeout: number): AbortSignal {
     get(target, prop) {
       if (prop === 'addEventListener') {
         return function(type: string, listener: EventListener) {
-          const wrappedListener = () => {
+          const wrappedListener = (event: Event) => {
             clearTimeout(timeoutId)
-            listener.call(this)
+            listener.call(listener, event)
           }
           return target.addEventListener(type, wrappedListener)
         }
@@ -67,12 +70,12 @@ async function retryRequest<T>(
       lastError = error instanceof Error ? error : new Error(String(error))
       
       // Don't retry on client errors (4xx) or if out of retries
-      if (error instanceof APIError && error.status >= 400 && error.status < 500) {
+      if (error instanceof APIError && error.status >= CLIENT_ERROR_MIN && error.status < CLIENT_ERROR_MAX) {
         throw error
       }
       
       if (attempt < retries) {
-        const delay = RETRY_DELAY * Math.pow(2, attempt) // Exponential backoff
+        const delay = RETRY_DELAY_MS * Math.pow(2, attempt) // Exponential backoff
         await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
@@ -85,7 +88,7 @@ async function request<T>(
   endpoint: string,
   config: RequestConfig = {}
 ): Promise<T> {
-  const { params, timeout = REQUEST_TIMEOUT, retries = MAX_RETRIES, ...fetchConfig } = config
+  const { params, timeout = REQUEST_TIMEOUT_MS, retries = MAX_RETRIES, ...fetchConfig } = config
 
   // Build URL with query params
   const url = new URL(`${API_BASE_URL}${endpoint}`)

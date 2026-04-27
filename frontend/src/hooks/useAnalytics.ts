@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
+// Configuration constants
+const DASHBOARD_STALE_TIME_MS = 2 * 60 * 1000 // 2 minutes
+const METRICS_STALE_TIME_MS = 5 * 60 * 1000 // 5 minutes
+
 export interface DashboardSummary {
   totalSales: number
   totalCosts: number
@@ -49,7 +53,7 @@ export function useDashboardSummary() {
   return useQuery({
     queryKey: analyticsKeys.summary(),
     queryFn: () => api.get<DashboardSummary>('/api/analytics/dashboard'),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: DASHBOARD_STALE_TIME_MS,
   })
 }
 
@@ -66,6 +70,6 @@ export function useBusinessMetrics(filters?: {
       api.get<BusinessMetric[]>('/api/analytics/metrics', {
         params: filters as Record<string, string | undefined>,
       }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: METRICS_STALE_TIME_MS,
   })
 }

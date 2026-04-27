@@ -17,6 +17,9 @@ import com.businessai.documents.repository.DocumentRepository;
 @Service
 public class DocumentService {
     
+    // Constants to avoid magic numbers
+    private static final int MAX_EXTRACTED_TEXT_LENGTH = 1_000_000;
+    
     @Autowired
     public DocumentRepository documentRepository;
     
@@ -67,9 +70,9 @@ public class DocumentService {
         try {
             String extractedText = textExtractor.extractText(file, fileType);
             
-            // Limit extracted text to 1000000 characters
-            if (extractedText.length() > 1000000) {
-                extractedText = extractedText.substring(0, 1000000);
+            // Limit extracted text to prevent memory issues
+            if (extractedText.length() > MAX_EXTRACTED_TEXT_LENGTH) {
+                extractedText = extractedText.substring(0, MAX_EXTRACTED_TEXT_LENGTH);
             }
             
             document.setExtractedText(extractedText);
@@ -92,6 +95,9 @@ public class DocumentService {
      * @return the Document if found
      */
     public Optional<Document> getDocument(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return documentRepository.findById(id);
     }
     
@@ -109,6 +115,9 @@ public class DocumentService {
      * @return the extracted text content
      */
     public Optional<String> getDocumentContent(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return documentRepository.findById(id)
             .map(Document::getExtractedText);
     }
@@ -118,6 +127,9 @@ public class DocumentService {
      * @param id the document ID
      */
     public void deleteDocument(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Document ID cannot be null");
+        }
         documentRepository.deleteById(id);
     }
     

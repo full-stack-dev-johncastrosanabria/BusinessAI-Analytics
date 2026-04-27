@@ -14,6 +14,18 @@ import {
 import { useDashboardSummary, useBusinessMetrics } from '../hooks/useAnalytics'
 import './Dashboard.css'
 
+// Chart configuration constants
+const CHART_HEIGHT = 300
+const CHART_WIDTH = "100%"
+const GRID_STROKE_DASH = "3 3"
+const MONTH_PADDING = 2
+
+// Chart colors
+const SALES_COLOR = "#8884d8"
+const COSTS_COLOR = "#82ca9d"
+const PROFIT_COLOR = "#ffc658"
+const BAR_COLOR = "#8884d8"
+
 function Dashboard() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
@@ -108,7 +120,7 @@ function Dashboard() {
           <div className="metric-card">
             <h3>Worst Month</h3>
             <p className="metric-value">
-              {summary.worstMonth?.year}-{String(summary.worstMonth?.month).padStart(2, '0')}
+              {summary.worstMonth?.year}-{String(summary.worstMonth?.month).padStart(MONTH_PADDING, '0')}
             </p>
             <p className="metric-subtext">${summary.worstMonth?.profit.toFixed(2)}</p>
           </div>
@@ -119,16 +131,16 @@ function Dashboard() {
       <div className="charts-section">
         <div className="chart-container">
           <h2>Sales, Costs & Profit Trends</h2>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="sales" stroke="#8884d8" />
-              <Line type="monotone" dataKey="costs" stroke="#82ca9d" />
-              <Line type="monotone" dataKey="profit" stroke="#ffc658" />
+              <Line type="monotone" dataKey="sales" stroke={SALES_COLOR} />
+              <Line type="monotone" dataKey="costs" stroke={COSTS_COLOR} />
+              <Line type="monotone" dataKey="profit" stroke={PROFIT_COLOR} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -137,13 +149,13 @@ function Dashboard() {
         {topProductsData.length > 0 && (
           <div className="chart-container">
             <h2>Top 5 Products by Revenue</h2>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
               <BarChart data={topProductsData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="totalRevenue" fill="#8884d8" />
+                <Bar dataKey="totalRevenue" fill={BAR_COLOR} />
               </BarChart>
             </ResponsiveContainer>
           </div>

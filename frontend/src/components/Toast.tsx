@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import './Toast.css'
 
+// Configuration constants
+const DEFAULT_TOAST_DURATION_MS = 3000 // 3 seconds
+
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
 export interface ToastMessage {
@@ -19,7 +22,7 @@ function Toast({ toast, onClose }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose(toast.id)
-    }, toast.duration || 3000)
+    }, toast.duration || DEFAULT_TOAST_DURATION_MS)
 
     return () => clearTimeout(timer)
   }, [toast, onClose])

@@ -93,6 +93,9 @@ public class SalesService {
      * @throws SalesValidationException if transaction not found
      */
     public SalesTransaction getTransactionById(Long id) {
+        if (id == null) {
+            throw new SalesValidationException("Transaction ID cannot be null");
+        }
         logger.debug("Retrieving sales transaction with ID: {}", id);
         return salesRepository.findById(id)
                 .orElseThrow(() -> new SalesValidationException("Sales transaction not found with ID: " + id));

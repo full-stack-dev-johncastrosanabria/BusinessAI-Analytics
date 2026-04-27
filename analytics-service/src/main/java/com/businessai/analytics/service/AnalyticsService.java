@@ -15,6 +15,12 @@ import com.businessai.analytics.repository.MetricsRepository;
 @Transactional
 public class AnalyticsService {
 
+    // Constants to avoid magic numbers
+    private static final int MIN_MONTH = 1;
+    private static final int MAX_MONTH = 12;
+    private static final int MIN_YEAR = 1900;
+    private static final int MAX_YEAR = 2100;
+
     private final MetricsRepository metricsRepository;
 
     public AnalyticsService(MetricsRepository metricsRepository) {
@@ -27,11 +33,11 @@ public class AnalyticsService {
     public BusinessMetric createMetric(Integer month, Integer year, BigDecimal totalSales,
                                        BigDecimal totalCosts, BigDecimal totalExpenses) {
         // Validate inputs
-        if (month == null || month < 1 || month > 12) {
-            throw new IllegalArgumentException("Month must be between 1 and 12");
+        if (month == null || month < MIN_MONTH || month > MAX_MONTH) {
+            throw new IllegalArgumentException("Month must be between " + MIN_MONTH + " and " + MAX_MONTH);
         }
-        if (year == null || year < 1900 || year > 2100) {
-            throw new IllegalArgumentException("Year must be between 1900 and 2100");
+        if (year == null || year < MIN_YEAR || year > MAX_YEAR) {
+            throw new IllegalArgumentException("Year must be between " + MIN_YEAR + " and " + MAX_YEAR);
         }
         if (totalSales == null || totalSales.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Total sales must be non-negative");
@@ -96,8 +102,8 @@ public class AnalyticsService {
         }
         
         // Validate month ranges
-        if (startMonth < 1 || startMonth > 12 || endMonth < 1 || endMonth > 12) {
-            throw new IllegalArgumentException("Months must be between 1 and 12");
+        if (startMonth < MIN_MONTH || startMonth > MAX_MONTH || endMonth < MIN_MONTH || endMonth > MAX_MONTH) {
+            throw new IllegalArgumentException("Months must be between " + MIN_MONTH + " and " + MAX_MONTH);
         }
         
         // Validate date order
