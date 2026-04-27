@@ -22,6 +22,10 @@ import com.businessai.analytics.service.AnalyticsService;
 @RequestMapping("/api/analytics")
 public class AnalyticsController {
 
+    // Constants for repeated strings
+    private static final String VALIDATION_FAILED = VALIDATION_FAILED;
+    private static final String NOT_FOUND = NOT_FOUND;
+
     private final AnalyticsService analyticsService;
 
     public AnalyticsController(AnalyticsService analyticsService) {
@@ -45,7 +49,7 @@ public class AnalyticsController {
             return ResponseEntity.status(HttpStatus.CREATED).body(metric);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Validation failed", e.getMessage()));
+                    .body(new ErrorResponse(VALIDATION_FAILED, e.getMessage()));
         }
     }
 
@@ -69,7 +73,7 @@ public class AnalyticsController {
             return ResponseEntity.ok(metrics);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Validation failed", e.getMessage()));
+                    .body(new ErrorResponse(VALIDATION_FAILED, e.getMessage()));
         }
     }
 
@@ -84,7 +88,7 @@ public class AnalyticsController {
             return ResponseEntity.ok(metric);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Not found", e.getMessage()));
+                    .body(new ErrorResponse(NOT_FOUND, e.getMessage()));
         }
     }
 
@@ -104,7 +108,7 @@ public class AnalyticsController {
             return ResponseEntity.ok(metric);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Not found", e.getMessage()));
+                    .body(new ErrorResponse(NOT_FOUND, e.getMessage()));
         }
     }
 
@@ -119,7 +123,7 @@ public class AnalyticsController {
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Not found", e.getMessage()));
+                    .body(new ErrorResponse(NOT_FOUND, e.getMessage()));
         }
     }
 
@@ -148,7 +152,7 @@ public class AnalyticsController {
             return ResponseEntity.ok(summary);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Validation failed", e.getMessage()));
+                    .body(new ErrorResponse(VALIDATION_FAILED, e.getMessage()));
         }
     }
 

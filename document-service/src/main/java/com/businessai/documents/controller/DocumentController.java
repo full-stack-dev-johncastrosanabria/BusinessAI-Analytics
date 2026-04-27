@@ -31,6 +31,10 @@ import com.businessai.documents.service.DocumentService;
 @RequestMapping("/api/documents")
 public class DocumentController {
     
+    // Constants for repeated strings
+    private static final String INVALID_DOCUMENT_ID = INVALID_DOCUMENT_ID;
+    private static final String DOCUMENT_NOT_FOUND = DOCUMENT_NOT_FOUND;
+    
     @Autowired
     private DocumentService documentService;
     
@@ -68,7 +72,7 @@ public class DocumentController {
     public ResponseEntity<?> getDocument(@PathVariable Long id) {
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Invalid document ID"));
+                .body(new ErrorResponse(INVALID_DOCUMENT_ID));
         }
         
         Optional<Document> document = documentService.getDocument(id);
@@ -76,7 +80,7 @@ public class DocumentController {
             return ResponseEntity.ok(document.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Document not found"));
+                .body(new ErrorResponse(DOCUMENT_NOT_FOUND));
         }
     }
     
@@ -99,7 +103,7 @@ public class DocumentController {
     public ResponseEntity<?> getDocumentContent(@PathVariable Long id) {
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Invalid document ID"));
+                .body(new ErrorResponse(INVALID_DOCUMENT_ID));
         }
         
         Optional<String> content = documentService.getDocumentContent(id);
@@ -107,7 +111,7 @@ public class DocumentController {
             return ResponseEntity.ok(new ContentResponse(content.get()));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Document not found"));
+                .body(new ErrorResponse(DOCUMENT_NOT_FOUND));
         }
     }
     
@@ -120,7 +124,7 @@ public class DocumentController {
     public ResponseEntity<?> deleteDocument(@PathVariable Long id) {
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Invalid document ID"));
+                .body(new ErrorResponse(INVALID_DOCUMENT_ID));
         }
         
         Optional<Document> document = documentService.getDocument(id);
@@ -129,7 +133,7 @@ public class DocumentController {
             return ResponseEntity.ok(new SuccessResponse("Document deleted successfully"));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Document not found"));
+                .body(new ErrorResponse(DOCUMENT_NOT_FOUND));
         }
     }
     

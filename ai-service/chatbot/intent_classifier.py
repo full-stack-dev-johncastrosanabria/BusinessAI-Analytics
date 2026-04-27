@@ -17,6 +17,12 @@ from difflib import SequenceMatcher
 
 logger = logging.getLogger(__name__)
 
+# ── Constants for repeated strings ──────────────────────────────────────────
+BILLING_ES = "facturación"
+COLLECTION_ES = "recaudación"
+LOSS_ES = "pérdida"
+WHEN_ES = "cuándo"
+
 
 class Language(Enum):
     """Supported languages"""
@@ -184,8 +190,8 @@ class AdvancedIntentClassifier:
                     "volumen de ventas", "cifras de ventas", "datos de ventas", "métricas de ventas",
                     "rendimiento de ventas", "resultados de ventas", "informe de ventas", "análisis de ventas",
                     "estadísticas de ventas", "desglose de ventas", "transacción", "transacciones",
-                    "pedidos", "volumen de pedidos", "compras", "reservas", "facturación", "facturado",
-                    "cobrado", "cuentas por cobrar", "volumen de negocios", "ganancias", "recaudación",
+                    "pedidos", "volumen de pedidos", "compras", "reservas", BILLING_ES, "facturado",
+                    "cobrado", "cuentas por cobrar", "volumen de negocios", "ganancias", COLLECTION_ES,
                     
                     # Pipeline y proceso de ventas
                     "pipeline de ventas", "embudo de ventas", "tasa de conversión", "tasa de cierre",
@@ -254,7 +260,7 @@ class AdvancedIntentClassifier:
                 ],
                 Language.SPANISH: [
                     # Términos básicos de ingresos
-                    "ingresos", "ganancias", "beneficios", "recaudación", "facturación", "volumen de negocios",
+                    "ingresos", "ganancias", "beneficios", COLLECTION_ES, BILLING_ES, "volumen de negocios",
                     "ingresos brutos", "ingresos netos", "ingresos operativos", "ingresos recurrentes",
                     "ingresos recurrentes anuales", "ingresos recurrentes mensuales", "flujo de ingresos",
                     "crecimiento de ingresos", "disminución de ingresos", "pronóstico de ingresos",
@@ -345,7 +351,7 @@ class AdvancedIntentClassifier:
                     "asignación de ganancias", "ratio de rentabilidad", "índice de rentabilidad",
                     "retorno sobre ventas", "velocidad de ganancia", "calidad de ganancia",
                     "sostenibilidad de ganancia", "volatilidad de ganancia", "consistencia de ganancia",
-                    "pérdida", "pérdidas", "déficit", "faltante", "números rojos", "en rojo",
+                    LOSS_ES, "pérdidas", "déficit", "faltante", "números rojos", "en rojo",
                     "pérdida operativa", "pérdida neta", "líder en pérdidas", "prevención de pérdidas",
                     "recuperación de pérdidas", "cancelación", "deterioro"
                 ]
@@ -576,7 +582,7 @@ class AdvancedIntentClassifier:
                 "recordar", "terminar", "permitir", "aparecer", "conseguir", "comenzar", "servir",
                 
                 # Palabras interrogativas
-                "qué", "cuál", "cuáles", "quién", "quiénes", "cómo", "cuándo", "dónde", "por qué",
+                "qué", "cuál", "cuáles", "quién", "quiénes", "cómo", WHEN_ES, "dónde", "por qué",
                 "para qué", "cuánto", "cuánta", "cuántos", "cuántas", "dime", "muestra", "enseña",
                 "lista", "ve", "mira", "encuentra", "busca", "dame", "proporciona", "quiero",
                 "necesito", "me gusta", "ayuda", "por favor",
@@ -644,9 +650,9 @@ class AdvancedIntentClassifier:
             
             Language.SPANISH: {
                 # Sinónimos de negocios
-                "ingresos": ["ganancias", "beneficios", "recaudación", "facturación", "entradas"],
+                "ingresos": ["ganancias", "beneficios", COLLECTION_ES, BILLING_ES, "entradas"],
                 "ganancia": ["beneficio", "utilidad", "provecho", "rendimiento", "lucro"],
-                "ventas": ["ingresos", "facturación", "transacciones", "pedidos", "comercio"],
+                "ventas": ["ingresos", BILLING_ES, "transacciones", "pedidos", "comercio"],
                 "cliente": ["comprador", "consumidor", "usuario", "clientela", "parroquiano"],
                 "producto": ["artículo", "mercancía", "bien", "oferta", "commodity"],
                 "empresa": ["compañía", "negocio", "organización", "corporación", "firma"],
@@ -673,7 +679,7 @@ class AdvancedIntentClassifier:
                 "solución": ["respuesta", "resolución", "arreglo", "remedio"],
                 "mejora": ["mejoramiento", "perfeccionamiento", "upgrade", "progreso"],
                 "éxito": ["logro", "triunfo", "victoria", "consecución"],
-                "fracaso": ["derrota", "pérdida", "revés", "decepción"]
+                "fracaso": ["derrota", LOSS_ES, "revés", "decepción"]
             }
         }
     
@@ -687,7 +693,7 @@ class AdvancedIntentClassifier:
                 "pronouns": ["yo", "tú", "él", "ella", "nosotros", "vosotros", "ellos", "ellas"],
                 "verbs": ["es", "son", "está", "están", "tiene", "tienen", "hace", "hacen"],
                 "prepositions": ["de", "del", "en", "con", "por", "para", "desde", "hasta"],
-                "question_words": ["qué", "cuál", "quién", "cómo", "cuándo", "dónde", "por qué"],
+                "question_words": ["qué", "cuál", "quién", "cómo", WHEN_ES, "dónde", "por qué"],
                 "accented_chars": ["á", "é", "í", "ó", "ú", "ñ", "ü"],
                 "common_endings": ["ción", "sión", "dad", "tad", "mente", "ando", "iendo"]
             },
@@ -1081,7 +1087,7 @@ class AdvancedIntentClassifier:
             Language.ENGLISH: ["bad", "terrible", "awful", "worst", "low", "decrease", "decline",
                               "loss", "problem", "issue", "error", "fail", "failure"],
             Language.SPANISH: ["malo", "terrible", "horrible", "peor", "bajo", "disminución",
-                              "declive", "pérdida", "problema", "error", "falla", "fracaso"]
+                              "declive", LOSS_ES, "problema", "error", "falla", "fracaso"]
         }
         
         text_lower = text.lower()
@@ -1111,7 +1117,7 @@ class AdvancedIntentClassifier:
         
         if urgent_count > 0:
             return "high"
-        elif "?" in text or any(q in text_lower for q in ["when", "cuándo", "how long", "cuánto tiempo"]):
+        elif "?" in text or any(q in text_lower for q in ["when", WHEN_ES, "how long", "cuánto tiempo"]):
             return "medium"
         else:
             return "low"

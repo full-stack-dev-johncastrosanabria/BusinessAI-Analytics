@@ -60,14 +60,14 @@ if ! pgrep -x mysqld > /dev/null; then
     brew services start mysql 2>/dev/null || true
     sleep 5
 fi
-export MYSQL_PASSWORD=Cnzmws67
-mysql -u root -pCnzmws67 -e "CREATE DATABASE IF NOT EXISTS businessai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null || true
+export MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
+mysql -u root -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS businessai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null || true
 log_ok "Database ready"
 
 ################################################################################
 log_step "STEP 3: Start All Systems"
 
-export MYSQL_PASSWORD=Cnzmws67
+export MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
 ./start-system.sh 2>&1 | tail -10
 log_info "Waiting for services to start..."
 sleep 15

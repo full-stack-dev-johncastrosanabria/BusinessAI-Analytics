@@ -78,3 +78,41 @@ yarn-error.log*
 
 # ── Kiro internal ─────────────────────────────────────────────────────────────
 .kiro/
+
+# ── SonarQube ─────────────────────────────────────────────────────────────────
+.scannerwork/
+.sonar/
+
+# ── Database ──────────────────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+.docker/
+docker-compose.override.yml
+
+# ── Temporary files ───────────────────────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+*~
+.DS_Store
+
+# ── OS specific ───────────────────────────────────────────────────────────────
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+
+# ── Build artifacts ──────────────────────────────────────────────────────────
+.gradle/
+build/
+out/
+
+# ── IDE specific ──────────────────────────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+*.code-workspace

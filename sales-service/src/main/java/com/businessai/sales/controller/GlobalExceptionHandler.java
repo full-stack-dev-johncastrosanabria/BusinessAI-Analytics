@@ -26,6 +26,9 @@ import com.businessai.sales.exception.SalesValidationException;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
+    // Constants for repeated strings
+    private static final String BAD_REQUEST = BAD_REQUEST;
 
     /**
      * Handle SalesValidationException.
@@ -37,7 +40,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 ex.getMessage(),
                 null,
                 request.getDescription(false).replace("uri=", "")
@@ -55,7 +58,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 ex.getMessage(),
                 null,
                 request.getDescription(false).replace("uri=", "")
@@ -73,7 +76,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 ex.getMessage(),
                 null,
                 request.getDescription(false).replace("uri=", "")
@@ -98,7 +101,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 "Validation failed for sales transaction",
                 details,
                 request.getDescription(false).replace("uri=", "")

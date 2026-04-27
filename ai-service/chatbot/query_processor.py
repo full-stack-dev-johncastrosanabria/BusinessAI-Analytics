@@ -8,6 +8,9 @@ from chatbot.intent_classifier import IntentClassifier, Intent
 
 logger = logging.getLogger(__name__)
 
+# Import constants
+DB_BUSINESS_METRICS = "database:business_metrics"
+
 
 class QueryProcessor:
     """Process chatbot queries and retrieve relevant data"""
@@ -81,19 +84,19 @@ class QueryProcessor:
                 best = best_worst.get("best_month")
                 if best:
                     answer = f"The best performing month was {best['month']}/{best['year']} with a profit of ${best['profit']:,.2f}."
-                    return answer, ["database:business_metrics"]
+                    return answer, [DB_BUSINESS_METRICS]
             
             if "worst" in question.lower() or "lowest" in question.lower():
                 best_worst = self.db.get_best_worst_months()
                 worst = best_worst.get("worst_month")
                 if worst:
                     answer = f"The worst performing month was {worst['month']}/{worst['year']} with a profit of ${worst['profit']:,.2f}."
-                    return answer, ["database:business_metrics"]
+                    return answer, [DB_BUSINESS_METRICS]
             
             # Default: return recent metrics summary
             recent = metrics[0]
             answer = f"Recent sales metrics for {recent['month']}/{recent['year']}: Total Sales: ${recent['total_sales']:,.2f}, Total Costs: ${recent['total_costs']:,.2f}, Profit: ${recent['profit']:,.2f}."
-            return answer, ["database:business_metrics"]
+            return answer, [DB_BUSINESS_METRICS]
         
         except Exception as e:
             logger.error(f"Error handling sales metrics query: {e}")

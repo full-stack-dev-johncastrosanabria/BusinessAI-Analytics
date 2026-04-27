@@ -23,6 +23,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ── Constants for repeated strings ──────────────────────────────────────────
+INSUFFICIENT_TRAINING_DATA = "Insufficient training data. Need at least 24 months of historical data."
+
 # Initialize FastAPI app
 app = FastAPI(
     title="BusinessAI Analytics AI Service",
@@ -132,7 +135,13 @@ async def shutdown_event():
 
 # Forecast Endpoints
 
-@app.post("/api/ai/forecast/sales", response_model=ForecastResponse)
+@app.post("/api/ai/forecast/sales", 
+          response_model=ForecastResponse,
+          responses={
+              400: {"description": "Insufficient training data"},
+              500: {"description": "Internal server error"},
+              503: {"description": "Sales model not loaded"}
+          })
 async def forecast_sales():
     """
     Generate 12-month sales forecast
@@ -152,7 +161,7 @@ async def forecast_sales():
         if len(historical_data) < 24:
             raise HTTPException(
                 status_code=400,
-                detail="Insufficient training data. Need at least 24 months of historical data."
+                detail=INSUFFICIENT_TRAINING_DATA
             )
         
         # Generate forecast
@@ -177,7 +186,13 @@ async def forecast_sales():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/ai/forecast/costs", response_model=ForecastResponse)
+@app.post("/api/ai/forecast/costs", 
+          response_model=ForecastResponse,
+          responses={
+              400: {"description": "Insufficient training data"},
+              500: {"description": "Internal server error"},
+              503: {"description": "Cost model not loaded"}
+          })
 async def forecast_costs():
     """
     Generate 12-month cost forecast
@@ -197,7 +212,7 @@ async def forecast_costs():
         if len(historical_data) < 24:
             raise HTTPException(
                 status_code=400,
-                detail="Insufficient training data. Need at least 24 months of historical data."
+                detail=INSUFFICIENT_TRAINING_DATA
             )
         
         # Try to generate forecast
@@ -229,7 +244,13 @@ async def forecast_costs():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/ai/forecast/profit", response_model=ForecastResponse)
+@app.post("/api/ai/forecast/profit", 
+          response_model=ForecastResponse,
+          responses={
+              400: {"description": "Insufficient training data"},
+              500: {"description": "Internal server error"},
+              503: {"description": "Models not loaded"}
+          })
 async def forecast_profit():
     """
     Generate 12-month profit forecast by subtracting cost from sales
@@ -249,7 +270,7 @@ async def forecast_profit():
         if len(historical_data) < 24:
             raise HTTPException(
                 status_code=400,
-                detail="Insufficient training data. Need at least 24 months of historical data."
+                detail=INSUFFICIENT_TRAINING_DATA
             )
         
         # Generate sales forecast
@@ -288,7 +309,12 @@ async def forecast_profit():
 
 # Chatbot Endpoints
 
-@app.post("/api/ai/chatbot/query", response_model=ChatbotQueryResponse)
+@app.post("/api/ai/chatbot/query", 
+          response_model=ChatbotQueryResponse,
+          responses={
+              500: {"description": "Internal server error"},
+              503: {"description": "Chatbot not initialized"}
+          })
 async def process_chatbot_query(request: ChatbotQueryRequest):
     """
     Process a natural language question and return an answer
@@ -331,7 +357,13 @@ async def process_chatbot_query(request: ChatbotQueryRequest):
 
 # Training Endpoint
 
-@app.post("/api/ai/train", response_model=TrainingResponse)
+@app.post("/api/ai/train", 
+          response_model=TrainingResponse,
+          responses={
+              400: {"description": "Insufficient training data"},
+              500: {"description": "Internal server error"},
+              503: {"description": "Models not initialized"}
+          })
 async def train_models(request: TrainingRequest = None):
     """
     Train both sales and cost forecasting models
@@ -356,7 +388,7 @@ async def train_models(request: TrainingRequest = None):
         if len(historical_data) < 24:
             raise HTTPException(
                 status_code=400,
-                detail="Insufficient training data. Need at least 24 months of historical data."
+                detail=INSUFFICIENT_TRAINING_DATA
             )
         
         # Train models
@@ -398,4 +430,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)

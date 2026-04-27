@@ -20,20 +20,8 @@ import {
 } from '../hooks/useForecasts'
 import './Forecasts.css'
 
-function Forecasts() {
-  const [isPending, startTransition] = useTransition()
-
-  // Queries
-  const salesQuery = useSalesForecast()
-  const costQuery = useCostForecast()
-  const profitQuery = useProfitForecast()
-
-  // Mutations
-  const generateSales = useGenerateSalesForecast()
-  const generateCost = useGenerateCostForecast()
-  const generateProfit = useGenerateProfitForecast()
-  const generateAll = useGenerateAllForecasts()
-
+// Helper hooks to reduce cognitive complexity
+function useForecastHandlers({ generateSales, generateCost, generateProfit, generateAll, startTransition }) {
   const handleGenerateAll = () => {
     startTransition(() => {
       generateAll.mutate()
@@ -58,6 +46,15 @@ function Forecasts() {
     })
   }
 
+  return {
+    handleGenerateAll,
+    handleGenerateSales,
+    handleGenerateCost,
+    handleGenerateProfit
+  }
+}
+
+function useForecastState({ generateSales, generateCost, generateProfit, generateAll, isPending }) {
   const isLoading =
     generateSales.isPending ||
     generateCost.isPending ||
@@ -68,16 +65,65 @@ function Forecasts() {
   const error =
     generateSales.error || generateCost.error || generateProfit.error || generateAll.error
 
-  // Combine data for the combined chart
-  const combinedData =
-    salesQuery.data && costQuery.data && profitQuery.data
-      ? salesQuery.data.predictions.map((item, index) => ({
-          month: item.month,
-          sales: item.value,
-          cost: costQuery.data.predictions[index]?.value || 0,
-          profit: profitQuery.data.predictions[index]?.value || 0,
-        }))
-      : []
+  return { isLoading, error }
+}
+
+function useCombinedForecastData({ salesQuery, costQuery, profitQuery }) {
+  return salesQuery.data && costQuery.data && profitQuery.data
+    ? salesQuery.data.predictions.map((item, index) => ({
+        month: item.month,
+        sales: item.value,
+        cost: costQuery.data.predictions[index]?.value || 0,
+        profit: profitQuery.data.predictions[index]?.value || 0,
+      }))
+    : []
+}
+
+function Forecasts() {
+  const [isPending, startTransition] = useTransition()
+
+  // Queries
+  const salesQuery = useSalesForecast()
+  const costQuery = useCostForecast()
+  const profitQuery = useProfitForecast()
+
+  // Mutations
+  const generateSales = useGenerateSalesForecast()
+  const generateCost = useGenerateCostForecast()
+  const generateProfit = useGenerateProfitForecast()
+  const generateAll = useGenerateAllForecasts()
+
+  // Extract handlers to reduce complexity
+  const handlers = useForecastHandlers({
+    generateSales,
+    generateCost,
+    generateProfit,
+    generateAll,
+    startTransition
+  })
+
+  // Extract loading and error state logic
+  const { isLoading, error } = useForecastState({
+    generateSales,
+    generateCost,
+    generateProfit,
+    generateAll,
+    isPending
+  })
+
+  // Extract data combination logic
+  const combinedData = useCombinedForecastData({
+    salesQuery,
+    costQuery,
+    profitQuery
+  })
+
+  const {
+    handleGenerateAll,
+    handleGenerateSales,
+    handleGenerateCost,
+    handleGenerateProfit
+  } = handlers
 
   return (
     <div className="forecasts">
