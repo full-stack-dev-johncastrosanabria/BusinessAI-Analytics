@@ -6,9 +6,11 @@ Enterprise-grade business analytics platform with AI-powered forecasting, real-t
 
 Watch the platform in action:
 
-![Demo](./demo.gif)
+<div align="center">
+  <img src="./demo.gif" alt="Demo" width="100%">
+</div>
 
-**[📥 Download full demo video (MP4, 4.1MB)](./demo.mp4)** for better quality
+**[📥 Download full demo video (MP4, 4.1MB)](./demo.mp4)** for better quality and full length
 
 ---
 

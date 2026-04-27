@@ -264,7 +264,7 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=10000
             monthly_factor = 1.0
         
         # Occasional promotional spikes (5% chance)
-        promo_factor = 1.5 if random.random() < 0.05 else 1.0
+        promo_factor = 1.5 if random.random() < 0.05 else 1.0  # nosec - test data generation only
         
         # Combined probability for this date
         probability = growth_factor * seasonal_factor * weekly_factor * monthly_factor * promo_factor
@@ -380,7 +380,7 @@ def generate_business_metrics(cursor, start_date, end_date):
         )
         
         # Occasionally add unexpected expenses (10% chance)
-        if random.random() < 0.10:
+        if random.random() < 0.10:  # nosec - test data generation only
             unexpected_expense = round(random.uniform(3000, 12000), 2)
             total_expenses += unexpected_expense
         
