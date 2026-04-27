@@ -114,6 +114,7 @@ class AdvancedQueryProcessor:
             'transactions', 'transacciones', 'worst month', 'best month',
             'peor mes', 'mejor mes', 'año pasado', 'last year', 'annual',
             'anual', 'trimestre', 'quarter', 'q1', 'q2', 'q3', 'q4',
+            '1q', '2q', '3q', '4q',
         ]
 
         if any(s in q for s in product_signals):
@@ -954,17 +955,29 @@ class AdvancedQueryProcessor:
         return None
 
     def _extract_quarter(self, question: str) -> Optional[Tuple[int, List[int]]]:
-        """Return (year, [months]) for quarter queries like 'Q3 2023'."""
+        """Return (year, [months]) for quarter queries like 'Q3 2023', '3Q 2023', '2023 Q3'."""
         q = question.lower()
+        # Pattern: Q3 2025 or q3 2025
         m = re.search(r'q([1-4])\s*(\d{4})', q)
-        if not m:
-            m = re.search(r'(\d{4})\s*q([1-4])', q)
-            if m:
-                year, qnum = int(m.group(1)), int(m.group(2))
-            else:
-                return None
-        else:
+        if m:
             qnum, year = int(m.group(1)), int(m.group(2))
+        else:
+            # Pattern: 3Q 2025 or 3q 2025
+            m = re.search(r'([1-4])q\s*(\d{4})', q)
+            if m:
+                qnum, year = int(m.group(1)), int(m.group(2))
+            else:
+                # Pattern: 2025 Q3 or 2025 q3
+                m = re.search(r'(\d{4})\s*q([1-4])', q)
+                if m:
+                    year, qnum = int(m.group(1)), int(m.group(2))
+                else:
+                    # Pattern: 2025 3Q
+                    m = re.search(r'(\d{4})\s*([1-4])q', q)
+                    if m:
+                        year, qnum = int(m.group(1)), int(m.group(2))
+                    else:
+                        return None
         months = QUARTER_MONTHS[f'q{qnum}']
         return year, months
 
