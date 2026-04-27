@@ -256,23 +256,29 @@ class AdvancedQueryProcessor:
                     r = metrics[0]
                     mn = MONTH_NAMES_EN[r['month']]
                     mn_es = MONTH_NAMES_ES[r['month']]
+                    # Convert Decimal to float
+                    total_sales = float(r['total_sales'])
+                    total_costs = float(r['total_costs'])
+                    profit = float(r['profit'])
+                    total_expenses = float(r.get('total_expenses', 0))
+                    margin = (profit / total_sales * 100) if total_sales else 0
                     if language == Language.SPANISH:
                         return (
                             f"📊 **Facturación de {mn_es} {r['year']}:**\n\n"
-                            f"💰 Ventas Totales: ${r['total_sales']:,.2f}\n"
-                            f"📦 Costos Totales: ${r['total_costs']:,.2f}\n"
-                            f"💵 Gastos: ${r.get('total_expenses', 0):,.2f}\n"
-                            f"📈 Ganancia: ${r['profit']:,.2f}\n"
-                            f"📊 Margen: {(r['profit'] / r['total_sales'] * 100) if r['total_sales'] else 0:.1f}%",
+                            f"💰 Ventas Totales: ${total_sales:,.2f}\n"
+                            f"📦 Costos Totales: ${total_costs:,.2f}\n"
+                            f"💵 Gastos: ${total_expenses:,.2f}\n"
+                            f"📈 Ganancia: ${profit:,.2f}\n"
+                            f"📊 Margen: {margin:.1f}%",
                             ["database:business_metrics"]
                         )
                     return (
                         f"📊 **Billing for {mn} {r['year']}:**\n\n"
-                        f"💰 Total Sales: ${r['total_sales']:,.2f}\n"
-                        f"📦 Total Costs: ${r['total_costs']:,.2f}\n"
-                        f"💵 Expenses: ${r.get('total_expenses', 0):,.2f}\n"
-                        f"📈 Profit: ${r['profit']:,.2f}\n"
-                        f"📊 Margin: {(r['profit'] / r['total_sales'] * 100) if r['total_sales'] else 0:.1f}%",
+                        f"💰 Total Sales: ${total_sales:,.2f}\n"
+                        f"📦 Total Costs: ${total_costs:,.2f}\n"
+                        f"💵 Expenses: ${total_expenses:,.2f}\n"
+                        f"📈 Profit: ${profit:,.2f}\n"
+                        f"📊 Margin: {margin:.1f}%",
                         ["database:business_metrics"]
                     )
                 return self._no_data("sales", language), []
@@ -291,16 +297,17 @@ class AdvancedQueryProcessor:
                     label_es = 'mejor' if is_best else 'peor'
                     mn = MONTH_NAMES_EN[rec['month']]
                     mn_es = MONTH_NAMES_ES[rec['month']]
+                    profit = float(rec['profit'])
                     if language == Language.SPANISH:
                         return (
                             f"📊 El {label_es} mes fue **{mn_es} {rec['year']}**\n"
-                            f"• Ganancia: ${rec['profit']:,.2f}\n\n"
+                            f"• Ganancia: ${profit:,.2f}\n\n"
                             f"💡 Esto se basa en el historial completo de métricas de negocio.",
                             ["database:business_metrics"]
                         )
                     return (
                         f"📊 The {label_en} performing month was **{mn} {rec['year']}**\n"
-                        f"• Profit: ${rec['profit']:,.2f}\n\n"
+                        f"• Profit: ${profit:,.2f}\n\n"
                         f"💡 Based on the full history of business metrics.",
                         ["database:business_metrics"]
                     )
@@ -324,21 +331,24 @@ class AdvancedQueryProcessor:
                 if rec:
                     mn = MONTH_NAMES_EN[month]
                     mn_es = MONTH_NAMES_ES[month]
-                    margin = (rec['profit'] / rec['total_sales'] * 100) if rec['total_sales'] else 0
+                    total_sales = float(rec['total_sales'])
+                    total_costs = float(rec['total_costs'])
+                    profit = float(rec['profit'])
+                    margin = (profit / total_sales * 100) if total_sales else 0
                     if language == Language.SPANISH:
                         return (
                             f"📅 Ventas de {mn_es} {year}:\n"
-                            f"• Ventas Totales: ${rec['total_sales']:,.2f}\n"
-                            f"• Costos Totales: ${rec['total_costs']:,.2f}\n"
-                            f"• Ganancia: ${rec['profit']:,.2f}\n"
+                            f"• Ventas Totales: ${total_sales:,.2f}\n"
+                            f"• Costos Totales: ${total_costs:,.2f}\n"
+                            f"• Ganancia: ${profit:,.2f}\n"
                             f"• Margen: {margin:.1f}%",
                             ["database:business_metrics"]
                         )
                     return (
                         f"📅 Sales for {mn} {year}:\n"
-                        f"• Total Sales: ${rec['total_sales']:,.2f}\n"
-                        f"• Total Costs: ${rec['total_costs']:,.2f}\n"
-                        f"• Profit: ${rec['profit']:,.2f}\n"
+                        f"• Total Sales: ${total_sales:,.2f}\n"
+                        f"• Total Costs: ${total_costs:,.2f}\n"
+                        f"• Profit: ${profit:,.2f}\n"
                         f"• Margin: {margin:.1f}%",
                         ["database:business_metrics"]
                     )
@@ -370,28 +380,31 @@ class AdvancedQueryProcessor:
             if not metrics:
                 return self._no_data("sales", language), []
             r = metrics[0]
-            margin = (r['profit'] / r['total_sales'] * 100) if r['total_sales'] else 0
+            total_sales = float(r['total_sales'])
+            total_costs = float(r['total_costs'])
+            profit = float(r['profit'])
+            margin = (profit / total_sales * 100) if total_sales else 0
             mn = MONTH_NAMES_EN[r['month']]
             mn_es = MONTH_NAMES_ES[r['month']]
             if language == Language.SPANISH:
                 return (
                     f"📊 Métricas más recientes — {mn_es} {r['year']}:\n"
-                    f"• Ventas Totales: ${r['total_sales']:,.2f}\n"
-                    f"• Costos Totales: ${r['total_costs']:,.2f}\n"
-                    f"• Ganancia: ${r['profit']:,.2f}\n"
+                    f"• Ventas Totales: ${total_sales:,.2f}\n"
+                    f"• Costos Totales: ${total_costs:,.2f}\n"
+                    f"• Ganancia: ${profit:,.2f}\n"
                     f"• Margen: {margin:.1f}%",
                     ["database:business_metrics"]
                 )
             return (
                 f"📊 Most recent metrics — {mn} {r['year']}:\n"
-                f"• Total Sales: ${r['total_sales']:,.2f}\n"
-                f"• Total Costs: ${r['total_costs']:,.2f}\n"
-                f"• Profit: ${r['profit']:,.2f}\n"
+                f"• Total Sales: ${total_sales:,.2f}\n"
+                f"• Total Costs: ${total_costs:,.2f}\n"
+                f"• Profit: ${profit:,.2f}\n"
                 f"• Margin: {margin:.1f}%",
                 ["database:business_metrics"]
             )
         except Exception as e:
-            logger.error("Error in sales handler: %s", e)
+            logger.error("Error in sales handler: %s", e, exc_info=True)
             return self._err(language), []
 
     async def _handle_profit_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
@@ -433,12 +446,6 @@ class AdvancedQueryProcessor:
             if any(w in q for w in ['suspicious', 'sospechoso', 'too high', 'muy altas', 'muy alta',
                                     'too low', 'muy bajas', 'muy baja', 'looks suspicious', 'parece sospechoso']):
                 return await self._handle_suspicious_months(language)
-            
-            # ── Closest to losing money ──
-            if any(w in q for w in ['closest to losing', 'más cerca de perder', 'losing money', 
-                                    'perder dinero', 'closest to loss', 'near bankruptcy', 'estuvimos cerca',
-                                    'cerca de pérdida', 'más cerca de pérdida']):
-                return await self._handle_closest_to_loss(language)
             
             # ── Business failure scenarios ──
             if any(w in q for w in ['stop being profitable', 'deje de ser rentable', 'dejar de ser rentable',
@@ -494,7 +501,7 @@ class AdvancedQueryProcessor:
             return await self._handle_sales_metrics(question, language)
             
         except Exception as e:
-            logger.error(f"Error in profit analysis: {e}")
+            logger.error(f"Error in profit analysis: {e}", exc_info=True)
             return self._err(language), []
 
     async def _handle_avg_margin(self, language: Language) -> Tuple[str, List[str]]:
@@ -693,16 +700,18 @@ class AdvancedQueryProcessor:
                     if language == Language.SPANISH:
                         ans = "🏆 Top 5 productos por ingresos:\n\n"
                         for i, p in enumerate(top, 1):
+                            revenue = float(p['total_revenue'])
                             ans += (f"{i}. {p['name']}\n"
                                     f"   • Categoría: {p['category']}\n"
-                                    f"   • Ingresos: ${p['total_revenue']:,.2f}\n\n")
+                                    f"   • Ingresos: ${revenue:,.2f}\n\n")
                         ans += f"✨ Producto líder: **{top[0]['name']}**"
                     else:
                         ans = "🏆 Top 5 products by revenue:\n\n"
                         for i, p in enumerate(top, 1):
+                            revenue = float(p['total_revenue'])
                             ans += (f"{i}. {p['name']}\n"
                                     f"   • Category: {p['category']}\n"
-                                    f"   • Revenue: ${p['total_revenue']:,.2f}\n\n")
+                                    f"   • Revenue: ${revenue:,.2f}\n\n")
                         ans += f"✨ Top product: **{top[0]['name']}**"
                     return ans, ["database:products", "database:sales_transactions"]
 
@@ -713,14 +722,15 @@ class AdvancedQueryProcessor:
                 if matches:
                     if len(matches) == 1:
                         p = matches[0]
+                        price = float(p['price'])
                         if language == Language.SPANISH:
                             ans = (f"📦 {p['name']}\n"
                                    f"• Categoría: {p['category']}\n"
-                                   f"• Precio: ${p['price']:,.2f}")
+                                   f"• Precio: ${price:,.2f}")
                         else:
                             ans = (f"📦 {p['name']}\n"
                                    f"• Category: {p['category']}\n"
-                                   f"• Price: ${p['price']:,.2f}")
+                                   f"• Price: ${price:,.2f}")
                     else:
                         names = ', '.join(p['name'] for p in matches[:5])
                         ans = f"Productos encontrados: {names}" if language == Language.SPANISH \
@@ -1919,6 +1929,9 @@ class AdvancedQueryProcessor:
             mn = MONTH_NAMES_EN[month]
             mn_es = MONTH_NAMES_ES[month]
             
+            # Convert Decimal to float
+            worst_profit = float(worst['profit'])
+            
             # Get all metrics to compare
             all_metrics = self.db.get_all_sales_metrics()
             if not all_metrics:
@@ -1927,13 +1940,13 @@ class AdvancedQueryProcessor:
                 
             avg_profit = sum(float(m['profit']) for m in all_metrics) / len(all_metrics)
             
-            profit_diff = float(worst['profit']) - avg_profit
+            profit_diff = worst_profit - avg_profit
             
             if language == Language.SPANISH:
                 return (
                     f"📉 **Peor mes: {mn_es} {year}**\n\n"
                     f"💰 Resultados:\n"
-                    f"• Ganancia: ${worst['profit']:,.2f}\n"
+                    f"• Ganancia: ${worst_profit:,.2f}\n"
                     f"• Diferencia vs promedio: ${profit_diff:,.2f}\n\n"
                     f"🔍 **¿Por qué fue malo?**\n"
                     f"• Ganancia {abs(profit_diff):,.2f} por debajo del promedio\n"
@@ -1945,7 +1958,7 @@ class AdvancedQueryProcessor:
             return (
                 f"📉 **Worst month: {mn} {year}**\n\n"
                 f"💰 Results:\n"
-                f"• Profit: ${worst['profit']:,.2f}\n"
+                f"• Profit: ${worst_profit:,.2f}\n"
                 f"• Difference vs average: ${profit_diff:,.2f}\n\n"
                 f"🔍 **Why was it bad?**\n"
                 f"• Profit ${abs(profit_diff):,.2f} below average\n"
@@ -2197,6 +2210,10 @@ class AdvancedQueryProcessor:
             closest_month = min(all_metrics, key=lambda x: abs(float(x['profit'])))
             profit = float(closest_month['profit'])
             
+            # Convert all Decimal values to float
+            total_sales = float(closest_month['total_sales'])
+            total_costs = float(closest_month['total_costs'])
+            
             mn = MONTH_NAMES_EN[closest_month['month']]
             mn_es = MONTH_NAMES_ES[closest_month['month']]
             
@@ -2209,15 +2226,15 @@ class AdvancedQueryProcessor:
                     answer = (f"💸 **Más cerca de perder dinero: {mn_es} {closest_month['year']}**\n\n"
                              f"💰 Resultados:\n"
                              f"• Ganancia: ${profit:,.2f} (apenas positiva)\n"
-                             f"• Ventas: ${closest_month['total_sales']:,.2f}\n"
-                             f"• Costos: ${closest_month['total_costs']:,.2f}\n\n"
+                             f"• Ventas: ${total_sales:,.2f}\n"
+                             f"• Costos: ${total_costs:,.2f}\n\n"
                              f"⚠️ Este mes estuvo a solo ${profit:,.2f} de operar con pérdidas.\n")
                 else:
                     answer = (f"💸 **Más cerca de perder dinero: {mn_es} {closest_month['year']}**\n\n"
                              f"💰 Resultados:\n"
                              f"• Pérdida: ${abs(profit):,.2f}\n"
-                             f"• Ventas: ${closest_month['total_sales']:,.2f}\n"
-                             f"• Costos: ${closest_month['total_costs']:,.2f}\n\n"
+                             f"• Ventas: ${total_sales:,.2f}\n"
+                             f"• Costos: ${total_costs:,.2f}\n\n"
                              f"🚨 Este mes operamos con pérdidas de ${abs(profit):,.2f}.\n")
                 
                 if worst_profit != profit:
@@ -2228,15 +2245,15 @@ class AdvancedQueryProcessor:
                     answer = (f"💸 **Closest to losing money: {mn} {closest_month['year']}**\n\n"
                              f"💰 Results:\n"
                              f"• Profit: ${profit:,.2f} (barely positive)\n"
-                             f"• Sales: ${closest_month['total_sales']:,.2f}\n"
-                             f"• Costs: ${closest_month['total_costs']:,.2f}\n\n"
+                             f"• Sales: ${total_sales:,.2f}\n"
+                             f"• Costs: ${total_costs:,.2f}\n\n"
                              f"⚠️ This month was only ${profit:,.2f} away from operating at a loss.\n")
                 else:
                     answer = (f"💸 **Closest to losing money: {mn} {closest_month['year']}**\n\n"
                              f"💰 Results:\n"
                              f"• Loss: ${abs(profit):,.2f}\n"
-                             f"• Sales: ${closest_month['total_sales']:,.2f}\n"
-                             f"• Costs: ${closest_month['total_costs']:,.2f}\n\n"
+                             f"• Sales: ${total_sales:,.2f}\n"
+                             f"• Costs: ${total_costs:,.2f}\n\n"
                              f"🚨 This month we operated at a loss of ${abs(profit):,.2f}.\n")
                 
                 if worst_profit != profit:
@@ -2245,7 +2262,7 @@ class AdvancedQueryProcessor:
             
             return answer, ["database:business_metrics"]
         except Exception as e:
-            logger.error(f"Error in closest to loss analysis: {e}")
+            logger.error(f"Error in closest to loss analysis: {e}", exc_info=True)
             return self._err(language), []
 
     async def _handle_failure_scenarios(self, language: Language) -> Tuple[str, List[str]]:
