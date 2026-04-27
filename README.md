@@ -6,9 +6,11 @@ Enterprise-grade business analytics platform with AI-powered forecasting, real-t
 
 Watch the platform in action:
 
-[![Demo Video](./preview.png)](./demo.webm)
+![Demo Preview](./preview.png)
 
-[▶️ Watch Demo Video](./demo.webm)
+> **Note:** For the full demo video, please download [demo.webm](./demo.webm) or view it locally.
+> 
+> Alternatively, you can convert it to MP4 and upload to GitHub releases or host it on YouTube/Vimeo for embedding.
 
 ---
 
