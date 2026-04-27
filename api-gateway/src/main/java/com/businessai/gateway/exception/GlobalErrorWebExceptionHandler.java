@@ -48,7 +48,12 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
     }
 
     @Override
+    @SuppressWarnings("null")
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+        if (exchange == null || ex == null) {
+            return Mono.empty();
+        }
+        
         // Determine HTTP status and error message
         HttpStatus status = determineHttpStatus(ex);
         String path = exchange.getRequest().getURI().getPath();
@@ -81,6 +86,10 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      * Determine appropriate HTTP status code based on exception type.
      */
     private HttpStatus determineHttpStatus(Throwable ex) {
+        if (ex == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        
         if (ex instanceof ResponseStatusException rse) {
             HttpStatus resolved = HttpStatus.resolve(rse.getStatusCode().value());
             return resolved != null ? resolved : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -128,6 +137,10 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      * Determine appropriate error message based on exception and status.
      */
     private String determineErrorMessage(Throwable ex, HttpStatus status) {
+        if (ex == null) {
+            return status.getReasonPhrase();
+        }
+        
         // For ResponseStatusException, use the reason if available
         if (ex instanceof ResponseStatusException rse) {
             String reason = rse.getReason();
@@ -138,7 +151,7 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
         
         // For client errors (4xx), include exception message
         String exMessage = ex.getMessage();
-        if (status.is4xxClientError() && exMessage != null) {
+        if (status.is4xxClientError() && exMessage != null && !exMessage.isEmpty()) {
             return exMessage;
         }
         
@@ -156,6 +169,10 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      * Log error with appropriate level based on status code.
      */
     private void logError(ServerWebExchange exchange, HttpStatus status, Throwable ex) {
+        if (exchange == null || status == null || ex == null) {
+            return;
+        }
+        
         String method = exchange.getRequest().getMethod() != null ? exchange.getRequest().getMethod().toString() : "UNKNOWN";
         String path = exchange.getRequest().getURI().getPath();
         String message = ex.getMessage() != null ? ex.getMessage() : "No message";
