@@ -7,13 +7,13 @@ Plataforma de inteligencia empresarial con arquitectura de microservicios, pron�
 ```
 Frontend (5173)
     └── API Gateway (8080)
-            ├── Product Service   (8081)
-            ├── Customer Service  (8082)
-            ├── Sales Service     (8083)
-            ├── Analytics Service (8084)
-            ├── Document Service  (8085)
-            └── AI Service        (8000)
-                    └── MySQL (3306)
+            ├── Product Service   (8081)  → /api/products/**
+            ├── Customer Service  (8082)  → /api/customers/**
+            ├── Sales Service     (8083)  → /api/sales/**
+            ├── Analytics Service (8084)  → /api/analytics/**
+            ├── Document Service  (8085)  → /api/documents/**
+            └── AI Service        (8000)  → /api/ai/**
+                    └── MySQL (3306) — businessai
 ```
 
 ## Requisitos
@@ -37,11 +37,8 @@ mysql -u root -p < database/schema.sql
 # 2. Generar datos sintéticos
 python3 database/generate_seed_data.py
 
-# 3. Exportar contraseña de MySQL
-export MYSQL_PASSWORD=tu_contraseña
-
-# 4. Iniciar todo el sistema
-./start-system.sh
+# 3. Iniciar todo el sistema
+MYSQL_PASSWORD=tu_contraseña ./start-system.sh
 ```
 
 La aplicación estará disponible en **http://localhost:5173**
@@ -49,12 +46,10 @@ La aplicación estará disponible en **http://localhost:5173**
 ### Uso diario
 
 ```bash
-export MYSQL_PASSWORD=tu_contraseña
-
-./start-system.sh      # Iniciar
-./check-system.sh      # Ver estado
-./stop-system.sh       # Detener
-./stop-system.sh --force  # Forzar detención
+MYSQL_PASSWORD=tu_contraseña ./start-system.sh   # Iniciar
+./check-system.sh                                 # Ver estado
+./stop-system.sh                                  # Detener
+./stop-system.sh --force                          # Forzar detención
 ```
 
 ## Puertos de servicios
@@ -80,25 +75,24 @@ export MYSQL_PASSWORD=tu_contraseña
 
 ### Pronósticos (AI)
 - Pronóstico de ventas a 12 meses — modelo PyTorch LSTM
-- Pronóstico de costos a 12 meses — modelo TensorFlow LSTM
+- Pronóstico de costos a 12 meses — modelo PyTorch LSTM
 - Pronóstico de ganancias calculado automáticamente
 - Métrica de precisión MAPE
 
 ### Asistente empresarial (Chatbot)
-- Consultas en lenguaje natural en inglés y español
-- Acceso directo a base de datos (ventas, productos, clientes)
-- Búsqueda en documentos subidos
-- Soporte para preguntas por mes, trimestre, año, comparaciones y tendencias
+Consultas en lenguaje natural en inglés y español con respuestas específicas de la base de datos.
 
 **Ejemplos de preguntas:**
 ```
-¿Cuánto vendimos en total en 2024?
-¿Cuál fue nuestro mes más rentable?
-¿Qué categoría de productos genera más ingresos?
-¿Qué clientes son del segmento Enterprise?
-Compare sales between January and June 2024
-What was our worst performing month ever?
-Who are our top customers by number of orders?
+¿Cuál fue el mes con peor utilidad?
+¿Qué mes estuvo más cerca de pérdida?
+¿Cuánto se facturó este mes?
+¿Cuál fue la factura o venta más alta?
+¿Qué producto se facturó más?
+¿Qué día tuvimos más ventas?
+¿Hay ventas muy pequeñas que no valen la pena?
+What was our best performing month?
+Which product generates the most revenue?
 ```
 
 ### Gestión de documentos
@@ -107,7 +101,7 @@ Who are our top customers by number of orders?
 - Búsqueda full-text en contenido
 
 ### Gestión de datos
-- CRUD de productos, clientes y transacciones de ventas
+- CRUD completo de productos, clientes y transacciones de ventas
 - Validación de email único en clientes
 - Cálculo automático de totales en transacciones
 
@@ -130,8 +124,8 @@ Esquema con 5 tablas principales:
 |----------------------|-----------|------------------------------------------|
 | `products`           | 30        | Catálogo: Electronics, Furniture, etc.   |
 | `customers`          | 100       | Segmentos: Enterprise, SMB, Startup      |
-| `sales_transactions` | 5 000     | 5 años de transacciones con tendencias   |
-| `business_metrics`   | 60        | Métricas mensuales agregadas             |
+| `sales_transactions` | 5 000+    | Transacciones con tendencias históricas  |
+| `business_metrics`   | 97        | Métricas mensuales (Ene 2018 – Abr 2026) |
 | `documents`          | Variable  | Documentos subidos con texto extraído    |
 
 Para regenerar datos sintéticos:
@@ -167,18 +161,6 @@ cd ai-service && pytest
 # Frontend
 cd frontend && npm test
 ```
-
-| Servicio           | Tests |
-|--------------------|-------|
-| Product Service    | 56    |
-| Customer Service   | 55    |
-| Sales Service      | 78    |
-| Analytics Service  | 32    |
-| Document Service   | 25    |
-| API Gateway        | 69    |
-| AI Service         | 105   |
-| Frontend           | 82    |
-| **Total**          | **502** |
 
 ## Solución de problemas
 
@@ -225,13 +207,13 @@ BusinessAI-Analytics/
 ├── check-system.sh
 ├── setup-database.sh
 ├── database/              # Esquema SQL y generador de datos
-├── api-gateway/           # Spring Cloud Gateway
-├── product-service/       # Microservicio productos
-├── customer-service/      # Microservicio clientes
-├── sales-service/         # Microservicio ventas
-├── analytics-service/     # Microservicio analítica
-├── document-service/      # Microservicio documentos
-├── ai-service/            # FastAPI + modelos LSTM
-├── frontend/              # React TypeScript SPA
+├── api-gateway/           # Spring Cloud Gateway (8080)
+├── product-service/       # Microservicio productos (8081)
+├── customer-service/      # Microservicio clientes (8082)
+├── sales-service/         # Microservicio ventas (8083)
+├── analytics-service/     # Microservicio analítica (8084)
+├── document-service/      # Microservicio documentos (8085)
+├── ai-service/            # FastAPI + modelos LSTM (8000)
+├── frontend/              # React 19 TypeScript SPA (5173)
 └── logs/                  # Logs en tiempo de ejecución
 ```
