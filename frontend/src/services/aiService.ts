@@ -24,27 +24,27 @@ export interface ChatbotResponse {
 const aiService = {
   // Generate sales forecast
   getSalesForecast: async (): Promise<ForecastResponse> => {
-    const response = await api.post('/api/ai/forecast/sales')
+    return await api.post('/api/ai/forecast/sales')
   },
 
   // Generate cost forecast
   getCostForecast: async (): Promise<ForecastResponse> => {
-    const response = await api.post('/api/ai/forecast/costs')
+    return await api.post('/api/ai/forecast/costs')
   },
 
   // Generate profit forecast
   getProfitForecast: async (): Promise<ForecastResponse> => {
-    const response = await api.post('/api/ai/forecast/profit')
+    return await api.post('/api/ai/forecast/profit')
   },
 
   // Process chatbot query
   processChatbotQuery: async (query: ChatbotQuery): Promise<ChatbotResponse> => {
-    const response = await api.post('/api/ai/chatbot/query', query)
+    return await api.post('/api/ai/chatbot/query', query)
   },
 
   // Trigger model training (admin endpoint)
   trainModels: async (): Promise<{ message: string }> => {
-    const response = await api.post('/api/ai/train')
+    return await api.post('/api/ai/train')
   },
 }
 

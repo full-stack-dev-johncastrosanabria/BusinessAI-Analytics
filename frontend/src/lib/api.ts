@@ -1,15 +1,20 @@
 /**
  * Modern API client using native fetch
  * Replaces axios with a lightweight, type-safe alternative
+ * Includes timeout, retry logic, and comprehensive error handling
  */
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080'
+const REQUEST_TIMEOUT = 30000 // 30 seconds
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000 // 1 second
 
 export class APIError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: unknown
+    public data?: unknown,
+    public context?: string
   ) {
     super(message)
     this.name = 'APIError'
@@ -18,13 +23,69 @@ export class APIError extends Error {
 
 interface RequestConfig extends RequestInit {
   params?: Record<string, string | number | boolean>
+  timeout?: number
+  retries?: number
+}
+
+/**
+ * Create an AbortSignal with timeout
+ */
+function createTimeoutSignal(timeout: number): AbortSignal {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
+  
+  // Clean up timeout if request completes
+  return new Proxy(controller.signal, {
+    get(target, prop) {
+      if (prop === 'addEventListener') {
+        return function(type: string, listener: EventListener) {
+          const wrappedListener = () => {
+            clearTimeout(timeoutId)
+            listener.call(this)
+          }
+          return target.addEventListener(type, wrappedListener)
+        }
+      }
+      return Reflect.get(target, prop)
+    }
+  })
+}
+
+/**
+ * Retry logic with exponential backoff
+ */
+async function retryRequest<T>(
+  fn: () => Promise<T>,
+  retries: number = MAX_RETRIES
+): Promise<T> {
+  let lastError: Error | null = null
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      
+      // Don't retry on client errors (4xx) or if out of retries
+      if (error instanceof APIError && error.status >= 400 && error.status < 500) {
+        throw error
+      }
+      
+      if (attempt < retries) {
+        const delay = RETRY_DELAY * Math.pow(2, attempt) // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+  }
+  
+  throw lastError || new Error('Request failed after retries')
 }
 
 async function request<T>(
   endpoint: string,
   config: RequestConfig = {}
 ): Promise<T> {
-  const { params, ...fetchConfig } = config
+  const { params, timeout = REQUEST_TIMEOUT, retries = MAX_RETRIES, ...fetchConfig } = config
 
   // Build URL with query params
   const url = new URL(`${API_BASE_URL}${endpoint}`)
@@ -40,34 +101,58 @@ async function request<T>(
     headers.set('Content-Type', 'application/json')
   }
 
-  try {
-    const response = await fetch(url.toString(), {
-      ...fetchConfig,
-      headers,
-    })
+  return retryRequest(async () => {
+    try {
+      const signal = createTimeoutSignal(timeout)
+      
+      const response = await fetch(url.toString(), {
+        ...fetchConfig,
+        headers,
+        signal,
+      })
 
-    // Handle non-OK responses
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null)
+      // Handle non-OK responses
+      if (!response.ok) {
+        let errorData: unknown = null
+        try {
+          errorData = await response.json()
+        } catch {
+          // Response is not JSON, that's okay
+        }
+        
+        throw new APIError(
+          (errorData as any)?.message || `HTTP ${response.status}: ${response.statusText}`,
+          response.status,
+          errorData,
+          endpoint
+        )
+      }
+
+      // Parse JSON response
+      const data = await response.json()
+      return data as T
+    } catch (error) {
+      if (error instanceof APIError) {
+        throw error
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new APIError(
+          `Request timeout after ${timeout}ms`,
+          0,
+          undefined,
+          endpoint
+        )
+      }
+      
       throw new APIError(
-        errorData?.message || `HTTP ${response.status}: ${response.statusText}`,
-        response.status,
-        errorData
+        error instanceof Error ? error.message : 'Network request failed',
+        0,
+        undefined,
+        endpoint
       )
     }
-
-    // Parse JSON response
-    const data = await response.json()
-    return data as T
-  } catch (error) {
-    if (error instanceof APIError) {
-      throw error
-    }
-    throw new APIError(
-      error instanceof Error ? error.message : 'Network request failed',
-      0
-    )
-  }
+  }, retries)
 }
 
 export const api = {

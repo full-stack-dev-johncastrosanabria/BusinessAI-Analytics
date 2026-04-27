@@ -81,8 +81,9 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      * Determine appropriate HTTP status code based on exception type.
      */
     private HttpStatus determineHttpStatus(Throwable ex) {
-        if (ex instanceof ResponseStatusException) {
-            return HttpStatus.resolve(((ResponseStatusException) ex).getStatusCode().value());
+        if (ex instanceof ResponseStatusException rse) {
+            HttpStatus resolved = HttpStatus.resolve(rse.getStatusCode().value());
+            return resolved != null ? resolved : HttpStatus.INTERNAL_SERVER_ERROR;
         }
         
         // Check exception class name for common patterns
@@ -128,16 +129,17 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      */
     private String determineErrorMessage(Throwable ex, HttpStatus status) {
         // For ResponseStatusException, use the reason if available
-        if (ex instanceof ResponseStatusException) {
-            String reason = ((ResponseStatusException) ex).getReason();
+        if (ex instanceof ResponseStatusException rse) {
+            String reason = rse.getReason();
             if (reason != null && !reason.isEmpty()) {
                 return reason;
             }
         }
         
         // For client errors (4xx), include exception message
-        if (status.is4xxClientError() && ex.getMessage() != null) {
-            return ex.getMessage();
+        String exMessage = ex.getMessage();
+        if (status.is4xxClientError() && exMessage != null) {
+            return exMessage;
         }
         
         // For server errors (5xx), use generic message to avoid exposing internals
@@ -154,21 +156,22 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
      * Log error with appropriate level based on status code.
      */
     private void logError(ServerWebExchange exchange, HttpStatus status, Throwable ex) {
-        String method = exchange.getRequest().getMethod().toString();
+        String method = exchange.getRequest().getMethod() != null ? exchange.getRequest().getMethod().toString() : "UNKNOWN";
         String path = exchange.getRequest().getURI().getPath();
+        String message = ex.getMessage() != null ? ex.getMessage() : "No message";
         
         if (status.is5xxServerError()) {
             // Server errors are logged as ERROR with full stack trace
             logger.error("Server error processing request: {} {} -> Status: {} | Error: {}",
-                method, path, status.value(), ex.getMessage(), ex);
+                method, path, status.value(), message, ex);
         } else if (status.is4xxClientError()) {
             // Client errors are logged as WARN without stack trace
             logger.warn("Client error processing request: {} {} -> Status: {} | Error: {}",
-                method, path, status.value(), ex.getMessage());
+                method, path, status.value(), message);
         } else {
             // Other errors logged as INFO
             logger.info("Error processing request: {} {} -> Status: {} | Error: {}",
-                method, path, status.value(), ex.getMessage());
+                method, path, status.value(), message);
         }
     }
 

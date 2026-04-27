@@ -61,6 +61,9 @@ public class AnalyticsService {
      * Calculate profit: profit = totalSales - totalCosts - totalExpenses
      */
     public BigDecimal calculateProfit(BigDecimal totalSales, BigDecimal totalCosts, BigDecimal totalExpenses) {
+        if (totalSales == null || totalCosts == null || totalExpenses == null) {
+            throw new IllegalArgumentException("All parameters must be non-null");
+        }
         return totalSales.subtract(totalCosts).subtract(totalExpenses);
     }
 
@@ -68,6 +71,9 @@ public class AnalyticsService {
      * Get a metric by ID
      */
     public BusinessMetric getMetricById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID must not be null");
+        }
         return metricsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Metric not found with id: " + id));
     }
@@ -84,11 +90,19 @@ public class AnalyticsService {
      */
     public List<BusinessMetric> getMetricsByDateRange(Integer startYear, Integer startMonth,
                                                       Integer endYear, Integer endMonth) {
+        // Validate inputs
         if (startYear == null || startMonth == null || endYear == null || endMonth == null) {
             throw new IllegalArgumentException("All date range parameters are required");
         }
+        
+        // Validate month ranges
         if (startMonth < 1 || startMonth > 12 || endMonth < 1 || endMonth > 12) {
             throw new IllegalArgumentException("Months must be between 1 and 12");
+        }
+        
+        // Validate date order
+        if (startYear > endYear || (startYear.equals(endYear) && startMonth > endMonth)) {
+            throw new IllegalArgumentException("Start date must be before or equal to end date");
         }
 
         return metricsRepository.findByDateRange(startYear, startMonth, endYear, endMonth);
@@ -98,6 +112,9 @@ public class AnalyticsService {
      * Update a metric
      */
     public BusinessMetric updateMetric(Long id, BigDecimal totalSales, BigDecimal totalCosts, BigDecimal totalExpenses) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID must not be null");
+        }
         BusinessMetric metric = getMetricById(id);
 
         if (totalSales != null && totalSales.compareTo(BigDecimal.ZERO) >= 0) {
@@ -121,6 +138,9 @@ public class AnalyticsService {
      * Delete a metric
      */
     public void deleteMetric(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID must not be null");
+        }
         if (!metricsRepository.existsById(id)) {
             throw new IllegalArgumentException("Metric not found with id: " + id);
         }
@@ -133,6 +153,9 @@ public class AnalyticsService {
      */
     public DashboardSummary getDashboardSummary(Integer startYear, Integer startMonth,
                                                 Integer endYear, Integer endMonth) {
+        if (startYear == null || startMonth == null || endYear == null || endMonth == null) {
+            throw new IllegalArgumentException("All date range parameters are required");
+        }
         List<BusinessMetric> metrics = getMetricsByDateRange(startYear, startMonth, endYear, endMonth);
 
         if (metrics.isEmpty()) {
