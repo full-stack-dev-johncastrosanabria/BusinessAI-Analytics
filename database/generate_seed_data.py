@@ -23,12 +23,13 @@ import math
 from datetime import datetime, timedelta
 from decimal import Decimal
 import sys
+import os
 
 # Database configuration
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Cnzmws67',  # Will be prompted or set via environment
+    'password': os.getenv('MYSQL_PASSWORD', ''),  # Use environment variable, no hardcoded password
     'database': 'businessai'
 }
 

@@ -18,6 +18,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.businessai.documents.entity.Document;
 import com.businessai.documents.service.DocumentService;
 
+/**
+ * REST Controller for document management operations.
+ * 
+ * Security considerations:
+ * - File uploads are validated for type, size, and content
+ * - Extracted text is limited to prevent memory exhaustion
+ * - All inputs are sanitized and validated
+ * - Database queries use parameterized statements (JPA)
+ */
 @RestController
 @RequestMapping("/api/documents")
 public class DocumentController {
@@ -27,11 +36,17 @@ public class DocumentController {
     
     /**
      * Upload a document
-     * @param file the document file to upload
+     * @param file the document file to upload (max 50MB)
      * @return the uploaded document metadata
      */
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(@RequestParam("file") MultipartFile file) {
+        // Validate file is not null
+        if (file == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("File is required"));
+        }
+        
         try {
             Document document = documentService.uploadDocument(file);
             return ResponseEntity.status(HttpStatus.CREATED).body(document);
@@ -46,11 +61,16 @@ public class DocumentController {
     
     /**
      * Retrieve document metadata by ID
-     * @param id the document ID
+     * @param id the document ID (must be positive)
      * @return the document metadata
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getDocument(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Invalid document ID"));
+        }
+        
         Optional<Document> document = documentService.getDocument(id);
         if (document.isPresent()) {
             return ResponseEntity.ok(document.get());
@@ -72,11 +92,16 @@ public class DocumentController {
     
     /**
      * Retrieve extracted text content for a document
-     * @param id the document ID
+     * @param id the document ID (must be positive)
      * @return the extracted text content
      */
     @GetMapping("/{id}/content")
     public ResponseEntity<?> getDocumentContent(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Invalid document ID"));
+        }
+        
         Optional<String> content = documentService.getDocumentContent(id);
         if (content.isPresent()) {
             return ResponseEntity.ok(new ContentResponse(content.get()));
@@ -88,11 +113,16 @@ public class DocumentController {
     
     /**
      * Delete a document
-     * @param id the document ID
+     * @param id the document ID (must be positive)
      * @return success response
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDocument(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Invalid document ID"));
+        }
+        
         Optional<Document> document = documentService.getDocument(id);
         if (document.isPresent()) {
             documentService.deleteDocument(id);

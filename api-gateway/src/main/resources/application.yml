@@ -1,5 +1,12 @@
 server:
   port: 8080
+  # SSL/TLS Configuration (for production, use proper certificates)
+  # ssl:
+  #   key-store: classpath:keystore.p12
+  #   key-store-password: ${SSL_KEYSTORE_PASSWORD}
+  #   key-store-type: PKCS12
+  #   key-alias: tomcat
+  # Note: In development, HTTP is acceptable. For production, enable SSL/TLS above.
 
 spring:
   application:
