@@ -31,9 +31,9 @@ management:
 
 logging:
   level:
-    com.businessai.sales: DEBUG
+    com.businessai.sales: INFO
     org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: WARN
 
 # External service URLs
 services:

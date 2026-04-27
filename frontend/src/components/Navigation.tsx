@@ -26,15 +26,7 @@ function Navigation() {
               to="/forecasts"
               className={`nav-link ${isActive('/forecasts') ? 'active' : ''}`}
             >
-              Forecasts
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/documents"
-              className={`nav-link ${isActive('/documents') ? 'active' : ''}`}
-            >
-              Documents
+              Analytics
             </Link>
           </li>
           <li>
@@ -61,28 +53,36 @@ function Navigation() {
               Customers
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/sales"
               className={`nav-link ${isActive('/sales') ? 'active' : ''}`}
             >
               Sales
             </Link>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <Link
               to="/sales-table"
               className={`nav-link ${isActive('/sales-table') ? 'active' : ''}`}
             >
               Sales Table
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/sales-infinite"
               className={`nav-link ${isActive('/sales-infinite') ? 'active' : ''}`}
             >
-              Sales Infinite
+              Sales
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/documents"
+              className={`nav-link ${isActive('/documents') ? 'active' : ''}`}
+            >
+              Documents
             </Link>
           </li>
         </ul>

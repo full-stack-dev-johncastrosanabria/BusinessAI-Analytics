@@ -1,0 +1,2 @@
+# This file should be replaced with an actual preview image
+# Generate from: ffmpeg -i demo.mp4 -ss 00:00:05 -vframes 1 preview.png

@@ -31,6 +31,6 @@ management:
 
 logging:
   level:
-    com.businessai.analytics: DEBUG
+    com.businessai.analytics: INFO
     org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: WARN

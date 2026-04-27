@@ -31,9 +31,9 @@ management:
 
 logging:
   level:
-    com.businessai.documents: DEBUG
+    com.businessai.documents: INFO
     org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: WARN
 
 # Document upload configuration
 document:

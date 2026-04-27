@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -22,6 +24,8 @@ import com.businessai.sales.exception.SalesValidationException;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Handle SalesValidationException.
@@ -117,8 +121,8 @@ public class GlobalExceptionHandler {
                 null,
                 request.getDescription(false).replace("uri=", "")
         );
-        // Log the full exception for debugging
-        ex.printStackTrace();
+        // Log the full exception with proper logging
+        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 

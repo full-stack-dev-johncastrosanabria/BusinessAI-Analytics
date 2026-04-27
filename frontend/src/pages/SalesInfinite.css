@@ -1,7 +1,7 @@
 .sales-infinite {
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  margin: 0;
+  width: 100%;
 }
 
 .sales-infinite h1 {

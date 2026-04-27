@@ -33,25 +33,14 @@ interface RequestConfig extends RequestInit {
 /**
  * Create an AbortSignal with timeout
  */
-function createTimeoutSignal(timeout: number): AbortSignal {
+function createTimeoutSignal(timeout: number): { signal: AbortSignal; cleanup: () => void } {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
   
-  // Clean up timeout if request completes
-  return new Proxy(controller.signal, {
-    get(target, prop) {
-      if (prop === 'addEventListener') {
-        return function(type: string, listener: EventListener) {
-          const wrappedListener = (event: Event) => {
-            clearTimeout(timeoutId)
-            listener.call(listener, event)
-          }
-          return target.addEventListener(type, wrappedListener)
-        }
-      }
-      return Reflect.get(target, prop)
-    }
-  })
+  return {
+    signal: controller.signal,
+    cleanup: () => clearTimeout(timeoutId)
+  }
 }
 
 /**
@@ -106,34 +95,39 @@ async function request<T>(
 
   return retryRequest(async () => {
     try {
-      const signal = createTimeoutSignal(timeout)
+      const { signal, cleanup } = createTimeoutSignal(timeout)
       
-      const response = await fetch(url.toString(), {
-        ...fetchConfig,
-        headers,
-        signal,
-      })
+      try {
+        const response = await fetch(url.toString(), {
+          ...fetchConfig,
+          headers,
+          signal,
+        })
 
-      // Handle non-OK responses
-      if (!response.ok) {
-        let errorData: unknown = null
-        try {
-          errorData = await response.json()
-        } catch {
-          // Response is not JSON, that's okay
+        // Handle non-OK responses
+        if (!response.ok) {
+          let errorData: unknown = null
+          try {
+            errorData = await response.json()
+          } catch {
+            // Response is not JSON, that's okay
+          }
+          
+          throw new APIError(
+            (errorData as any)?.message || `HTTP ${response.status}: ${response.statusText}`,
+            response.status,
+            errorData,
+            endpoint
+          )
         }
-        
-        throw new APIError(
-          (errorData as any)?.message || `HTTP ${response.status}: ${response.statusText}`,
-          response.status,
-          errorData,
-          endpoint
-        )
-      }
 
-      // Parse JSON response
-      const data = await response.json()
-      return data as T
+        // Parse JSON response
+        const data = await response.json()
+        cleanup()
+        return data as T
+      } finally {
+        cleanup()
+      }
     } catch (error) {
       if (error instanceof APIError) {
         throw error

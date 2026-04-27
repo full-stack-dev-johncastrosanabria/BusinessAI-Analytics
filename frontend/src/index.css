@@ -40,7 +40,13 @@ button:focus-visible {
   box-sizing: border-box;
 }
 
+html,
 body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -50,6 +56,7 @@ body {
 
 #root {
   width: 100%;
-  margin: 0 auto;
-  text-align: center;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 }

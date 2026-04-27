@@ -1,8 +1,10 @@
 .chatbot {
-  padding: 20px;
+  padding: 30px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   height: calc(100vh - 100px);
+  width: 100%;
 }
 
 .chat-container {

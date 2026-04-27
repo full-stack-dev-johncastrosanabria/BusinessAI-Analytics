@@ -1,5 +1,7 @@
 .dashboard {
-  padding: 20px;
+  padding: 30px;
+  margin: 0;
+  width: 100%;
 }
 
 .dashboard.loading,
