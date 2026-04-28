@@ -1,8 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
+import ThemeToggle from './ThemeToggle'
 import './Navigation.css'
 
 function Navigation() {
   const location = useLocation()
+  const { t } = useTranslation()
 
   const isActive = (path: string) => location.pathname === path
 
@@ -18,7 +22,7 @@ function Navigation() {
               to="/"
               className={`nav-link ${isActive('/') ? 'active' : ''}`}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </Link>
           </li>
           <li>
@@ -26,7 +30,7 @@ function Navigation() {
               to="/forecasts"
               className={`nav-link ${isActive('/forecasts') ? 'active' : ''}`}
             >
-              Analytics
+              {t('nav.forecasts')}
             </Link>
           </li>
           <li>
@@ -34,7 +38,7 @@ function Navigation() {
               to="/chatbot"
               className={`nav-link ${isActive('/chatbot') ? 'active' : ''}`}
             >
-              Chatbot
+              {t('nav.chatbot')}
             </Link>
           </li>
           <li>
@@ -42,7 +46,7 @@ function Navigation() {
               to="/products"
               className={`nav-link ${isActive('/products') ? 'active' : ''}`}
             >
-              Products
+              {t('nav.products')}
             </Link>
           </li>
           <li>
@@ -50,31 +54,15 @@ function Navigation() {
               to="/customers"
               className={`nav-link ${isActive('/customers') ? 'active' : ''}`}
             >
-              Customers
+              {t('nav.customers')}
             </Link>
           </li>
-          {/* <li>
-            <Link
-              to="/sales"
-              className={`nav-link ${isActive('/sales') ? 'active' : ''}`}
-            >
-              Sales
-            </Link>
-          </li> */}
-          {/* <li>
-            <Link
-              to="/sales-table"
-              className={`nav-link ${isActive('/sales-table') ? 'active' : ''}`}
-            >
-              Sales Table
-            </Link>
-          </li> */}
           <li>
             <Link
               to="/sales-infinite"
               className={`nav-link ${isActive('/sales-infinite') ? 'active' : ''}`}
             >
-              Sales
+              {t('nav.sales')}
             </Link>
           </li>
           <li>
@@ -82,13 +70,19 @@ function Navigation() {
               to="/documents"
               className={`nav-link ${isActive('/documents') ? 'active' : ''}`}
             >
-              Documents
+              {t('nav.documents')}
             </Link>
           </li>
         </ul>
+        <div className="nav-controls">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </div>
     </nav>
   )
 }
+
+export default Navigation
 
 export default Navigation

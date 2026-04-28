@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   LineChart,
   Line,
@@ -27,6 +28,7 @@ const PROFIT_COLOR = "#ffc658"
 const BAR_COLOR = "#8884d8"
 
 function Dashboard() {
+  const { t } = useTranslation()
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
 
@@ -45,13 +47,13 @@ function Dashboard() {
   const error = summaryQuery.error || metricsQuery.error
 
   if (isLoading) {
-    return <div className="dashboard loading">Loading dashboard...</div>
+    return <div className="dashboard loading">{t('common.loading')}</div>
   }
 
   if (error) {
     return (
       <div className="dashboard error">
-        Error: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
+        {t('common.error')}: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
       </div>
     )
   }
@@ -70,7 +72,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <h1>Dashboard</h1>
+      <h1>{t('dashboard.title')}</h1>
 
       {/* Date Range Filter */}
       <div className="filter-section">
@@ -91,7 +93,7 @@ function Dashboard() {
           />
         </div>
         <button onClick={handleFilterChange} className="filter-button">
-          Apply Filter
+          {t('common.filter')}
         </button>
       </div>
 
@@ -99,7 +101,7 @@ function Dashboard() {
       {summary && (
         <div className="metrics-grid">
           <div className="metric-card">
-            <h3>Total Sales</h3>
+            <h3>{t('dashboard.totalSales')}</h3>
             <p className="metric-value">${summary.totalSales.toFixed(2)}</p>
           </div>
           <div className="metric-card">
@@ -107,7 +109,7 @@ function Dashboard() {
             <p className="metric-value">${summary.totalCosts.toFixed(2)}</p>
           </div>
           <div className="metric-card">
-            <h3>Total Profit</h3>
+            <h3>{t('dashboard.totalProfit')}</h3>
             <p className="metric-value">${summary.totalProfit.toFixed(2)}</p>
           </div>
           <div className="metric-card">
@@ -130,7 +132,7 @@ function Dashboard() {
       {/* Charts */}
       <div className="charts-section">
         <div className="chart-container">
-          <h2>Sales, Costs & Profit Trends</h2>
+          <h2>{t('dashboard.salesTrend')}</h2>
           <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />
@@ -148,7 +150,7 @@ function Dashboard() {
         {/* Top Products */}
         {topProductsData.length > 0 && (
           <div className="chart-container">
-            <h2>Top 5 Products by Revenue</h2>
+            <h2>{t('dashboard.topProducts')}</h2>
             <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
               <BarChart data={topProductsData}>
                 <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />

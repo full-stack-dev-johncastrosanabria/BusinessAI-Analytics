@@ -14,8 +14,11 @@
   "dependencies": {
     "@tanstack/react-query": "^5.28.0",
     "@tanstack/react-query-devtools": "^5.28.0",
+    "i18next": "^26.0.8",
+    "i18next-browser-languagedetector": "^8.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^17.0.6",
     "react-router": "^7.0.0",
     "react-router-dom": "^7.0.0",
     "recharts": "^2.12.0",
