@@ -10,7 +10,7 @@ Watch the platform in action (includes Dashboard, Sales, Customers, Products, **
   <img src="./demo-full.gif" alt="Full Platform Demo" width="100%">
 </div>
 
-**[📥 Download full demo video (MP4, 4.1MB)](./demo.mp4)** for HD quality and full length
+**[🎥 Watch Full Demo on YouTube](https://youtu.be/1SOA6Z88fvM)** | **[📥 Download MP4 (4.1MB)](./demo.mp4)**
 
 ---
 
