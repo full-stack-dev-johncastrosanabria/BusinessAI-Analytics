@@ -1,40 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-import { I18nextProvider } from 'react-i18next'
-import i18n from '../../i18n'
-import { AuthProvider } from '../../contexts/AuthContext'
-import { ThemeProvider } from '../../contexts/ThemeContext'
+import { describe, it, expect } from 'vitest'
+import { screen } from '@testing-library/react'
 import Navigation from '../Navigation'
-
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
-    clear: () => { store = {}; },
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-
-const renderWithProviders = (ui: React.ReactElement) =>
-  render(
-    <I18nextProvider i18n={i18n}>
-      <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>{ui}</BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </I18nextProvider>
-  )
+import { renderWithProviders, setupTestEnvironmentWithStorage } from '../../test/utils'
 
 describe('Navigation Component', () => {
-  beforeEach(() => {
-    localStorageMock.clear();
-  });
+  setupTestEnvironmentWithStorage();
   it('renders navigation links', () => {
     renderWithProviders(<Navigation />)
 

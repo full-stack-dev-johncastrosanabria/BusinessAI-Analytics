@@ -121,7 +121,10 @@ const REQUIRED_CI_JOBS = [
  * Validate that the branch hierarchy is documented correctly
  */
 function validateBranchHierarchy(deploymentDoc: string): boolean {
-  const hierarchyPattern = /main.*\n.*staging.*\n.*develop.*\n.*feature/is
+  // SONAR_SAFE: Fixed regex to prevent catastrophic backtracking
+  // Original pattern was vulnerable due to nested quantifiers (.*\n.*staging.*\n.*)
+  // New pattern uses non-greedy quantifiers and specific line matching
+  const hierarchyPattern = /main[^\n]*\n[^\n]*staging[^\n]*\n[^\n]*develop[^\n]*\n[^\n]*feature/is
   return hierarchyPattern.test(deploymentDoc)
 }
 

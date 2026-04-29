@@ -19,235 +19,22 @@
  * 11. Show sales infinite scroll
  */
 
-import { chromium, Browser, Page, BrowserContext } from 'playwright';
+import { Browser, Page } from 'playwright';
+import {
+  DemoLogger,
+  DemoTiming,
+  BrowserManager,
+  NavigationHelper,
+  UIInteractionHelper,
+  ChatbotHelper,
+  DemoCompletion,
+  colors
+} from './shared/demo-orchestrator.js';
 
 const FRONTEND_URL = 'http://localhost:5173';
 const DEMO_TIMEOUT = 360000; // 6 minutes in ms (buffer for 4-5 min demo)
 
-// Colors for console output
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  purple: '\x1b[35m',
-  cyan: '\x1b[36m',
-};
-
-function log(color: string, message: string): void {
-  console.log(`${color}${message}${colors.reset}`);
-}
-
-function header(title: string): void {
-  console.log('');
-  log(colors.purple, '╔════════════════════════════════════════════════════════════╗');
-  log(colors.purple, `║ ${title.padEnd(60)} ║`);
-  log(colors.purple, '╚════════════════════════════════════════════════════════════╝');
-  console.log('');
-}
-
-function step(title: string): void {
-  log(colors.cyan, '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  log(colors.cyan, `📋 ${title}`);
-  log(colors.cyan, '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('');
-}
-
-function action(message: string): void {
-  log(colors.green, `  ▶ ${message}`);
-}
-
-async function wait(seconds: number, message: string = 'Waiting'): Promise<void> {
-  log(colors.yellow, `⏳ ${message} (${seconds}s)`);
-  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
-  log(colors.green, '   ✓ Ready!');
-}
-
-async function createProduct(page: Page): Promise<boolean> {
-  try {
-    log(colors.red, '🔴🔴🔴 CRUD OPERATION: CREATE PRODUCT 🔴🔴🔴');
-    action('🔴 CREATING NEW PRODUCT - Watch the form appear');
-    
-    const createSelectors = [
-      'button:has-text("Add Product")',
-      'button:has-text("Create Product")',
-      'button:has-text("New Product")',
-      'button:has-text("Add")',
-      'button:has-text("Create")',
-      '.btn-primary:has-text("Add")',
-      '[data-testid="add-product"]'
-    ];
-
-    for (const selector of createSelectors) {
-      try {
-        const btn = page.locator(selector).first();
-        if (await btn.isVisible({ timeout: 1000 }).catch(() => false)) {
-          log(colors.red, '🔴 FOUND: Add Product Button');
-          await wait(2, '🔴 Button found - clicking now');
-          await btn.click();
-          log(colors.red, '🔴 CLICKED: Add Product Button');
-          await page.waitForTimeout(800);
-          
-          // Try to fill in form fields
-          const nameInput = page.locator('input[placeholder*="name"], input[placeholder*="Name"], input[type="text"]').first();
-          if (await nameInput.isVisible({ timeout: 1000 }).catch(() => false)) {
-            log(colors.red, '🔴 FOUND: Product Name Input');
-            await nameInput.fill('Demo Product ' + Date.now());
-            log(colors.red, '🔴 FILLED: Product Name');
-            await wait(1, '✓ Product name entered');
-            
-            // Look for save button
-            const saveBtn = page.locator('button:has-text("Save"), button:has-text("Create"), button[type="submit"]').first();
-            if (await saveBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-              log(colors.red, '🔴 FOUND: Save Button');
-              await wait(1, '🔴 Clicking Save button');
-              await saveBtn.click();
-              log(colors.red, '🔴 CLICKED: Save Button');
-              await page.waitForTimeout(1500);
-              log(colors.green, '✅✅✅ PRODUCT CREATED SUCCESSFULLY ✅✅✅');
-              return true;
-            }
-          }
-          
-          await page.press('body', 'Escape');
-          return false;
-        }
-      } catch (e) {}
-    }
-    
-    log(colors.yellow, '⚠️  Could not find create product button');
-    return false;
-  } catch (error) {
-    log(colors.yellow, `⚠️  Error creating product: ${error}`);
-    return false;
-  }
-}
-
-async function createCustomer(page: Page): Promise<boolean> {
-  try {
-    log(colors.red, '🔴🔴🔴 CRUD OPERATION: CREATE CUSTOMER 🔴🔴🔴');
-    action('🔴 CREATING NEW CUSTOMER - Watch the form appear');
-    
-    const createSelectors = [
-      'button:has-text("Add Customer")',
-      'button:has-text("Create Customer")',
-      'button:has-text("New Customer")',
-      'button:has-text("Add")',
-      'button:has-text("Create")',
-      '.btn-primary:has-text("Add")',
-      '[data-testid="add-customer"]'
-    ];
-
-    for (const selector of createSelectors) {
-      try {
-        const btn = page.locator(selector).first();
-        if (await btn.isVisible({ timeout: 1000 }).catch(() => false)) {
-          log(colors.red, '🔴 FOUND: Add Customer Button');
-          await wait(2, '🔴 Button found - clicking now');
-          await btn.click();
-          log(colors.red, '🔴 CLICKED: Add Customer Button');
-          await page.waitForTimeout(800);
-          
-          // Try to fill in form fields
-          const nameInput = page.locator('input[placeholder*="name"], input[placeholder*="Name"], input[type="text"]').first();
-          if (await nameInput.isVisible({ timeout: 1000 }).catch(() => false)) {
-            log(colors.red, '🔴 FOUND: Customer Name Input');
-            await nameInput.fill('Demo Customer ' + Date.now());
-            log(colors.red, '🔴 FILLED: Customer Name');
-            await wait(1, '✓ Customer name entered');
-            
-            // Look for save button
-            const saveBtn = page.locator('button:has-text("Save"), button:has-text("Create"), button[type="submit"]').first();
-            if (await saveBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-              log(colors.red, '🔴 FOUND: Save Button');
-              await wait(1, '🔴 Clicking Save button');
-              await saveBtn.click();
-              log(colors.red, '🔴 CLICKED: Save Button');
-              await page.waitForTimeout(1500);
-              log(colors.green, '✅✅✅ CUSTOMER CREATED SUCCESSFULLY ✅✅✅');
-              return true;
-            }
-          }
-          
-          await page.press('body', 'Escape');
-          return false;
-        }
-      } catch (e) {}
-    }
-    
-    log(colors.yellow, '⚠️  Could not find create customer button');
-    return false;
-  } catch (error) {
-    log(colors.yellow, `⚠️  Error creating customer: ${error}`);
-    return false;
-  }
-}
-
-async function navigateToTab(page: Page, tabName: string, url: string): Promise<boolean> {
-  try {
-    action(`📍 Navigating to ${tabName} tab`);
-    
-    // Try clicking the tab first
-    const selectors = [
-      `text=${tabName}`,
-      `a:has-text("${tabName}")`,
-      `button:has-text("${tabName}")`,
-      `[role="tab"]:has-text("${tabName}")`,
-    ];
-
-    let found = false;
-    for (const selector of selectors) {
-      try {
-        const element = page.locator(selector).first();
-        if (await element.isVisible({ timeout: 1000 }).catch(() => false)) {
-          await element.click();
-          await page.waitForTimeout(800);
-          found = true;
-          break;
-        }
-      } catch (e) {}
-    }
-
-    // If tab click didn't work, navigate directly
-    if (!found) {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
-    }
-
-    // Scroll to top-left and fix positioning - CRITICAL
-    await page.evaluate(() => {
-      window.scrollTo(0, 0);
-      
-      // Remove all margins and padding
-      document.documentElement.style.margin = '0 !important';
-      document.documentElement.style.padding = '0 !important';
-      document.documentElement.style.border = '0 !important';
-      document.documentElement.style.width = '100vw !important';
-      document.documentElement.style.height = '100vh !important';
-      
-      document.body.style.margin = '0 !important';
-      document.body.style.padding = '0 !important';
-      document.body.style.border = '0 !important';
-      document.body.style.width = '100vw !important';
-      document.body.style.height = '100vh !important';
-      
-      // Remove existing override if present
-      const existingStyle = document.getElementById('fullscreen-override');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-      
-      // Minimal reset - let app styles work
-      window.scrollTo(0, 0);
-    });
-    await page.waitForTimeout(500);
-
-    return true;
-  } catch (error) {
-    log(colors.yellow, `⚠️  Could not navigate to ${tabName}`);
-    return false;
-  }
-}
+// Removed duplicate functions - now using shared module
 
 async function runDemo(): Promise<void> {
   let browser: Browser | null = null;
@@ -289,7 +76,7 @@ async function runDemo(): Promise<void> {
     
     log(colors.blue, '🖥️ Maximizing window and removing margins...');
     // Minimal CSS reset for fullscreen - let the app's own styles work
-    await page.evaluate(() => {
+    await page.evaluate(() => { // NOSONAR S4721 - Hardcoded CSS reset for demo
       // Reset HTML element
       document.documentElement.style.cssText = `
         margin: 0 !important;
@@ -311,7 +98,7 @@ async function runDemo(): Promise<void> {
     log(colors.green, `✅✅✅ FULLSCREEN MODE ACTIVE ✅✅✅`);
     
     // Verify fullscreen is actually working
-    const isFullscreenWorking = await page.evaluate(() => {
+    const isFullscreenWorking = await page.evaluate(() => { // NOSONAR S4721 - Hardcoded viewport verification
       const body = document.body;
       const rect = body.getBoundingClientRect();
       return {

@@ -264,7 +264,7 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=10000
             monthly_factor = 1.0
         
         # Occasional promotional spikes (5% chance)
-        promo_factor = 1.5 if random.random() < 0.05 else 1.0  # nosec - test data generation only
+        promo_factor = 1.5 if random.random() < 0.05 else 1.0  # NOSONAR S2245 - SAFE: test data generation only, no security implications
         
         # Combined probability for this date
         probability = growth_factor * seasonal_factor * weekly_factor * monthly_factor * promo_factor
@@ -274,7 +274,7 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=10000
         product_id = random.randint(1, num_products)
         
         # Quantity influenced by probability (higher probability = higher quantities)
-        base_quantity = random.choices([1, 2, 3, 4, 5, 10, 15], weights=[35, 25, 15, 12, 8, 3, 2])[0]
+        base_quantity = random.choices([1, 2, 3, 4, 5, 10, 15], weights=[35, 25, 15, 12, 8, 3, 2])[0]  # NOSONAR S2245 - SAFE: test data generation only
         quantity = max(1, int(base_quantity * probability * random.uniform(0.7, 1.3)))
         
         # Calculate total amount
@@ -380,7 +380,7 @@ def generate_business_metrics(cursor, start_date, end_date):
         )
         
         # Occasionally add unexpected expenses (10% chance)
-        if random.random() < 0.10:  # nosec - test data generation only
+        if random.random() < 0.10:  # NOSONAR S2245 - SAFE: test data generation only, no security implications
             unexpected_expense = round(random.uniform(3000, 12000), 2)
             total_expenses += unexpected_expense
         

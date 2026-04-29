@@ -1,47 +1,27 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Sales from '../Sales'
 import * as salesService from '../../services/salesService'
 import * as productService from '../../services/productService'
 import * as customerService from '../../services/customerService'
+import { 
+  setupTestEnvironment, 
+  createMockProducts, 
+  createMockCustomers, 
+  createMockTransactions,
+  expectTableHeaders
+} from '../../test/utils'
 
 vi.mock('../../services/salesService')
 vi.mock('../../services/productService')
 vi.mock('../../services/customerService')
 
-const mockProducts = [
-  { id: 1, name: 'Laptop', category: 'Electronics', cost: 800, price: 1200 },
-  { id: 2, name: 'Mouse', category: 'Accessories', cost: 10, price: 25 },
-]
-
-const mockCustomers = [
-  { id: 1, name: 'Alice Smith', email: 'alice@example.com', segment: 'Premium', country: 'USA' },
-  { id: 2, name: 'Bob Jones', email: 'bob@example.com', segment: 'Standard', country: 'UK' },
-]
-
-const mockTransactions = [
-  {
-    id: 1,
-    customerId: 1,
-    productId: 1,
-    transactionDate: '2024-01-15',
-    quantity: 2,
-    totalAmount: 2400,
-  },
-  {
-    id: 2,
-    customerId: 2,
-    productId: 2,
-    transactionDate: '2024-01-16',
-    quantity: 5,
-    totalAmount: 125,
-  },
-]
-
 describe('Sales Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+  setupTestEnvironment();
+  
+  const mockProducts = createMockProducts();
+  const mockCustomers = createMockCustomers();
+  const mockTransactions = createMockTransactions();
 
   it('displays loading state initially', () => {
     vi.mocked(salesService.default.getSalesTransactions).mockReturnValue(new Promise(() => {}))
@@ -195,14 +175,7 @@ describe('Sales Component', () => {
     render(<Sales />)
 
     await waitFor(() => {
-      // Check table headers specifically
-      const headers = document.querySelectorAll('th')
-      const headerTexts = Array.from(headers).map(h => h.textContent)
-      expect(headerTexts).toContain('Date')
-      expect(headerTexts).toContain('Customer')
-      expect(headerTexts).toContain('Product')
-      expect(headerTexts).toContain('Quantity')
-      expect(headerTexts).toContain('Total Amount')
+      expectTableHeaders(['Date', 'Customer', 'Product', 'Quantity', 'Total Amount']);
     })
   })
 })

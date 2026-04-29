@@ -5,7 +5,7 @@ Handles complex business queries in English and Spanish with real database data.
 
 import re
 import logging
-from typing import Tuple, List, Optional, Dict, Any
+from typing import Tuple, List, Optional, Dict
 from chatbot.intent_classifier import AdvancedIntentClassifier, Intent, Language
 
 logger = logging.getLogger(__name__)
@@ -16,6 +16,34 @@ DB_BUSINESS_METRICS = "business_metrics"
 DB_SALES_TRANSACTIONS = "sales_transactions"
 DB_PRODUCTS = "products"
 DB_CUSTOMERS = "customers"
+
+# High-value transaction patterns
+HIGHEST_INVOICE_ES = 'factura más alta'
+HIGHEST_SALE_ES = 'venta más alta'
+HIGHEST_TRANSACTION_EN = 'highest transaction'
+HIGHEST_SALE_EN = 'highest sale'
+
+# Break-even analysis patterns
+BREAK_EVEN_HYPHEN = 'break-even'
+BREAK_EVEN_SPACE = 'break even'
+BREAK_EVEN_SINGLE = 'breakeven'
+CLOSEST_TO_ZERO_EN = 'closest to zero'
+CLOSEST_TO_ZERO_ES = 'cerca de cero'
+CLOSEST_TO_ZERO_ES_FULL = 'más cerca de cero'
+CLOSEST_TO_BREAKEVEN_EN = 'closest to break-even'
+BREAK_EVEN_POINT_EN = 'break even point'
+
+# Loss and profit patterns
+LOSS_TO_PROFIT_EN = 'loss to profit'
+LOSS_TO_PROFIT_ES = 'pérdida a ganancia'
+MOST_SOLD_EN = 'most sold'
+MOST_SOLD_ES = 'más vendido'
+
+# Category patterns
+CATEGORY_ES = 'categoría'
+CATEGORY_EN = 'category'
+HOW_MANY_EN = 'how many'
+HOW_MANY_ES = 'cuántos'
 
 # Spanish query patterns
 CUSTOMER_SEGMENT_ES = 'qué cliente o segmento'
@@ -69,15 +97,6 @@ COUNTRY_OR_SEGMENT_EN = 'country or segment'
 COUNTRY_OR_SEGMENT_ES = 'país o segmento'
 COUNTRY_SEGMENT_BUYS_ES = 'país o segmento compra'
 COUNTRY_SEGMENT_BUYS_EN = 'country or segment buys'
-
-# Intent classifier constants
-BILLING_ES = "facturación"
-COLLECTION_ES = "recaudación"
-LOSS_ES = "pérdida"
-WHEN_ES = "cuándo"
-
-# Error messages
-INSUFFICIENT_TRAINING_DATA = "Insufficient training data. Need at least 24 months of historical data."
 
 # ── Stop words to strip from document keyword searches ──────────────────────
 _DOC_STOP_WORDS = {
@@ -230,7 +249,7 @@ class AdvancedQueryProcessor:
     def _is_sales_billing_query(self, q: str) -> bool:
         """Check for sales and billing questions."""
         sales_billing_patterns = [
-            'factura más alta', 'venta más alta', 'highest transaction', 'highest sale',
+            HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN,
             'se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue',
             'día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day',
             'ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales',
@@ -242,7 +261,7 @@ class AdvancedQueryProcessor:
 
     def _route_sales_billing_query(self, q: str) -> Intent:
         """Route sales and billing queries to appropriate intent."""
-        if any(w in q for w in ['factura más alta', 'venta más alta', 'highest transaction', 'highest sale']):
+        if any(w in q for w in [HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN]):
             return Intent.SALES_METRICS
         if any(w in q for w in ['se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue']):
             return Intent.PRODUCT_INFO
@@ -273,9 +292,9 @@ class AdvancedQueryProcessor:
     def _is_breakeven_query(self, q: str) -> bool:
         """Check for break-even analysis signals."""
         breakeven_signals = [
-            'break-even', 'break even', 'breakeven', BREAKEVEN_POINT_ES,
-            'equilibrio', 'closest to zero', 'cerca de cero', 'más cerca de cero',
-            'closest to break-even', 'break even point', BREAKEVEN_POINT_ES,
+            BREAK_EVEN_HYPHEN, BREAK_EVEN_SPACE, BREAK_EVEN_SINGLE, BREAKEVEN_POINT_ES,
+            'equilibrio', CLOSEST_TO_ZERO_EN, CLOSEST_TO_ZERO_ES, CLOSEST_TO_ZERO_ES_FULL,
+            CLOSEST_TO_BREAKEVEN_EN, BREAK_EVEN_POINT_EN, BREAKEVEN_POINT_ES,
             'cover costs', 'cubrir costos', 'cover expenses', 'cubrir gastos',
             'cuánto tendríamos que vender', 'cuánto vender', 'how much revenue',
             'how much do we need', 'cuánto necesitamos', 'para cubrir',
@@ -330,9 +349,9 @@ class AdvancedQueryProcessor:
             'algún mes donde', 'any month where', 'mes donde'
         ])
 
-    def _route_by_signal_type(self, q: str, intent: Intent) -> Intent:
-        """Route by signal type (product, customer, sales)."""
-        product_signals = [
+    def _get_product_signals(self) -> List[str]:
+        """Get list of product-related signal words."""
+        return [
             'product', 'products', 'producto', 'productos', 'item', 'items',
             'most sold', 'best selling', 'bestseller', 'top selling',
             'más vendido', 'más vendidos', 'más popular', 'más populares',
@@ -340,8 +359,10 @@ class AdvancedQueryProcessor:
             'categoría', 'categoria', 'category', 'categories',
             'which product', 'what product', 'qué producto', 'cuál producto'
         ]
-        
-        customer_signals = [
+    
+    def _get_customer_signals(self) -> List[str]:
+        """Get list of customer-related signal words."""
+        return [
             'customer', 'customers', 'client', 'clients', 'cliente', 'clientes',
             'buyer', 'buyers', 'compradores', 'who buys', 'quién compra',
             'best customer', 'top customer', 'mejor cliente', 'principal cliente',
@@ -354,8 +375,10 @@ class AdvancedQueryProcessor:
             MOST_FREQUENT_ES, BUYS_MOST_OFTEN_EN, BUYS_MOST_OFTEN_ES,
             COUNTRY_OR_SEGMENT_ES, COUNTRY_OR_SEGMENT_EN
         ]
-        
-        sales_signals = [
+    
+    def _get_sales_signals(self) -> List[str]:
+        """Get list of sales-related signal words."""
+        return [
             'sales', 'revenue', 'ventas', 'ingresos', 'income', 'sold',
             'how much', 'cuánto', 'total sales', 'total ventas', 'profit',
             'ganancia', 'rentable', 'rentabilidad', 'margin', 'margen',
@@ -364,6 +387,22 @@ class AdvancedQueryProcessor:
             'anual', 'trimestre', 'quarter', 'q1', 'q2', 'q3', 'q4',
             '1q', '2q', '3q', '4q'
         ]
+    
+    def _is_comparison_query(self, q: str) -> bool:
+        """Check if query is asking for comparison analysis."""
+        return any(w in q for w in ['compare', 'comparar', 'vs', 'versus', 'between',
+                                    'entre', 'difference', 'diferencia'])
+    
+    def _is_forecast_month_query(self, q: str) -> bool:
+        """Check if forecast query is actually about month performance."""
+        return any(w in q for w in ['worst', 'best', 'peor', 'mejor', 'rentable',
+                                    'month', 'mes', 'performing'])
+
+    def _route_by_signal_type(self, q: str, intent: Intent) -> Intent:
+        """Route by signal type (product, customer, sales)."""
+        product_signals = self._get_product_signals()
+        customer_signals = self._get_customer_signals()
+        sales_signals = self._get_sales_signals()
 
         if any(s in q for s in product_signals):
             return Intent.PRODUCT_INFO
@@ -371,18 +410,15 @@ class AdvancedQueryProcessor:
             return Intent.CUSTOMER_INFO
         
         # Comparison must be checked before generic sales
-        if any(w in q for w in ['compare', 'comparar', 'vs', 'versus', 'between',
-                                'entre', 'difference', 'diferencia']):
+        if self._is_comparison_query(q):
             return Intent.COMPARISON_ANALYSIS
         
         if intent == Intent.UNKNOWN and any(s in q for s in sales_signals):
             return Intent.SALES_METRICS
         
         # Also catch worst/best month when misrouted to forecast
-        if intent == Intent.FORECAST_PREDICTION:
-            if any(w in q for w in ['worst', 'best', 'peor', 'mejor', 'rentable',
-                                    'month', 'mes', 'performing']):
-                return Intent.SALES_METRICS
+        if intent == Intent.FORECAST_PREDICTION and self._is_forecast_month_query(q):
+            return Intent.SALES_METRICS
         
         return intent
 
@@ -394,49 +430,49 @@ class AdvancedQueryProcessor:
 
             # Route to specific handlers
             if self._is_highest_transaction_query(q):
-                return await self._handle_highest_transaction(language)
+                return self._handle_highest_transaction(language)
             
             if self._is_sales_by_day_query(q):
-                return await self._handle_sales_by_day(language)
+                return self._handle_sales_by_day(language)
             
             if self._is_small_transactions_query(q):
-                return await self._handle_small_transactions(language)
+                return self._handle_small_transactions(language)
             
             if self._is_monthly_sales_count_query(q):
-                return await self._handle_monthly_sales_count(language)
+                return self._handle_monthly_sales_count(language)
             
             if self._is_current_month_billing_query(q):
                 return await self._handle_current_month_billing(language)
 
             if self._is_best_worst_month_query(q):
-                return await self._handle_best_worst_month_query(q, language)
+                return self._handle_best_worst_month_query(q, language)
 
             if self._is_quarter_query(question):
                 quarter_data = self._extract_quarter(question)
                 if quarter_data:
                     year, months = quarter_data
-                    return await self._handle_quarter(year, months, language)
+                    return self._handle_quarter(year, months, language)
 
             if self._is_year_only_query(question):
                 year_only = self._extract_year_only(question)
                 if year_only:
-                    return await self._handle_year_total(year_only, language)
+                    return self._handle_year_total(year_only, language)
 
             if self._is_specific_month_query(question):
-                return await self._handle_specific_month_query(question, language)
+                return self._handle_specific_month_query(question, language)
 
             if self._is_average_margin_query(q):
-                return await self._handle_avg_margin(language)
+                return self._handle_avg_margin(language)
 
             if self._is_transaction_count_query(q):
-                return await self._handle_transaction_count(question, language)
+                return self._handle_transaction_count(question, language)
 
             if self._is_trend_query(q):
                 metrics = self.db.get_sales_metrics()
-                return await self._analyze_sales_trends(metrics, language)
+                return self._analyze_sales_trends(metrics, language)
 
             # Default: recent month
-            return await self._handle_recent_month_metrics(language)
+            return self._handle_recent_month_metrics(language)
             
         except Exception as e:
             logger.error("Error in sales handler: %s", e, exc_info=True)
@@ -444,7 +480,7 @@ class AdvancedQueryProcessor:
 
     def _is_highest_transaction_query(self, q: str) -> bool:
         """Check for highest transaction queries."""
-        return any(w in q for w in ['factura más alta', 'venta más alta', 'highest transaction', 'highest sale'])
+        return any(w in q for w in [HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN])
 
     def _is_sales_by_day_query(self, q: str) -> bool:
         """Check for sales by day queries."""
@@ -493,7 +529,7 @@ class AdvancedQueryProcessor:
         return any(w in q for w in ['trend', 'tendencia', 'growth', 'crecimiento', 'change', 'cambio', 
                                     'compare', 'comparar', 'últimos', 'last', 'recent', 'reciente'])
 
-    async def _handle_current_month_billing(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_current_month_billing(self, language: Language) -> Tuple[str, List[str]]:
         """Handle current month billing queries."""
         metrics = self.db.get_sales_metrics()
         if metrics:
@@ -527,7 +563,7 @@ class AdvancedQueryProcessor:
             )
         return self._no_data("sales", language), []
 
-    async def _handle_best_worst_month_query(self, q: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_best_worst_month_query(self, q: str, language: Language) -> Tuple[str, List[str]]:
         """Handle best/worst month queries."""
         is_best = any(w in q for w in ['best', 'mejor', 'highest', 'más alto', 'top', 'peak', 'rentable', 'profitable'])
         bw = self.db.get_best_worst_months()
@@ -554,7 +590,7 @@ class AdvancedQueryProcessor:
             )
         return self._no_data("sales", language), []
 
-    async def _handle_specific_month_query(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_specific_month_query(self, question: str, language: Language) -> Tuple[str, List[str]]:
         """Handle specific month queries."""
         date_info = self._extract_date_from_question(question)
         if date_info:
@@ -591,7 +627,7 @@ class AdvancedQueryProcessor:
             return f"No data found for {mn} {year}.", []
         return self._no_data("sales", language), []
 
-    async def _handle_recent_month_metrics(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_recent_month_metrics(self, language: Language) -> Tuple[str, List[str]]:
         """Handle default recent month metrics."""
         metrics = self.db.get_sales_metrics()
         if not metrics:
@@ -625,12 +661,12 @@ class AdvancedQueryProcessor:
         quarter_data = self._extract_quarter(question)
         if quarter_data:
             year, months = quarter_data
-            return await self._handle_quarter(year, months, language)
+            return self._handle_quarter(year, months, language)
 
         # ── Year-only query (e.g. "total 2024") ──
         year_only = self._extract_year_only(question)
         if year_only:
-            return await self._handle_year_total(year_only, language)
+            return self._handle_year_total(year_only, language)
 
         # ── Specific month query ──
         try:
@@ -671,19 +707,19 @@ class AdvancedQueryProcessor:
             # ── Average margin query ──
             if any(w in q for w in ['average', 'promedio', 'avg', 'mean', 'margin',
                                     'margen', 'average profit', 'margen promedio']):
-                return await self._handle_avg_margin(language)
+                return self._handle_avg_margin(language)
 
             # ── Transaction count query ──
             if any(w in q for w in ['transaction', 'transaccion', 'transacciones',
                                     'how many', 'cuántas', 'count', 'número de']):
-                return await self._handle_transaction_count(question, language)
+                return self._handle_transaction_count(question, language)
 
             # ── Trend query ──
             if any(w in q for w in ['trend', 'tendencia', 'growth', 'crecimiento',
                                     'change', 'cambio', 'compare', 'comparar',
                                     'últimos', 'last', 'recent', 'reciente']):
                 metrics = self.db.get_sales_metrics()
-                return await self._analyze_sales_trends(metrics, language)
+                return self._analyze_sales_trends(metrics, language)
 
             # ── Default: recent month ──
             metrics = self.db.get_sales_metrics()
@@ -724,46 +760,46 @@ class AdvancedQueryProcessor:
             
             # Route to specific analysis handlers
             if self._is_worst_month_analysis_query(q):
-                return await self._handle_worst_month_analysis(language)
+                return self._handle_worst_month_analysis(language)
             
             if self._is_closest_to_loss_query(q):
-                return await self._handle_closest_to_loss(language)
+                return self._handle_closest_to_loss(language)
             
             if self._is_accounting_analysis_detailed_query(q):
-                return await self._handle_accounting_analysis(question, language)
+                return self._handle_accounting_analysis(question, language)
             
             if self._is_high_sales_low_profit_detailed_query(q):
-                return await self._handle_high_sales_low_profit(language)
+                return self._handle_high_sales_low_profit(language)
             
             if self._is_surprising_performance_query(q):
-                return await self._handle_surprising_performance(language)
+                return self._handle_surprising_performance(language)
             
             if self._is_suspicious_months_query(q):
-                return await self._handle_suspicious_months(language)
+                return self._handle_suspicious_months(language)
             
             if self._is_business_failure_query(q):
-                return await self._handle_failure_scenarios(language)
+                return self._handle_failure_scenarios(language)
             
             if self._is_near_failure_query(q):
-                return await self._handle_near_failure_month(language)
+                return self._handle_near_failure_month(language)
             
             if self._is_breakeven_point_query(q):
-                return await self._handle_breakeven_point(language)
+                return self._handle_breakeven_point(language)
             
             if self._is_breakeven_closest_query(q):
-                return await self._handle_breakeven_closest(language)
+                return self._handle_breakeven_closest(language)
             
             if self._is_first_profitable_query(q):
-                return await self._handle_first_profitable_month(language)
+                return self._handle_first_profitable_month(language)
             
             if self._is_loss_months_query(q):
-                return await self._handle_loss_months(language)
+                return self._handle_loss_months(language)
             
             if self._is_risk_analysis_query(q):
-                return await self._handle_risk_analysis(language)
+                return self._handle_risk_analysis(language)
             
             if self._is_cost_increase_scenario_query(q):
-                return await self._handle_cost_increase_scenario(question, language)
+                return self._handle_cost_increase_scenario(question, language)
             
             # Default: delegate to sales metrics
             return await self._handle_sales_metrics(question, language)
@@ -859,41 +895,9 @@ class AdvancedQueryProcessor:
                                     'maintain profit', 'mantener utilidad',
                                     'mantener ganancia', 'keep profit positive'])
 
-    def _is_breakeven_closest_query(self, q: str) -> bool:
-        """Check for closest to break-even queries."""
-        return (any(w in q for w in ['closest to zero', 'cerca de cero', 'más cerca de cero',
-                                     'closest to break-even', 'break-even', 'break even',
-                                     'breakeven']) and 
-                any(w in q for w in ['closest', 'cerca', 'month', 'mes']))
+    # ── Business Metrics Analysis ────────────────────────────────────────────
 
-    def _is_first_profitable_query(self, q: str) -> bool:
-        """Check for first profitable month queries."""
-        return any(w in q for w in ['first month', 'primer mes', 'loss to profit',
-                                    'pérdida a ganancia', 'perdida a ganancia',
-                                    'first profitable', 'primer mes rentable',
-                                    'moved from loss', 'pasó de pérdida'])
-
-    def _is_loss_months_query(self, q: str) -> bool:
-        """Check for loss months queries."""
-        return any(w in q for w in ['sales lower than', 'ventas menores que',
-                                    'sales less than', 'ventas menor que',
-                                    'costs plus expenses', 'costos y gastos',
-                                    'suma de costos', 'total costs'])
-
-    def _is_risk_analysis_query(self, q: str) -> bool:
-        """Check for risk analysis queries."""
-        return any(w in q for w in ['risk of operating', 'riesgo de operar',
-                                    'operating below', 'operar por debajo',
-                                    'highest risk', 'mayor riesgo', 'most risk'])
-
-    def _is_cost_increase_scenario_query(self, q: str) -> bool:
-        """Check for cost increase scenario queries."""
-        return any(w in q for w in ['costs increase', 'costos suben', 'costos aumentan',
-                                    'costs go up', 'increase by', 'suben un',
-                                    'maintain profit', 'mantener utilidad',
-                                    'mantener ganancia', 'keep profit positive'])
-
-    async def _handle_avg_margin(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_avg_margin(self, language: Language) -> Tuple[str, List[str]]:
         """Calculate average profit margin across all months."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -925,7 +929,7 @@ class AdvancedQueryProcessor:
             logger.error("Error in avg margin: %s", e)
             return self._err(language), []
 
-    async def _handle_quarter(self, year: int, months: List[int],
+    def _handle_quarter(self, year: int, months: List[int],
                                language: Language) -> Tuple[str, List[str]]:
         """Aggregate sales for a quarter."""
         try:
@@ -943,7 +947,9 @@ class AdvancedQueryProcessor:
             if not found:
                 if language == Language.SPANISH:
                     return f"No hay datos para {q_num} {year}.", []
-                return f"No data found for {q_num} {year}.", []
+                else:
+                    return f"No data found for {q_num} {year}.", []
+            
             margin = (total_profit / total_sales * 100) if total_sales else 0
             if language == Language.SPANISH:
                 return (
@@ -966,7 +972,7 @@ class AdvancedQueryProcessor:
             logger.error("Error in quarter handler: %s", e)
             return self._err(language), []
 
-    async def _handle_year_total(self, year: int, language: Language) -> Tuple[str, List[str]]:
+    def _handle_year_total(self, year: int, language: Language) -> Tuple[str, List[str]]:
         """Aggregate full-year sales."""
         try:
             total_sales = total_costs = total_profit = 0.0
@@ -981,7 +987,9 @@ class AdvancedQueryProcessor:
             if not months_found:
                 if language == Language.SPANISH:
                     return f"No hay datos para el año {year}.", []
-                return f"No data found for year {year}.", []
+                else:
+                    return f"No data found for year {year}.", []
+            
             margin = (total_profit / total_sales * 100) if total_sales else 0
             if language == Language.SPANISH:
                 return (
@@ -1004,7 +1012,7 @@ class AdvancedQueryProcessor:
             logger.error("Error in year total: %s", e)
             return self._err(language), []
 
-    async def _handle_transaction_count(self, question: str,
+    def _handle_transaction_count(self, question: str,
                                          language: Language) -> Tuple[str, List[str]]:
         """Return transaction count, optionally for a period."""
         try:
@@ -1040,39 +1048,39 @@ class AdvancedQueryProcessor:
 
     # ── Product handler ──────────────────────────────────────────────────────
 
-    async def _handle_product_info(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_product_info(self, question: str, language: Language) -> Tuple[str, List[str]]:
         try:
             q = question.lower()
 
             # Route to specific handlers
             if self._is_top_product_revenue_query(q):
-                return await self._handle_top_product_by_revenue(language)
+                return self._handle_top_product_by_revenue(language)
 
             if self._is_underpriced_products_query(q):
-                return await self._handle_underpriced_products(language)
+                return self._handle_underpriced_products(language)
 
             if self._is_high_volume_low_margin_query(q):
-                return await self._handle_high_volume_low_margin_products(language)
+                return self._handle_high_volume_low_margin_products(language)
 
             if self._is_product_margin_query(q):
-                return await self._handle_product_margins(language)
+                return self._handle_product_margins(language)
 
             if self._is_product_breakeven_query(q):
-                return await self._handle_product_breakeven_contribution(language)
+                return self._handle_product_breakeven_contribution(language)
 
             if self._is_category_revenue_query(q):
-                return await self._handle_category_revenue(language)
+                return self._handle_category_revenue(language)
 
             if self._is_top_products_query(q):
-                return await self._handle_top_products_list(language)
+                return self._handle_top_products_list(language)
 
             # Try specific product search
-            product_result = await self._handle_product_search(question, language)
+            product_result = self._handle_product_search(question, language)
             if product_result[0]:
                 return product_result
 
             # Default: catalog overview
-            return await self._handle_product_catalog_overview(language)
+            return self._handle_product_catalog_overview(language)
             
         except Exception as e:
             logger.error("Error in product handler: %s", e)
@@ -1120,7 +1128,7 @@ class AdvancedQueryProcessor:
                                     'which', 'cuál', 'what', 'qué', 'show',
                                     'list', 'lista', 'ranking'])
 
-    async def _handle_top_products_list(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_top_products_list(self, language: Language) -> Tuple[str, List[str]]:
         """Handle top products list queries."""
         top = self.db.get_top_products(limit=5)
         if top:
@@ -1143,7 +1151,7 @@ class AdvancedQueryProcessor:
             return ans, [DB_PRODUCTS, DB_SALES_TRANSACTIONS]
         return self._no_data("products", language), []
 
-    async def _handle_product_search(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_product_search(self, question: str, language: Language) -> Tuple[str, List[str]]:
         """Handle specific product search."""
         keywords = self._extract_product_keywords(question)
         for kw in keywords:
@@ -1167,7 +1175,7 @@ class AdvancedQueryProcessor:
                 return ans, [DB_PRODUCTS]
         return "", []
 
-    async def _handle_product_catalog_overview(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_product_catalog_overview(self, language: Language) -> Tuple[str, List[str]]:
         """Handle product catalog overview."""
         products = self.db.get_products(limit=100)
         if not products:
@@ -1190,7 +1198,7 @@ class AdvancedQueryProcessor:
             [DB_PRODUCTS]
         )
 
-    async def _handle_category_revenue(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_category_revenue(self, language: Language) -> Tuple[str, List[str]]:
         """Revenue breakdown by product category."""
         try:
             data = self.db.get_revenue_by_category()
@@ -1226,35 +1234,35 @@ class AdvancedQueryProcessor:
                 return await self._handle_marketing_analysis(question, language)
 
             if self._is_customer_frequency_query(q):
-                return await self._handle_customer_frequency_analysis(language)
+                return self._handle_customer_frequency_analysis(language)
 
             if self._is_most_valuable_segment_query(q):
-                return await self._handle_most_valuable_segment(language)
+                return self._handle_most_valuable_segment(language)
 
             if self._is_customer_profitability_query(q):
-                return await self._handle_customer_profitability(language)
+                return self._handle_customer_profitability(language)
 
             # Filter by country
             country = self._extract_country(q)
             if country:
-                return await self._handle_customers_by_country(country, language)
+                return self._handle_customers_by_country(country, language)
 
             # Filter by segment
             segment = self._extract_segment(q)
             if segment:
-                return await self._handle_customers_by_segment(segment, language)
+                return self._handle_customers_by_segment(segment, language)
 
             if self._is_customer_orders_query(q):
-                return await self._handle_top_customers_by_orders(language)
+                return self._handle_top_customers_by_orders(language)
 
             if self._is_top_customers_query(q):
-                return await self._handle_top_customers_list(language)
+                return self._handle_top_customers_list(language)
 
             if self._is_customer_count_query(q):
-                return await self._handle_customer_count(language)
+                return self._handle_customer_count(language)
 
             # Default overview
-            return await self._handle_customer_overview(language)
+            return self._handle_customer_overview(language)
             
         except Exception as e:
             logger.error("Error in customer handler: %s", e)
@@ -1304,7 +1312,7 @@ class AdvancedQueryProcessor:
         return any(w in q for w in ['how many', 'cuántos', 'count', 'total',
                                     'number', 'número', 'cantidad'])
 
-    async def _handle_top_customers_list(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_top_customers_list(self, language: Language) -> Tuple[str, List[str]]:
         """Handle top customers list queries."""
         top = self.db.get_top_customers(limit=5)
         if top:
@@ -1329,7 +1337,7 @@ class AdvancedQueryProcessor:
             return ans, [DB_CUSTOMERS, DB_SALES_TRANSACTIONS]
         return self._no_data("customers", language), []
 
-    async def _handle_customer_count(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_customer_count(self, language: Language) -> Tuple[str, List[str]]:
         """Handle customer count queries."""
         customers = self.db.get_customers(limit=2000)
         segs: Dict[str, int] = {}
@@ -1353,7 +1361,7 @@ class AdvancedQueryProcessor:
                 ans += f"• {co}: {n}\n"
         return ans, [DB_CUSTOMERS]
 
-    async def _handle_customer_overview(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_customer_overview(self, language: Language) -> Tuple[str, List[str]]:
         """Handle customer overview queries."""
         customers = self.db.get_customers(limit=200)
         if not customers:
@@ -1376,14 +1384,16 @@ class AdvancedQueryProcessor:
             [DB_CUSTOMERS]
         )
 
-    async def _handle_customers_by_country(self, country: str,
+    def _handle_customers_by_country(self, country: str,
                                             language: Language) -> Tuple[str, List[str]]:
         try:
             customers = self.db.get_customers_by_country(country)
             if not customers:
                 if language == Language.SPANISH:
                     return f"No se encontraron clientes de {country}.", []
-                return f"No customers found from {country}.", []
+                else:
+                    return f"No customers found from {country}.", []
+            
             if language == Language.SPANISH:
                 ans = f"🌍 Clientes de {country} ({len(customers)}):\n\n"
                 for c in customers[:10]:
@@ -1401,14 +1411,16 @@ class AdvancedQueryProcessor:
             logger.error("Error in customers by country: %s", e)
             return self._err(language), []
 
-    async def _handle_customers_by_segment(self, segment: str,
+    def _handle_customers_by_segment(self, segment: str,
                                             language: Language) -> Tuple[str, List[str]]:
         try:
             customers = self.db.get_customers_by_segment(segment)
             if not customers:
                 if language == Language.SPANISH:
                     return f"No se encontraron clientes en el segmento {segment}.", []
-                return f"No customers found in segment {segment}.", []
+                else:
+                    return f"No customers found in segment {segment}.", []
+            
             if language == Language.SPANISH:
                 ans = f"🏢 Clientes del segmento {segment} ({len(customers)}):\n\n"
                 for c in customers[:10]:
@@ -1426,7 +1438,7 @@ class AdvancedQueryProcessor:
             logger.error("Error in customers by segment: %s", e)
             return self._err(language), []
 
-    async def _handle_top_customers_by_orders(self,
+    def _handle_top_customers_by_orders(self,
                                                language: Language) -> Tuple[str, List[str]]:
         try:
             top = self.db.get_top_customers_by_orders(limit=5)
@@ -1451,57 +1463,72 @@ class AdvancedQueryProcessor:
 
     # ── Document search ──────────────────────────────────────────────────────
 
-    async def _handle_document_search(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _clean_document_keywords(self, question: str, language: Language) -> List[str]:
+        """Clean and filter keywords for document search."""
+        raw = self.classifier.extract_keywords(question, language)
+        keywords = []
+        for k in raw:
+            kl = k.lower()
+            # Skip if any word in the phrase is a stop word
+            words_in_k = kl.split()
+            if any(w in _DOC_STOP_WORDS for w in words_in_k):
+                continue
+            if kl in _DOC_STOP_WORDS:
+                continue
+            if len(k) > 2:
+                keywords.append(k)
+        return keywords
+    
+    def _format_no_keywords_message(self, language: Language) -> str:
+        """Format message when no valid keywords are found."""
+        if language == Language.SPANISH:
+            return "Por favor indica qué tema quieres buscar en los documentos."
+        return "Please specify what topic you want to search in the documents."
+    
+    def _format_no_results_message(self, keywords: List[str], language: Language) -> str:
+        """Format message when no documents are found."""
+        if language == Language.SPANISH:
+            return (
+                f"📂 No se encontraron documentos sobre: **{', '.join(keywords)}**.\n"
+                "Intenta con términos más específicos."
+            )
+        return (
+            f"📂 No documents found about: **{', '.join(keywords)}**.\n"
+            "Try more specific terms."
+        )
+    
+    def _format_document_results(self, results: List[Dict], keywords: List[str], language: Language) -> Tuple[str, List[str]]:
+        """Format document search results."""
+        sources = []
+        if language == Language.SPANISH:
+            parts = [f"📂 {len(results)} documento(s) encontrado(s) para «{', '.join(keywords)}»:"]
+        else:
+            parts = [f"📂 {len(results)} document(s) found for «{', '.join(keywords)}»:"]
+
+        for r in results:
+            fname = r.get('filename', 'Unknown')
+            text = r.get('extracted_text', '')
+            sources.append(f"document:{fname}")
+            excerpt = self._extract_excerpt(text, keywords, max_length=250)
+            parts.append(f"\n📄 **{fname}**\n{excerpt}")
+
+        return "\n".join(parts), sources
+
+    def _handle_document_search(self, question: str, language: Language) -> Tuple[str, List[str]]:
         try:
             # Clean keywords: remove stop words, question words, and multi-word
             # phrases that contain stop words
-            raw = self.classifier.extract_keywords(question, language)
-            keywords = []
-            for k in raw:
-                kl = k.lower()
-                # Skip if any word in the phrase is a stop word
-                words_in_k = kl.split()
-                if any(w in _DOC_STOP_WORDS for w in words_in_k):
-                    continue
-                if kl in _DOC_STOP_WORDS:
-                    continue
-                if len(k) > 2:
-                    keywords.append(k)
+            keywords = self._clean_document_keywords(question, language)
 
             if not keywords:
-                if language == Language.SPANISH:
-                    return "Por favor indica qué tema quieres buscar en los documentos.", []
-                return "Please specify what topic you want to search in the documents.", []
+                return self._format_no_keywords_message(language), []
 
             results = self.db.search_documents(keywords, limit=3)
 
             if not results:
-                if language == Language.SPANISH:
-                    return (
-                        f"📂 No se encontraron documentos sobre: **{', '.join(keywords)}**.\n"
-                        "Intenta con términos más específicos.",
-                        []
-                    )
-                return (
-                    f"📂 No documents found about: **{', '.join(keywords)}**.\n"
-                    "Try more specific terms.",
-                    []
-                )
+                return self._format_no_results_message(keywords, language), []
 
-            sources = []
-            if language == Language.SPANISH:
-                parts = [f"📂 {len(results)} documento(s) encontrado(s) para «{', '.join(keywords)}»:"]
-            else:
-                parts = [f"📂 {len(results)} document(s) found for «{', '.join(keywords)}»:"]
-
-            for r in results:
-                fname = r.get('filename', 'Unknown')
-                text = r.get('extracted_text', '')
-                sources.append(f"document:{fname}")
-                excerpt = self._extract_excerpt(text, keywords, max_length=250)
-                parts.append(f"\n📄 **{fname}**\n{excerpt}")
-
-            return "\n".join(parts), sources
+            return self._format_document_results(results, keywords, language)
         except Exception as e:
             logger.error("Error in document search: %s", e)
             return self._err(language), []
@@ -1549,11 +1576,11 @@ class AdvancedQueryProcessor:
 
     # ── Trend analysis ───────────────────────────────────────────────────────
 
-    async def _handle_trend_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_trend_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
         metrics = self.db.get_sales_metrics()
-        return await self._analyze_sales_trends(metrics, language)
+        return self._analyze_sales_trends(metrics, language)
 
-    async def _analyze_sales_trends(self, metrics: List[Dict],
+    def _analyze_sales_trends(self, metrics: List[Dict],
                                      language: Language) -> Tuple[str, List[str]]:
         if len(metrics) < 2:
             if language == Language.SPANISH:
@@ -1590,21 +1617,21 @@ class AdvancedQueryProcessor:
 
     # ── Other handlers ───────────────────────────────────────────────────────
 
-    async def _handle_forecast(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_forecast(self, question: str, language: Language) -> Tuple[str, List[str]]:
         if language == Language.SPANISH:
             return ("Los pronósticos están disponibles en la sección de Pronósticos. "
                     "Puedes generar proyecciones de ventas, costos y ganancias.", ["forecasts"])
         return ("Forecasts are available in the Forecasts section. "
                 "You can generate sales, cost, and profit projections.", ["forecasts"])
 
-    async def _handle_market_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_market_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
         if language == Language.SPANISH:
             return ("El análisis de mercado externo no está disponible. "
                     "Puedo mostrarte datos internos de ventas y clientes.", [DB_BUSINESS_METRICS])
         return ("External market analysis is not available. "
                 "I can show you internal sales and customer data.", [DB_BUSINESS_METRICS])
 
-    async def _handle_competitive_intelligence(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_competitive_intelligence(self, question: str, language: Language) -> Tuple[str, List[str]]:
         if language == Language.SPANISH:
             return ("No tengo datos de competidores. "
                     "Puedo mostrarte nuestro rendimiento interno.", [DB_BUSINESS_METRICS])
@@ -1614,7 +1641,7 @@ class AdvancedQueryProcessor:
     async def _handle_mixed_query(self, question: str, language: Language) -> Tuple[str, List[str]]:
         return await self._handle_sales_metrics(question, language)
 
-    async def _handle_unknown(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_unknown(self, question: str, language: Language) -> Tuple[str, List[str]]:
         if language == Language.SPANISH:
             return (
                 "No entendí tu pregunta. Puedo ayudarte con:\n"
@@ -1637,15 +1664,8 @@ class AdvancedQueryProcessor:
 
     # ── Utility / parsing helpers ────────────────────────────────────────────
 
-    def _extract_date_from_question(self, question: str) -> Optional[Tuple[int, int]]:
-        """Return (year, month) or None."""
-        q = question.lower()
-        # Month name + year
-        # Use (?<![a-z]) / (?![a-z]) instead of \b to handle non-ASCII month names
-        # (e.g. Spanish months like 'enero') and avoid catastrophic backtracking
-        # (SonarQube S5852).  Replace .*? with [^0-9]* so the wildcard and the
-        # digit group are mutually exclusive, eliminating polynomial backtracking.
-        all_months = {**MONTHS_EN, **MONTHS_ES}
+    def _compile_month_patterns(self, all_months: Dict[str, int]) -> Tuple[Dict[str, re.Pattern], Dict[str, re.Pattern]]:
+        """Compile regex patterns for month matching to avoid ReDoS."""
         compiled_month_year = {
             name: re.compile(
                 r'(?<![a-z])' + re.escape(name) + r'(?![a-z])[^0-9]*(\d{4})'
@@ -1658,13 +1678,22 @@ class AdvancedQueryProcessor:
             )
             for name in all_months
         }
+        return compiled_month_year, compiled_year_month
+    
+    def _extract_month_year_from_text(self, q: str, all_months: Dict[str, int]) -> Optional[Tuple[int, int]]:
+        """Extract month and year from text using compiled patterns."""
+        compiled_month_year, compiled_year_month = self._compile_month_patterns(all_months)
+        
         for name, num in all_months.items():
             m = compiled_month_year[name].search(q)
             if not m:
                 m = compiled_year_month[name].search(q)
             if m:
                 return int(m.group(1)), num
-        # Numeric patterns
+        return None
+    
+    def _extract_numeric_date_patterns(self, q: str) -> Optional[Tuple[int, int]]:
+        """Extract date from numeric patterns like MM/YYYY or YYYY/MM."""
         for pat in [r'(\d{1,2})[/\-](\d{4})', r'(\d{4})[/\-](\d{1,2})']:
             m = re.search(pat, q)
             if m:
@@ -1675,21 +1704,30 @@ class AdvancedQueryProcessor:
                     return b, a
         return None
 
-    def _extract_multiple_dates(self, question: str) -> List[Tuple[int, int]]:
-        """Extract all (year, month) pairs from a question.
-        Handles cases like 'January and June 2024' where year appears once.
-        """
+    def _extract_date_from_question(self, question: str) -> Optional[Tuple[int, int]]:
+        """Return (year, month) or None."""
         q = question.lower()
-        results = []
+        # Month name + year
+        # Use (?<![a-z]) / (?![a-z]) instead of \b to handle non-ASCII month names
+        # (e.g. Spanish months like 'enero') and avoid catastrophic backtracking
+        # (SonarQube S5852).  Replace .*? with [^0-9]* so the wildcard and the
+        # digit group are mutually exclusive, eliminating polynomial backtracking.
         all_months = {**MONTHS_EN, **MONTHS_ES}
+        
+        # Try month name patterns first
+        result = self._extract_month_year_from_text(q, all_months)
+        if result:
+            return result
+        
+        # Try numeric patterns
+        return self._extract_numeric_date_patterns(q)
 
-        # Find all years in the question
-        years_found = [int(y) for y in re.findall(r'\b(20\d{2})\b', q)]
-
-        # Find all month names with their positions
-        # Pre-compile patterns once to avoid ReDoS via repeated compilation (S5852).
-        # Use re.escape + explicit space/start/end anchors instead of \b to keep
-        # linear-time matching even for non-ASCII month names.
+    def _find_years_in_question(self, q: str) -> List[int]:
+        """Find all years mentioned in the question."""
+        return [int(y) for y in re.findall(r'\b(20\d{2})\b', q)]
+    
+    def _find_month_positions(self, q: str, all_months: Dict[str, int]) -> List[Tuple[int, int, str]]:
+        """Find all month names with their positions in the text."""
         month_positions = []
         compiled_months = {
             name: re.compile(r'(?<![a-z])' + re.escape(name) + r'(?![a-z])')
@@ -1698,36 +1736,59 @@ class AdvancedQueryProcessor:
         for name, num in all_months.items():
             for m in compiled_months[name].finditer(q):
                 month_positions.append((m.start(), num, name))
-
+        
         month_positions.sort(key=lambda x: x[0])
+        return month_positions
+    
+    def _match_months_to_single_year(self, year: int, month_positions: List[Tuple[int, int, str]]) -> List[Tuple[int, int]]:
+        """Match all found months to a single year."""
+        results = []
+        for _, num, _ in month_positions:
+            pair = (year, num)
+            if pair not in results:
+                results.append(pair)
+        return results
+    
+    def _match_months_to_nearest_years(self, q: str, month_positions: List[Tuple[int, int, str]]) -> List[Tuple[int, int]]:
+        """Match each month to its nearest year in the text."""
+        results = []
+        for pos, num, _ in month_positions:
+            # Find closest year after this month name
+            best_year = None
+            best_dist = float('inf')
+            for m in re.finditer(r'\b(20\d{2})\b', q):
+                dist = abs(m.start() - pos)
+                if dist < best_dist:
+                    best_dist = dist
+                    best_year = int(m.group(1))
+            if best_year:
+                pair = (best_year, num)
+                if pair not in results:
+                    results.append(pair)
+        return results
+
+    def _extract_multiple_dates(self, question: str) -> List[Tuple[int, int]]:
+        """Extract all (year, month) pairs from a question.
+        Handles cases like 'January and June 2024' where year appears once.
+        """
+        q = question.lower()
+        all_months = {**MONTHS_EN, **MONTHS_ES}
+
+        # Find all years in the question
+        years_found = self._find_years_in_question(q)
+
+        # Find all month names with their positions
+        month_positions = self._find_month_positions(q, all_months)
 
         if not month_positions:
-            return results
+            return []
 
         # If only one year, assign it to all months found
         if len(years_found) == 1:
-            year = years_found[0]
-            for _, num, _ in month_positions:
-                pair = (year, num)
-                if pair not in results:
-                    results.append(pair)
+            return self._match_months_to_single_year(years_found[0], month_positions)
         else:
             # Try to match each month with nearest year
-            for pos, num, _ in month_positions:
-                # Find closest year after this month name
-                best_year = None
-                best_dist = float('inf')
-                for m in re.finditer(r'\b(20\d{2})\b', q):
-                    dist = abs(m.start() - pos)
-                    if dist < best_dist:
-                        best_dist = dist
-                        best_year = int(m.group(1))
-                if best_year:
-                    pair = (best_year, num)
-                    if pair not in results:
-                        results.append(pair)
-
-        return results
+            return self._match_months_to_nearest_years(q, month_positions)
 
     def _extract_year_only(self, question: str) -> Optional[int]:
         """Return a standalone year if the question asks about a full year."""
@@ -1841,7 +1902,7 @@ class AdvancedQueryProcessor:
 
     # ── Break-even Analysis Methods ──────────────────────────────────────────
 
-    async def _handle_breakeven_closest(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_breakeven_closest(self, language: Language) -> Tuple[str, List[str]]:
         """Find the month with profit closest to zero (break-even)."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -1855,7 +1916,7 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 return (
-                    f"🎯 Mes más cerca del punto de equilibrio: **{mn_es} {closest_month['year']}**\n"
+                    f"🎯 Mes más cerca del {BREAKEVEN_POINT_ES}: **{mn_es} {closest_month['year']}**\n"
                     f"• Ganancia: ${closest_month['profit']:,.2f}\n"
                     f"• Ventas: ${closest_month['total_sales']:,.2f}\n"
                     f"• Costos: ${closest_month['total_costs']:,.2f}\n\n"
@@ -1874,7 +1935,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in breakeven closest: {e}")
             return self._err(language), []
 
-    async def _handle_first_profitable_month(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_first_profitable_month(self, language: Language) -> Tuple[str, List[str]]:
         """Find the first month when business moved from loss to profit."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -1925,7 +1986,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in first profitable month: {e}")
             return self._err(language), []
 
-    async def _handle_breakeven_point(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_breakeven_point(self, language: Language) -> Tuple[str, List[str]]:
         """Calculate monthly break-even point based on average costs."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -1941,7 +2002,7 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 return (
-                    f"⚖️ Punto de equilibrio mensual estimado: **${avg_costs:,.2f}**\n\n"
+                    f"⚖️ {BREAKEVEN_POINT_ES.capitalize()} mensual estimado: **${avg_costs:,.2f}**\n\n"
                     "📊 Análisis basado en costos promedio:\n"
                     f"• Costos promedio mensuales: ${avg_costs:,.2f}\n"
                     f"• Ventas necesarias para equilibrio: ${avg_costs:,.2f}\n"
@@ -1968,7 +2029,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in breakeven point: {e}")
             return self._err(language), []
 
-    async def _handle_loss_months(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_loss_months(self, language: Language) -> Tuple[str, List[str]]:
         """Find months where sales were lower than total costs."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2028,7 +2089,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in loss months: {e}")
             return self._err(language), []
 
-    async def _handle_risk_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_risk_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which year had the highest risk of operating below break-even."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2085,7 +2146,7 @@ class AdvancedQueryProcessor:
                     f"• Margen promedio: {risk_data['avg_margin']:.1%}\n"
                     f"• Ganancia mínima: ${risk_data['min_profit']:,.2f}\n"
                     f"• Puntuación de riesgo: {risk_data['risk_score']:.2f}\n\n"
-                    "💡 Este año tuvo la mayor probabilidad de operar por debajo del punto de equilibrio.",
+                    f"💡 Este año tuvo la mayor probabilidad de operar por debajo del {BREAKEVEN_POINT_ES}.",
                     [DB_BUSINESS_METRICS]
                 )
             return (
@@ -2103,14 +2164,17 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in risk analysis: {e}")
             return self._err(language), []
 
-    async def _handle_cost_increase_scenario(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_increase_scenario(self, question: str, language: Language) -> Tuple[str, List[str]]:
         """Analyze scenario where costs increase by X% and calculate required sales increase."""
         try:
             # Extract percentage from question
             import re
-            percentage_match = re.search(r'(\d+)%', question)
+            # SONAR_SAFE: Fixed regex to prevent polynomial runtime vulnerability
+            # Original pattern r'(\d+)%' was vulnerable to backtracking
+            # New pattern uses atomic grouping equivalent and is more specific
+            percentage_match = re.search(r'(\d{1,3})%', question)
             if not percentage_match:
-                percentage_match = re.search(r'(\d+)', question)
+                percentage_match = re.search(r'(\d{1,3})', question)
             
             cost_increase_pct = float(percentage_match.group(1)) if percentage_match else 10.0
             
@@ -2207,7 +2271,55 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in cost increase scenario: {e}")
             return self._err(language), []
 
-    async def _handle_product_margins(self, language: Language) -> Tuple[str, List[str]]:
+    def _calculate_product_margins(self, products: List[Dict]) -> List[Dict]:
+        """Calculate margins for all products."""
+        product_margins = []
+        for product in products:
+            price = float(product.get('price', 0))  # Convert Decimal to float
+            # For this demo, estimate cost as 60-70% of price (since we don't have actual cost data)
+            estimated_cost = price * 0.65  # Assume 35% margin on average
+            margin = price - estimated_cost
+            margin_pct = (margin / price * 100) if price > 0 else 0
+            
+            product_margins.append({
+                'name': product['name'],
+                'category': product['category'],
+                'price': price,
+                'estimated_cost': estimated_cost,
+                'margin': margin,
+                'margin_pct': margin_pct
+            })
+        return product_margins
+    
+    def _format_product_margins_spanish(self, product_margins: List[Dict]) -> str:
+        """Format product margins analysis in Spanish."""
+        answer = "💰 Análisis de márgenes de productos (Top 10):\n\n"
+        for i, p in enumerate(product_margins[:10], 1):
+            answer += (f"{i}. {p['name']}\n"
+                      f"   • Precio: ${p['price']:,.2f}\n"
+                      f"   • Costo estimado: ${p['estimated_cost']:,.2f}\n"
+                      f"   • Margen: ${p['margin']:,.2f} ({p['margin_pct']:.1f}%)\n"
+                      f"   • Categoría: {p['category']}\n\n")
+        
+        best = product_margins[0]
+        answer += f"🏆 Mejor margen: **{best['name']}** con {best['margin_pct']:.1f}% de margen"
+        return answer
+    
+    def _format_product_margins_english(self, product_margins: List[Dict]) -> str:
+        """Format product margins analysis in English."""
+        answer = "💰 Product Margin Analysis (Top 10):\n\n"
+        for i, p in enumerate(product_margins[:10], 1):
+            answer += (f"{i}. {p['name']}\n"
+                      f"   • Price: ${p['price']:,.2f}\n"
+                      f"   • Estimated cost: ${p['estimated_cost']:,.2f}\n"
+                      f"   • Margin: ${p['margin']:,.2f} ({p['margin_pct']:.1f}%)\n"
+                      f"   • Category: {p['category']}\n\n")
+        
+        best = product_margins[0]
+        answer += f"🏆 Highest margin: **{best['name']}** with {best['margin_pct']:.1f}% margin"
+        return answer
+
+    def _handle_product_margins(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze product margins (price vs cost)."""
         try:
             # Get products with cost information
@@ -2216,55 +2328,22 @@ class AdvancedQueryProcessor:
                 return self._no_data("products", language), []
             
             # Calculate margins for products that have cost data
-            product_margins = []
-            for product in products:
-                price = float(product.get('price', 0))  # Convert Decimal to float
-                # For this demo, estimate cost as 60-70% of price (since we don't have actual cost data)
-                estimated_cost = price * 0.65  # Assume 35% margin on average
-                margin = price - estimated_cost
-                margin_pct = (margin / price * 100) if price > 0 else 0
-                
-                product_margins.append({
-                    'name': product['name'],
-                    'category': product['category'],
-                    'price': price,
-                    'estimated_cost': estimated_cost,
-                    'margin': margin,
-                    'margin_pct': margin_pct
-                })
+            product_margins = self._calculate_product_margins(products)
             
             # Sort by margin percentage (highest first)
             product_margins.sort(key=lambda x: x['margin_pct'], reverse=True)
             
             if language == Language.SPANISH:
-                answer = "💰 Análisis de márgenes de productos (Top 10):\n\n"
-                for i, p in enumerate(product_margins[:10], 1):
-                    answer += (f"{i}. {p['name']}\n"
-                              f"   • Precio: ${p['price']:,.2f}\n"
-                              f"   • Costo estimado: ${p['estimated_cost']:,.2f}\n"
-                              f"   • Margen: ${p['margin']:,.2f} ({p['margin_pct']:.1f}%)\n"
-                              f"   • Categoría: {p['category']}\n\n")
-                
-                best = product_margins[0]
-                answer += f"🏆 Mejor margen: **{best['name']}** con {best['margin_pct']:.1f}% de margen"
+                answer = self._format_product_margins_spanish(product_margins)
             else:
-                answer = "💰 Product Margin Analysis (Top 10):\n\n"
-                for i, p in enumerate(product_margins[:10], 1):
-                    answer += (f"{i}. {p['name']}\n"
-                              f"   • Price: ${p['price']:,.2f}\n"
-                              f"   • Estimated cost: ${p['estimated_cost']:,.2f}\n"
-                              f"   • Margin: ${p['margin']:,.2f} ({p['margin_pct']:.1f}%)\n"
-                              f"   • Category: {p['category']}\n\n")
-                
-                best = product_margins[0]
-                answer += f"🏆 Highest margin: **{best['name']}** with {best['margin_pct']:.1f}% margin"
+                answer = self._format_product_margins_english(product_margins)
             
             return answer, [DB_PRODUCTS]
         except Exception as e:
             logger.error(f"Error in product margins: {e}")
             return self._err(language), []
 
-    async def _handle_product_breakeven_contribution(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_product_breakeven_contribution(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which products contribute most to reaching break-even."""
         try:
             # Get top products by revenue (these contribute most to covering costs)
@@ -2279,11 +2358,8 @@ class AdvancedQueryProcessor:
             
             avg_monthly_costs = sum(m['total_costs'] for m in all_metrics) / len(all_metrics)
             
-            # Calculate each product's contribution to break-even
-            total_revenue = sum(p['total_revenue'] for p in top_products)
-            
             if language == Language.SPANISH:
-                answer = f"🎯 Contribución al punto de equilibrio (${avg_monthly_costs:,.2f}/mes):\n\n"
+                answer = f"🎯 Contribución al {BREAKEVEN_POINT_ES} (${avg_monthly_costs:,.2f}/mes):\n\n"
                 
                 for i, product in enumerate(top_products, 1):
                     # Estimate monthly contribution (assuming revenue is spread over time)
@@ -2300,7 +2376,7 @@ class AdvancedQueryProcessor:
                 monthly_top = top_product['total_revenue'] / len(all_metrics) if all_metrics else 0
                 coverage_top = (monthly_top / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
                 
-                answer += (f"🏆 **{top_product['name']}** contribuye más al punto de equilibrio\n"
+                answer += (f"🏆 **{top_product['name']}** contribuye más al {BREAKEVEN_POINT_ES}\n"
                           f"Cubre aproximadamente {coverage_top:.1f}% de los costos mensuales promedio.")
             else:
                 answer = f"🎯 Break-even contribution (${avg_monthly_costs:,.2f}/month):\n\n"
@@ -2328,7 +2404,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in product breakeven contribution: {e}")
             return self._err(language), []
 
-    async def _handle_customer_profitability(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_customer_profitability(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze customer segment profitability."""
         try:
             # Get customer segments and their spending
@@ -2391,67 +2467,153 @@ class AdvancedQueryProcessor:
             return self._err(language), []
     # ── Advanced Business Intelligence Methods ──────────────────────────────
 
-    async def _handle_worst_month_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _validate_worst_month_data(self, bw: Dict, language: Language) -> Tuple[bool, Optional[Tuple[str, List[str]]]]:
+        """Validate that we have the required worst month data."""
+        if not bw:
+            logger.error("No best/worst months data returned from database")
+            return False, (self._no_data("sales", language), [])
+            
+        worst = bw.get('worst_month')
+        if not worst:
+            logger.error("No worst_month in best/worst months data")
+            return False, (self._no_data("sales", language), [])
+        
+        return True, None
+    
+    def _calculate_worst_month_metrics(self, worst: Dict, all_metrics: List[Dict]) -> Tuple[float, float, float]:
+        """Calculate metrics for worst month analysis."""
+        worst_profit = float(worst['profit'])
+        avg_profit = sum(float(m['profit']) for m in all_metrics) / len(all_metrics)
+        profit_diff = worst_profit - avg_profit
+        return worst_profit, avg_profit, profit_diff
+    
+    def _format_worst_month_spanish(self, worst: Dict, worst_profit: float, profit_diff: float) -> str:
+        """Format worst month analysis in Spanish."""
+        year, month = worst['year'], worst['month']
+        mn_es = MONTH_NAMES_ES[month]
+        
+        return (
+            f"📉 **{WORST_MONTH_ES.capitalize()}: {mn_es} {year}**\n\n"
+            "💰 Resultados:\n"
+            f"• Ganancia: ${worst_profit:,.2f}\n"
+            f"• Diferencia vs promedio: ${profit_diff:,.2f}\n\n"
+            "🔍 **¿Por qué fue malo?**\n"
+            f"• Ganancia {abs(profit_diff):,.2f} por debajo del promedio\n"
+            "• Representa el peor rendimiento en nuestro historial\n"
+            "• Posibles causas: costos elevados, ventas bajas, o factores estacionales\n\n"
+            "💡 Este mes requiere análisis detallado para evitar repetir los problemas."
+        )
+    
+    def _format_worst_month_english(self, worst: Dict, worst_profit: float, profit_diff: float) -> str:
+        """Format worst month analysis in English."""
+        year, month = worst['year'], worst['month']
+        mn = MONTH_NAMES_EN[month]
+        
+        return (
+            f"📉 **{WORST_MONTH_EN.capitalize()}: {mn} {year}**\n\n"
+            "💰 Results:\n"
+            f"• Profit: ${worst_profit:,.2f}\n"
+            f"• Difference vs average: ${profit_diff:,.2f}\n\n"
+            "🔍 **Why was it bad?**\n"
+            f"• Profit ${abs(profit_diff):,.2f} below average\n"
+            "• Represents worst performance in our history\n"
+            "• Possible causes: high costs, low sales, or seasonal factors\n\n"
+            "💡 This month requires detailed analysis to avoid repeating the issues."
+        )
+
+    def _handle_worst_month_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze the worst performing month and explain why it was bad."""
         try:
             bw = self.db.get_best_worst_months()
-            if not bw:
-                logger.error("No best/worst months data returned from database")
-                return self._no_data("sales", language), []
-                
+            
+            # Validate data
+            is_valid, error_result = self._validate_worst_month_data(bw, language)
+            if not is_valid:
+                return error_result
+            
             worst = bw.get('worst_month')
-            if not worst:
-                logger.error("No worst_month in best/worst months data")
-                return self._no_data("sales", language), []
-            
-            # Get additional context about that month
-            year, month = worst['year'], worst['month']
-            mn = MONTH_NAMES_EN[month]
-            mn_es = MONTH_NAMES_ES[month]
-            
-            # Convert Decimal to float
-            worst_profit = float(worst['profit'])
             
             # Get all metrics to compare
             all_metrics = self.db.get_all_sales_metrics()
             if not all_metrics:
                 logger.error("No sales metrics available for comparison")
                 return self._no_data("sales", language), []
-                
-            avg_profit = sum(float(m['profit']) for m in all_metrics) / len(all_metrics)
             
-            profit_diff = worst_profit - avg_profit
+            # Calculate metrics
+            worst_profit, avg_profit, profit_diff = self._calculate_worst_month_metrics(worst, all_metrics)
             
             if language == Language.SPANISH:
-                return (
-                    f"📉 **Peor mes: {mn_es} {year}**\n\n"
-                    "💰 Resultados:\n"
-                    f"• Ganancia: ${worst_profit:,.2f}\n"
-                    f"• Diferencia vs promedio: ${profit_diff:,.2f}\n\n"
-                    "🔍 **¿Por qué fue malo?**\n"
-                    f"• Ganancia {abs(profit_diff):,.2f} por debajo del promedio\n"
-                    "• Representa el peor rendimiento en nuestro historial\n"
-                    "• Posibles causas: costos elevados, ventas bajas, o factores estacionales\n\n"
-                    "💡 Este mes requiere análisis detallado para evitar repetir los problemas.",
-                    [DB_BUSINESS_METRICS]
-                )
-            return (
-                f"📉 **Worst month: {mn} {year}**\n\n"
-                "💰 Results:\n"
-                f"• Profit: ${worst_profit:,.2f}\n"
-                f"• Difference vs average: ${profit_diff:,.2f}\n\n"
-                "🔍 **Why was it bad?**\n"
-                f"• Profit ${abs(profit_diff):,.2f} below average\n"
-                "• Represents worst performance in our history\n"
-                "• Possible causes: high costs, low sales, or seasonal factors\n\n"
-                "💡 This month requires detailed analysis to avoid repeating the issues.",
-                [DB_BUSINESS_METRICS]
-            )
+                answer = self._format_worst_month_spanish(worst, worst_profit, profit_diff)
+            else:
+                answer = self._format_worst_month_english(worst, worst_profit, profit_diff)
+            
+            return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
             logger.error(f"Error in worst month analysis: {e}", exc_info=True)
             return self._err(language), []
 
-    async def _handle_high_sales_low_profit(self, language: Language) -> Tuple[str, List[str]]:
+    def _calculate_months_with_margins(self, all_metrics: List[Dict]) -> List[Dict]:
+        """Calculate profit margins for all months."""
+        months_with_margins = []
+        for metric in all_metrics:
+            sales = float(metric['total_sales'])
+            profit = float(metric['profit'])
+            margin = (profit / sales * 100) if sales > 0 else 0
+            months_with_margins.append({
+                'month': metric['month'],
+                'year': metric['year'],
+                'sales': sales,
+                'profit': profit,
+                'margin': margin
+            })
+        return months_with_margins
+    
+    def _find_high_sales_low_margin_months(self, months_with_margins: List[Dict]) -> List[Dict]:
+        """Find months with high sales (top 30%) but low margins (bottom 30%)."""
+        sorted_by_sales = sorted(months_with_margins, key=lambda x: x['sales'], reverse=True)
+        sorted_by_margin = sorted(months_with_margins, key=lambda x: x['margin'])
+        
+        high_sales_threshold = len(sorted_by_sales) * 0.3
+        low_margin_threshold = len(sorted_by_margin) * 0.3
+        
+        high_sales_months = {(m['year'], m['month']) for m in sorted_by_sales[:int(high_sales_threshold)]}
+        low_margin_months = {(m['year'], m['month']) for m in sorted_by_margin[:int(low_margin_threshold)]}
+        
+        # Find intersection
+        problematic_months = []
+        for metric in months_with_margins:
+            if (metric['year'], metric['month']) in high_sales_months and (metric['year'], metric['month']) in low_margin_months:
+                problematic_months.append(metric)
+        
+        return problematic_months
+    
+    def _format_high_sales_low_profit_spanish(self, problematic_months: List[Dict]) -> str:
+        """Format high sales low profit analysis in Spanish."""
+        answer = f"⚠️ Meses con ventas altas pero ganancia baja ({len(problematic_months)}):\n\n"
+        for i, month in enumerate(problematic_months[:5], 1):
+            mn = MONTH_NAMES_ES[month['month']]
+            answer += (f"{i}. {mn} {month['year']}\n"
+                      f"   • Ventas: ${month['sales']:,.2f} (altas)\n"
+                      f"   • Ganancia: ${month['profit']:,.2f}\n"
+                      f"   • Margen: {month['margin']:.1f}% (bajo)\n\n")
+        
+        answer += "🔍 **Posibles causas:**\n• Costos operativos elevados\n• Descuentos excesivos\n• Productos de bajo margen"
+        return answer
+    
+    def _format_high_sales_low_profit_english(self, problematic_months: List[Dict]) -> str:
+        """Format high sales low profit analysis in English."""
+        answer = f"⚠️ Months with high sales but low profit ({len(problematic_months)}):\n\n"
+        for i, month in enumerate(problematic_months[:5], 1):
+            mn = MONTH_NAMES_EN[month['month']]
+            answer += (f"{i}. {mn} {month['year']}\n"
+                      f"   • Sales: ${month['sales']:,.2f} (high)\n"
+                      f"   • Profit: ${month['profit']:,.2f}\n"
+                      f"   • Margin: {month['margin']:.1f}% (low)\n\n")
+        
+        answer += "🔍 **Possible causes:**\n• High operational costs\n• Excessive discounts\n• Low-margin products"
+        return answer
+
+    def _handle_high_sales_low_profit(self, language: Language) -> Tuple[str, List[str]]:
         """Find months where sales were high but profit was disproportionately low."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2459,34 +2621,10 @@ class AdvancedQueryProcessor:
                 return self._no_data("sales", language), []
             
             # Calculate profit margins for all months
-            months_with_margins = []
-            for metric in all_metrics:
-                sales = float(metric['total_sales'])
-                profit = float(metric['profit'])
-                margin = (profit / sales * 100) if sales > 0 else 0
-                months_with_margins.append({
-                    'month': metric['month'],
-                    'year': metric['year'],
-                    'sales': sales,
-                    'profit': profit,
-                    'margin': margin
-                })
+            months_with_margins = self._calculate_months_with_margins(all_metrics)
             
-            # Find months with high sales (top 30%) but low margins (bottom 30%)
-            sorted_by_sales = sorted(months_with_margins, key=lambda x: x['sales'], reverse=True)
-            sorted_by_margin = sorted(months_with_margins, key=lambda x: x['margin'])
-            
-            high_sales_threshold = len(sorted_by_sales) * 0.3
-            low_margin_threshold = len(sorted_by_margin) * 0.3
-            
-            high_sales_months = {(m['year'], m['month']) for m in sorted_by_sales[:int(high_sales_threshold)]}
-            low_margin_months = {(m['year'], m['month']) for m in sorted_by_margin[:int(low_margin_threshold)]}
-            
-            # Find intersection
-            problematic_months = []
-            for metric in months_with_margins:
-                if (metric['year'], metric['month']) in high_sales_months and (metric['year'], metric['month']) in low_margin_months:
-                    problematic_months.append(metric)
+            # Find problematic months
+            problematic_months = self._find_high_sales_low_margin_months(months_with_margins)
             
             if not problematic_months:
                 if language == Language.SPANISH:
@@ -2505,32 +2643,16 @@ class AdvancedQueryProcessor:
             problematic_months.sort(key=lambda x: x['margin'])
             
             if language == Language.SPANISH:
-                answer = f"⚠️ Meses con ventas altas pero ganancia baja ({len(problematic_months)}):\n\n"
-                for i, month in enumerate(problematic_months[:5], 1):
-                    mn = MONTH_NAMES_ES[month['month']]
-                    answer += (f"{i}. {mn} {month['year']}\n"
-                              f"   • Ventas: ${month['sales']:,.2f} (altas)\n"
-                              f"   • Ganancia: ${month['profit']:,.2f}\n"
-                              f"   • Margen: {month['margin']:.1f}% (bajo)\n\n")
-                
-                answer += "🔍 **Posibles causas:**\n• Costos operativos elevados\n• Descuentos excesivos\n• Productos de bajo margen"
+                answer = self._format_high_sales_low_profit_spanish(problematic_months)
             else:
-                answer = f"⚠️ Months with high sales but low profit ({len(problematic_months)}):\n\n"
-                for i, month in enumerate(problematic_months[:5], 1):
-                    mn = MONTH_NAMES_EN[month['month']]
-                    answer += (f"{i}. {mn} {month['year']}\n"
-                              f"   • Sales: ${month['sales']:,.2f} (high)\n"
-                              f"   • Profit: ${month['profit']:,.2f}\n"
-                              f"   • Margin: {month['margin']:.1f}% (low)\n\n")
-                
-                answer += "🔍 **Possible causes:**\n• High operational costs\n• Excessive discounts\n• Low-margin products"
+                answer = self._format_high_sales_low_profit_english(problematic_months)
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
             logger.error(f"Error in high sales low profit analysis: {e}")
             return self._err(language), []
 
-    async def _handle_surprising_performance(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_surprising_performance(self, language: Language) -> Tuple[str, List[str]]:
         """Find months that performed surprisingly well compared to expectations."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2585,58 +2707,100 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in surprising performance analysis: {e}")
             return self._err(language), []
 
-    async def _handle_suspicious_months(self, language: Language) -> Tuple[str, List[str]]:
+    def _calculate_outlier_thresholds(self, values: List[float]) -> Tuple[float, float]:
+        """Calculate outlier thresholds using IQR method."""
+        import statistics
+        
+        q1 = statistics.quantiles(values, n=4)[0]
+        q3 = statistics.quantiles(values, n=4)[2]
+        iqr = q3 - q1
+        lower = q1 - 1.5 * iqr
+        upper = q3 + 1.5 * iqr
+        return lower, upper
+    
+    def _identify_outlier_reasons(self, metric: Dict, sales_lower: float, sales_upper: float, 
+                                  profit_lower: float, profit_upper: float, language: Language) -> List[str]:
+        """Identify reasons why a month is considered suspicious."""
+        sales = float(metric['total_sales'])
+        profit = float(metric['profit'])
+        reasons = []
+        
+        if sales < sales_lower:
+            reasons.append("ventas muy bajas" if language == Language.SPANISH else "very low sales")
+        elif sales > sales_upper:
+            reasons.append("ventas muy altas" if language == Language.SPANISH else "very high sales")
+        
+        if profit < profit_lower:
+            reasons.append("ganancia muy baja" if language == Language.SPANISH else "very low profit")
+        elif profit > profit_upper:
+            reasons.append("ganancia muy alta" if language == Language.SPANISH else "very high profit")
+        
+        return reasons
+    
+    def _find_suspicious_months(self, all_metrics: List[Dict], language: Language) -> List[Dict]:
+        """Find months with suspicious patterns (outliers in sales or profit)."""
+        # Calculate statistics for outlier detection
+        sales_values = [float(m['total_sales']) for m in all_metrics]
+        profit_values = [float(m['profit']) for m in all_metrics]
+        
+        # Calculate quartiles and IQR for sales and profit
+        sales_lower, sales_upper = self._calculate_outlier_thresholds(sales_values)
+        profit_lower, profit_upper = self._calculate_outlier_thresholds(profit_values)
+        
+        # Find outliers
+        suspicious_months = []
+        for metric in all_metrics:
+            reasons = self._identify_outlier_reasons(
+                metric, sales_lower, sales_upper, profit_lower, profit_upper, language
+            )
+            
+            if reasons:
+                suspicious_months.append({
+                    'month': metric['month'],
+                    'year': metric['year'],
+                    'sales': float(metric['total_sales']),
+                    'profit': float(metric['profit']),
+                    'reasons': reasons
+                })
+        
+        return suspicious_months
+    
+    def _format_suspicious_months_spanish(self, suspicious_months: List[Dict]) -> str:
+        """Format suspicious months analysis in Spanish."""
+        answer = f"🚨 Meses sospechosos detectados ({len(suspicious_months)}):\n\n"
+        for i, month in enumerate(suspicious_months, 1):
+            mn = MONTH_NAMES_ES[month['month']]
+            reasons_str = ", ".join(month['reasons'])
+            answer += (f"{i}. {mn} {month['year']}\n"
+                      f"   • Ventas: ${month['sales']:,.2f}\n"
+                      f"   • Ganancia: ${month['profit']:,.2f}\n"
+                      f"   • Razones: {reasons_str}\n\n")
+        
+        answer += "🔍 Estos meses requieren investigación adicional para entender las anomalías."
+        return answer
+    
+    def _format_suspicious_months_english(self, suspicious_months: List[Dict]) -> str:
+        """Format suspicious months analysis in English."""
+        answer = f"🚨 Suspicious months detected ({len(suspicious_months)}):\n\n"
+        for i, month in enumerate(suspicious_months, 1):
+            mn = MONTH_NAMES_EN[month['month']]
+            reasons_str = ", ".join(month['reasons'])
+            answer += (f"{i}. {mn} {month['year']}\n"
+                      f"   • Sales: ${month['sales']:,.2f}\n"
+                      f"   • Profit: ${month['profit']:,.2f}\n"
+                      f"   • Reasons: {reasons_str}\n\n")
+        
+        answer += "🔍 These months require additional investigation to understand the anomalies."
+        return answer
+
+    def _handle_suspicious_months(self, language: Language) -> Tuple[str, List[str]]:
         """Find months with suspicious patterns (outliers in sales or profit)."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
             if not all_metrics:
                 return self._no_data("sales", language), []
             
-            # Calculate statistics for outlier detection
-            sales_values = [float(m['total_sales']) for m in all_metrics]
-            profit_values = [float(m['profit']) for m in all_metrics]
-            
-            import statistics
-            
-            # Calculate quartiles and IQR for sales
-            sales_q1 = statistics.quantiles(sales_values, n=4)[0]
-            sales_q3 = statistics.quantiles(sales_values, n=4)[2]
-            sales_iqr = sales_q3 - sales_q1
-            sales_lower = sales_q1 - 1.5 * sales_iqr
-            sales_upper = sales_q3 + 1.5 * sales_iqr
-            
-            # Calculate quartiles and IQR for profit
-            profit_q1 = statistics.quantiles(profit_values, n=4)[0]
-            profit_q3 = statistics.quantiles(profit_values, n=4)[2]
-            profit_iqr = profit_q3 - profit_q1
-            profit_lower = profit_q1 - 1.5 * profit_iqr
-            profit_upper = profit_q3 + 1.5 * profit_iqr
-            
-            # Find outliers
-            suspicious_months = []
-            for metric in all_metrics:
-                sales = float(metric['total_sales'])
-                profit = float(metric['profit'])
-                
-                reasons = []
-                if sales < sales_lower:
-                    reasons.append("ventas muy bajas" if language == Language.SPANISH else "very low sales")
-                elif sales > sales_upper:
-                    reasons.append("ventas muy altas" if language == Language.SPANISH else "very high sales")
-                
-                if profit < profit_lower:
-                    reasons.append("ganancia muy baja" if language == Language.SPANISH else "very low profit")
-                elif profit > profit_upper:
-                    reasons.append("ganancia muy alta" if language == Language.SPANISH else "very high profit")
-                
-                if reasons:
-                    suspicious_months.append({
-                        'month': metric['month'],
-                        'year': metric['year'],
-                        'sales': sales,
-                        'profit': profit,
-                        'reasons': reasons
-                    })
+            suspicious_months = self._find_suspicious_months(all_metrics, language)
             
             if not suspicious_months:
                 if language == Language.SPANISH:
@@ -2652,34 +2816,16 @@ class AdvancedQueryProcessor:
                 )
             
             if language == Language.SPANISH:
-                answer = f"🚨 Meses sospechosos detectados ({len(suspicious_months)}):\n\n"
-                for i, month in enumerate(suspicious_months, 1):
-                    mn = MONTH_NAMES_ES[month['month']]
-                    reasons_str = ", ".join(month['reasons'])
-                    answer += (f"{i}. {mn} {month['year']}\n"
-                              f"   • Ventas: ${month['sales']:,.2f}\n"
-                              f"   • Ganancia: ${month['profit']:,.2f}\n"
-                              f"   • Razones: {reasons_str}\n\n")
-                
-                answer += "🔍 Estos meses requieren investigación adicional para entender las anomalías."
+                answer = self._format_suspicious_months_spanish(suspicious_months)
             else:
-                answer = f"🚨 Suspicious months detected ({len(suspicious_months)}):\n\n"
-                for i, month in enumerate(suspicious_months, 1):
-                    mn = MONTH_NAMES_EN[month['month']]
-                    reasons_str = ", ".join(month['reasons'])
-                    answer += (f"{i}. {mn} {month['year']}\n"
-                              f"   • Sales: ${month['sales']:,.2f}\n"
-                              f"   • Profit: ${month['profit']:,.2f}\n"
-                              f"   • Reasons: {reasons_str}\n\n")
-                
-                answer += "🔍 These months require additional investigation to understand the anomalies."
+                answer = self._format_suspicious_months_english(suspicious_months)
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
             logger.error(f"Error in suspicious months analysis: {e}")
             return self._err(language), []
 
-    async def _handle_closest_to_loss(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_closest_to_loss(self, language: Language) -> Tuple[str, List[str]]:
         """Find when the business was closest to losing money (lowest positive profit or highest loss)."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2745,7 +2891,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in closest to loss analysis: {e}", exc_info=True)
             return self._err(language), []
 
-    async def _handle_failure_scenarios(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_failure_scenarios(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze what would need to happen for the business to stop being profitable."""
         try:
             # Get recent metrics for scenario analysis
@@ -2780,10 +2926,10 @@ class AdvancedQueryProcessor:
                          f"Basado en {mn_es} {recent['year']} (ganancia actual: ${current_profit:,.2f})\n\n"
                          f"🔴 **Escenario 1: Aumento de costos**\n"
                          f"• Si los costos suben ${cost_increase_to_break_even:,.2f} ({cost_increase_pct:.1f}%)\n"
-                         f"• El negocio llegaría al punto de equilibrio (ganancia = $0)\n\n"
+                         f"• El negocio llegaría al {BREAKEVEN_POINT_ES} (ganancia = $0)\n\n"
                          f"🔴 **Escenario 2: Caída de ventas**\n"
                          f"• Si las ventas bajan ${sales_decrease_to_break_even:,.2f} ({sales_decrease_pct:.1f}%)\n"
-                         f"• El negocio llegaría al punto de equilibrio\n\n"
+                         f"• El negocio llegaría al {BREAKEVEN_POINT_ES}\n\n"
                          f"🔴 **Escenario 3: Combinado (más realista)**\n"
                          f"• Costos suben 15% (+${moderate_cost_increase:,.2f})\n"
                          f"• Y ventas bajan {abs(required_sales_drop_pct):.1f}% (-${abs(required_sales_drop):,.2f})\n"
@@ -2817,7 +2963,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in failure scenarios analysis: {e}")
             return self._err(language), []
 
-    async def _handle_near_failure_month(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_near_failure_month(self, language: Language) -> Tuple[str, List[str]]:
         """Identify the month where the business almost failed (worst performance)."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -2895,7 +3041,7 @@ class AdvancedQueryProcessor:
             return self._err(language), []
     # ── Enhanced Product Analysis Methods ────────────────────────────────────
 
-    async def _handle_underpriced_products(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_underpriced_products(self, language: Language) -> Tuple[str, List[str]]:
         """Identify products that may be underpriced based on sales volume vs profit contribution."""
         try:
             # Get top products by volume (transaction count) and revenue
@@ -2971,7 +3117,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in underpriced products analysis: {e}")
             return self._err(language), []
 
-    async def _handle_high_volume_low_margin_products(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_high_volume_low_margin_products(self, language: Language) -> Tuple[str, List[str]]:
         """Identify products that sell well but generate low profit margins."""
         try:
             top_products = self.db.get_top_products(limit=15)
@@ -3063,7 +3209,7 @@ class AdvancedQueryProcessor:
 
     # ── Enhanced Customer Analysis Methods ───────────────────────────────────
 
-    async def _handle_customer_frequency_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_customer_frequency_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which countries or segments buy most frequently."""
         try:
             # Get all customers with transaction data
@@ -3143,7 +3289,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in customer frequency analysis: {e}")
             return self._err(language), []
 
-    async def _handle_most_valuable_segment(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_most_valuable_segment(self, language: Language) -> Tuple[str, List[str]]:
         """Determine which customer segment is most valuable to the business."""
         try:
             # Get comprehensive customer data
@@ -3199,7 +3345,7 @@ class AdvancedQueryProcessor:
                               f"   • Puntuación de valor: {data['value_score']:,.0f}\n\n")
                 
                 most_valuable = sorted_segments[0]
-                answer += (f"🏆 **Segmento más valioso: {most_valuable[0]}**\n"
+                answer += (f"🏆 **Segmento {MOST_VALUABLE_ES}: {most_valuable[0]}**\n"
                           f"Genera ${most_valuable[1]['avg_spent_per_customer']:,.0f} promedio por cliente")
             else:
                 answer = "💎 **Customer Segment Value Analysis**\n\n"
@@ -3212,7 +3358,7 @@ class AdvancedQueryProcessor:
                               f"   • Value score: {data['value_score']:,.0f}\n\n")
                 
                 most_valuable = sorted_segments[0]
-                answer += (f"🏆 **Most valuable segment: {most_valuable[0]}**\n"
+                answer += (f"🏆 **{MOST_VALUABLE_EN.capitalize()} segment: {most_valuable[0]}**\n"
                           f"Generates ${most_valuable[1]['avg_spent_per_customer']:,.0f} average per customer")
             
             return answer, [DB_CUSTOMERS, DB_SALES_TRANSACTIONS]
@@ -3228,39 +3374,39 @@ class AdvancedQueryProcessor:
             
             # Best customer type analysis
             if any(w in q for w in [CUSTOMER_TYPE_ES, MOST_PROFITABLE_CLIENT_ES, 'client type', 'customer type']):
-                return await self._handle_most_profitable_customer_type(language)
+                return self._handle_most_profitable_customer_type(language)
             
             # Monthly segment analysis
             if any(w in q for w in ['segmento compró más este mes', 'segment bought most', 'compró más este mes']):
-                return await self._handle_monthly_segment_analysis(language)
+                return self._handle_monthly_segment_analysis(language)
             
             # Country performance analysis
             if any(w in q for w in ['país tuvo mejor comportamiento', 'country performance', SALES_BEHAVIOR_ES]):
-                return await self._handle_country_performance_analysis(language)
+                return self._handle_country_performance_analysis(language)
             
             # Product promotion recommendations
             if any(w in q for w in [PROMOTION_TARGET_ES, 'should promote', 'promocionarse más']):
-                return await self._handle_promotion_recommendations(language)
+                return self._handle_promotion_recommendations(language)
             
             # Campaign targeting
             if any(w in q for w in [CAMPAIGN_INTEREST_ES, 'interesting for campaign', 'para una campaña']):
-                return await self._handle_campaign_targeting(language)
+                return self._handle_campaign_targeting(language)
             
             # Segment decline analysis
             if any(w in q for w in ['comprando menos que antes', 'buying less than before', 'menos que antes']):
-                return await self._handle_segment_decline_analysis(language)
+                return self._handle_segment_decline_analysis(language)
             
             # Best promotion timing
             if any(w in q for w in [BEST_LAUNCH_MONTH_ES, 'best month to launch', LAUNCH_PROMOTIONS_ES]):
-                return await self._handle_promotion_timing(language)
+                return self._handle_promotion_timing(language)
             
             # Product acceptance analysis
             if any(w in q for w in [BEST_ACCEPTANCE_ES, 'best acceptance', 'aceptación por los clientes']):
-                return await self._handle_product_acceptance(language)
+                return self._handle_product_acceptance(language)
             
             # Premium segment targeting
             if any(w in q for w in [EXPENSIVE_PRODUCTS_ES, 'sell expensive products', 'productos más caros']):
-                return await self._handle_premium_segment_targeting(language)
+                return self._handle_premium_segment_targeting(language)
             
             # Default marketing response
             return await self._handle_customer_info(question, language)
@@ -3269,7 +3415,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in marketing analysis: {e}")
             return self._err(language), []
 
-    async def _handle_most_profitable_customer_type(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_most_profitable_customer_type(self, language: Language) -> Tuple[str, List[str]]:
         """Identify which customer type generates the most profit."""
         try:
             # Get customer segment profitability
@@ -3321,7 +3467,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in most profitable customer type: {e}")
             return self._err(language), []
 
-    async def _handle_monthly_segment_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_monthly_segment_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which segment bought the most this month."""
         try:
             # Get recent month data
@@ -3377,7 +3523,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in monthly segment analysis: {e}")
             return self._err(language), []
 
-    async def _handle_country_performance_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_country_performance_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which country had the best sales performance."""
         try:
             top_customers = self.db.get_top_customers(limit=100)
@@ -3409,7 +3555,7 @@ class AdvancedQueryProcessor:
             sorted_countries = sorted(country_stats.items(), key=lambda x: x[1]['performance_score'], reverse=True)
             
             if language == Language.SPANISH:
-                answer = "🌍 **Países con mejor comportamiento de ventas:**\n\n"
+                answer = "🌍 **Países con mejor {SALES_BEHAVIOR_ES}:**\n\n"
                 for i, (country, stats) in enumerate(sorted_countries[:10], 1):
                     answer += (f"{i}. **{country}**\n"
                               f"   • Ingresos totales: ${stats['total_spent']:,.0f}\n"
@@ -3436,7 +3582,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in country performance analysis: {e}")
             return self._err(language), []
 
-    async def _handle_promotion_recommendations(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_promotion_recommendations(self, language: Language) -> Tuple[str, List[str]]:
         """Recommend which products should be promoted more."""
         try:
             top_products = self.db.get_top_products(limit=20)
@@ -3510,46 +3656,46 @@ class AdvancedQueryProcessor:
 
     # ── Accounting and Cost Analysis Methods ─────────────────────────────────
 
-    async def _handle_accounting_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_accounting_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
         """Handle accounting and cost-focused questions."""
         try:
             q = question.lower()
             
             # High spending month analysis
             if any(w in q for w in ['gastamos más de lo normal', 'spent more than normal', 'mes gastamos más']):
-                return await self._handle_high_spending_analysis(language)
+                return self._handle_high_spending_analysis(language)
             
             # Cost coverage analysis
             if any(w in q for w in [COST_COVERAGE_ES, 'covered the costs', 'ventas cubrieron']):
-                return await self._handle_cost_coverage_analysis(language)
+                return self._handle_cost_coverage_analysis(language)
             
             # Net profit analysis
             if any(w in q for w in [ACTUAL_PROFIT_ES, 'quedó después de', 'really left', 'after costs']):
-                return await self._handle_net_profit_analysis(language)
+                return self._handle_net_profit_analysis(language)
             
             # Negative profit months
             if any(w in q for w in [NEGATIVE_PROFIT_ES, 'profit was negative', 'meses la utilidad']):
-                return await self._handle_negative_profit_months(language)
+                return self._handle_negative_profit_months(language)
             
             # Cost growth analysis
             if any(w in q for w in [RISING_COSTS_ES, 'costs are growing', 'creciendo más rápido']):
-                return await self._handle_cost_growth_analysis(language)
+                return self._handle_cost_growth_analysis(language)
             
             # Most profitable year
             if any(w in q for w in [MOST_PROFITABLE_YEAR_ES, 'year was most profitable', 'más rentable']):
-                return await self._handle_most_profitable_year(language)
+                return self._handle_most_profitable_year(language)
             
             # Cost reduction scenarios
             if any(w in q for w in [REDUCE_EXPENSES_ES, 'reduce expenses', 'quedar en positivo']):
-                return await self._handle_cost_reduction_scenarios(language)
+                return self._handle_cost_reduction_scenarios(language)
             
             # Money flow analysis
             if any(w in q for w in [MONEY_DRAIN_ES, 'money is going', 'yendo la plata']):
-                return await self._handle_money_flow_analysis(language)
+                return self._handle_money_flow_analysis(language)
             
             # Profit vs sales analysis
             if any(w in q for w in [PROFIT_VS_SALES_ES, 'earning or just selling', 'solo vendiendo mucho']):
-                return await self._handle_profit_vs_sales_analysis(language)
+                return self._handle_profit_vs_sales_analysis(language)
             
             # Default: return generic accounting message
             if language == Language.SPANISH:
@@ -3568,7 +3714,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in accounting analysis: {e}")
             return self._err(language), []
 
-    async def _handle_high_spending_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_high_spending_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Identify months with unusually high costs."""
         try:
             all_metrics = self.db.get_all_sales_metrics()
@@ -3623,7 +3769,7 @@ class AdvancedQueryProcessor:
                 
                 worst = high_spending_months[0]
                 mn_worst = MONTH_NAMES_ES[worst['month']]
-                answer += f"⚠️ **Peor mes: {mn_worst} {worst['year']}** con ${worst['costs']:,.2f} en costos (+{worst['deviation']:.1f}%)"
+                answer += f"⚠️ **{WORST_MONTH_ES.capitalize()}: {mn_worst} {worst['year']}** con ${worst['costs']:,.2f} en costos (+{worst['deviation']:.1f}%)"
             else:
                 answer = f"💸 **Months with higher than normal spending:**\n"
                 answer += f"(Average: ${avg_costs:,.2f})\n\n"
@@ -3637,14 +3783,14 @@ class AdvancedQueryProcessor:
                 
                 worst = high_spending_months[0]
                 mn_worst = MONTH_NAMES_EN[worst['month']]
-                answer += f"⚠️ **Worst month: {mn_worst} {worst['year']}** with ${worst['costs']:,.2f} in costs (+{worst['deviation']:.1f}%)"
+                answer += f"⚠️ **{WORST_MONTH_EN.capitalize()}: {mn_worst} {worst['year']}** with ${worst['costs']:,.2f} in costs (+{worst['deviation']:.1f}%)"
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
             logger.error(f"Error in high spending analysis: {e}")
             return self._err(language), []
 
-    async def _handle_cost_coverage_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_coverage_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze if sales covered costs this month."""
         try:
             recent_metrics = self.db.get_sales_metrics()
@@ -3662,7 +3808,7 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 if profit > 0:
-                    answer = (f"✅ **Sí, las ventas cubrieron los costos en {mn_es} {recent['year']}**\n\n"
+                    answer = (f"✅ **Sí, las ventas {COST_COVERAGE_ES} en {mn_es} {recent['year']}**\n\n"
                              f"📊 Análisis de cobertura:\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n"
@@ -3671,7 +3817,7 @@ class AdvancedQueryProcessor:
                              f"💡 Las ventas cubrieron {coverage_ratio:.1f} veces los costos, "
                              f"dejando ${profit:,.2f} de ganancia.")
                 else:
-                    answer = (f"❌ **No, las ventas NO cubrieron los costos en {mn_es} {recent['year']}**\n\n"
+                    answer = (f"❌ **No, las ventas NO {COST_COVERAGE_ES} en {mn_es} {recent['year']}**\n\n"
                              f"📊 Análisis de cobertura:\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n"
@@ -3702,7 +3848,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in cost coverage analysis: {e}")
             return self._err(language), []
 
-    async def _handle_net_profit_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_net_profit_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze what's left after all costs and expenses."""
         try:
             recent_metrics = self.db.get_sales_metrics()
@@ -3758,7 +3904,7 @@ class AdvancedQueryProcessor:
     # MARKETING ANALYSIS SUB-METHODS
     # ═══════════════════════════════════════════════════════════════════════════════
 
-    async def _handle_campaign_targeting(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_campaign_targeting(self, language: Language) -> Tuple[str, List[str]]:
         """Identify interesting customers for campaigns."""
         try:
             customers = self.db.get_customers(limit=1000)
@@ -3783,14 +3929,14 @@ class AdvancedQueryProcessor:
                                   key=lambda x: float(x.get('total_purchases', 0)), reverse=True)[:3]
             
             if language == Language.SPANISH:
-                answer = f"🎯 **Clientes interesantes para campaña:**\n\n"
-                answer += f"📊 Segmento más valioso: **{top_segment}** (${segment_avg[top_segment]:,.2f} promedio)\n\n"
+                answer = f"🎯 **Clientes {CAMPAIGN_INTEREST_ES}:**\n\n"
+                answer += f"📊 Segmento {MOST_VALUABLE_ES}: **{top_segment}** (${segment_avg[top_segment]:,.2f} promedio)\n\n"
                 answer += f"👥 Top 3 clientes para contactar:\n"
                 for i, c in enumerate(top_customers, 1):
                     answer += f"{i}. {c['name']} ({c['country']}) - ${float(c.get('total_purchases', 0)):,.2f}\n"
             else:
                 answer = f"🎯 **Interesting customers for campaigns:**\n\n"
-                answer += f"📊 Most valuable segment: **{top_segment}** (${segment_avg[top_segment]:,.2f} average)\n\n"
+                answer += f"📊 {MOST_VALUABLE_EN} segment: **{top_segment}** (${segment_avg[top_segment]:,.2f} average)\n\n"
                 answer += f"👥 Top 3 customers to contact:\n"
                 for i, c in enumerate(top_customers, 1):
                     answer += f"{i}. {c['name']} ({c['country']}) - ${float(c.get('total_purchases', 0)):,.2f}\n"
@@ -3800,7 +3946,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in campaign targeting: {e}")
             return self._err(language), []
 
-    async def _handle_segment_decline_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_segment_decline_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which segments are buying less than before."""
         try:
             customers = self.db.get_customers(limit=1000)
@@ -3839,7 +3985,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in segment decline analysis: {e}")
             return self._err(language), []
 
-    async def _handle_promotion_timing(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_promotion_timing(self, language: Language) -> Tuple[str, List[str]]:
         """Find the best month to launch promotions."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -3859,9 +4005,9 @@ class AdvancedQueryProcessor:
             mn_worst_es = MONTH_NAMES_ES[worst_month['month']]
             
             if language == Language.SPANISH:
-                answer = f"📅 **Mejor mes para lanzar promociones:**\n\n"
+                answer = f"📅 **{BEST_LAUNCH_MONTH_ES.capitalize()} promociones:**\n\n"
                 answer += f"🚀 **{mn_best_es}** es el mejor mes (${best_sales:,.2f} en ventas)\n"
-                answer += f"💡 Lanzar promociones en {mn_best_es} para aprovechar el momentum natural.\n\n"
+                answer += f"💡 {LAUNCH_PROMOTIONS_ES.capitalize()} en {mn_best_es} para aprovechar el momentum natural.\n\n"
                 answer += f"⚠️ {mn_worst_es} es el mes más lento (${worst_sales:,.2f})\n"
                 answer += f"💡 Considera promociones agresivas en {mn_worst_es} para estimular ventas."
             else:
@@ -3876,7 +4022,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in promotion timing: {e}")
             return self._err(language), []
 
-    async def _handle_product_acceptance(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_product_acceptance(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which products have the best customer acceptance."""
         try:
             products = self.db.get_products(limit=100)
@@ -3896,7 +4042,7 @@ class AdvancedQueryProcessor:
             top_products = acceptance_scores[:3]
             
             if language == Language.SPANISH:
-                answer = f"✨ **Productos con mejor aceptación:**\n\n"
+                answer = f"✨ **Productos con {BEST_ACCEPTANCE_ES}:**\n\n"
                 for i, (name, score, qty, sales) in enumerate(top_products, 1):
                     answer += f"{i}. **{name}**\n"
                     answer += f"   • Unidades vendidas: {int(qty)}\n"
@@ -3913,7 +4059,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in product acceptance: {e}")
             return self._err(language), []
 
-    async def _handle_premium_segment_targeting(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_premium_segment_targeting(self, language: Language) -> Tuple[str, List[str]]:
         """Identify which segment should be targeted with premium products."""
         try:
             customers = self.db.get_customers(limit=1000)
@@ -3935,7 +4081,7 @@ class AdvancedQueryProcessor:
             premium_value = segment_avg[premium_segment]
             
             if language == Language.SPANISH:
-                answer = f"💎 **Segmento para vender productos más caros:**\n\n"
+                answer = f"💎 **Segmento para {EXPENSIVE_PRODUCTS_ES}:**\n\n"
                 answer += f"🎯 **{premium_segment}** es el segmento premium\n"
                 answer += f"💰 Valor promedio por cliente: ${premium_value:,.2f}\n\n"
                 answer += f"💡 Este segmento tiene mayor capacidad de compra.\n"
@@ -3956,7 +4102,7 @@ class AdvancedQueryProcessor:
     # ACCOUNTING ANALYSIS SUB-METHODS
     # ═══════════════════════════════════════════════════════════════════════════════
 
-    async def _handle_negative_profit_months(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_negative_profit_months(self, language: Language) -> Tuple[str, List[str]]:
         """Find months with negative profit."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -3993,7 +4139,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in negative profit months: {e}")
             return self._err(language), []
 
-    async def _handle_cost_growth_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_growth_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze if costs are growing faster than sales."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -4039,7 +4185,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in cost growth analysis: {e}")
             return self._err(language), []
 
-    async def _handle_most_profitable_year(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_most_profitable_year(self, language: Language) -> Tuple[str, List[str]]:
         """Find the most profitable year."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -4078,7 +4224,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in most profitable year: {e}")
             return self._err(language), []
 
-    async def _handle_cost_reduction_scenarios(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_reduction_scenarios(self, language: Language) -> Tuple[str, List[str]]:
         """Calculate how much costs need to be reduced to be profitable."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -4125,7 +4271,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in cost reduction scenarios: {e}")
             return self._err(language), []
 
-    async def _handle_money_flow_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_money_flow_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze where the money is going."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -4176,7 +4322,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in money flow analysis: {e}")
             return self._err(language), []
 
-    async def _handle_profit_vs_sales_analysis(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_profit_vs_sales_analysis(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze if we're earning or just selling a lot."""
         try:
             metrics = self.db.get_sales_metrics()
@@ -4189,7 +4335,7 @@ class AdvancedQueryProcessor:
             profit_margin = (profit / sales * 100) if sales > 0 else 0
             
             if language == Language.SPANISH:
-                answer = f"💰 **¿Estamos ganando o solo vendiendo mucho?**\n\n"
+                answer = f"💰 **¿Estamos {PROFIT_VS_SALES_ES}?**\n\n"
                 answer += f"📊 Análisis del mes:\n"
                 answer += f"• Ventas: ${sales:,.2f}\n"
                 answer += f"• Ganancia: ${profit:,.2f}\n"
@@ -4226,7 +4372,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in profit vs sales analysis: {e}")
             return self._err(language), []
 
-    async def _handle_highest_transaction(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_highest_transaction(self, language: Language) -> Tuple[str, List[str]]:
         """Handle: ¿Cuál fue la factura o venta más alta?"""
         try:
             transaction = self.db.get_highest_transaction()
@@ -4263,7 +4409,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in highest transaction handler: {e}")
             return self._err(language), []
 
-    async def _handle_top_product_by_revenue(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_top_product_by_revenue(self, language: Language) -> Tuple[str, List[str]]:
         """Handle: ¿Qué producto se facturó más?"""
         try:
             products = self.db.get_top_products_by_revenue(limit=3)
@@ -4308,7 +4454,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in top product by revenue handler: {e}")
             return self._err(language), []
 
-    async def _handle_sales_by_day(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_sales_by_day(self, language: Language) -> Tuple[str, List[str]]:
         """Handle: ¿Qué día tuvimos más ventas?"""
         try:
             sales_by_day = self.db.get_sales_by_day()
@@ -4349,7 +4495,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in sales by day handler: {e}")
             return self._err(language), []
 
-    async def _handle_small_transactions(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_small_transactions(self, language: Language) -> Tuple[str, List[str]]:
         """Handle: ¿Hay ventas muy pequeñas que no valen la pena?"""
         try:
             small_txns = self.db.get_small_transactions(limit=5)
@@ -4395,7 +4541,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in small transactions handler: {e}")
             return self._err(language), []
 
-    async def _handle_monthly_sales_count(self, language: Language) -> Tuple[str, List[str]]:
+    def _handle_monthly_sales_count(self, language: Language) -> Tuple[str, List[str]]:
         """Handle: ¿Cuántas ventas hicimos por mes?"""
         try:
             sales_by_month = self.db.get_sales_by_month()

@@ -51,11 +51,28 @@ export function ratingToNumeric(rating: Rating): number {
 
 /** Parses an ISO 8601 duration string (e.g. "PT2H30M") into total minutes. */
 export function parseTechnicalDebtMinutes(iso: string): number {
-  const hoursMatch = iso.match(/(\d+)H/);
-  const minutesMatch = iso.match(/(\d+)M/);
-  const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
-  const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+  // SONAR_SAFE: Fixed regex to prevent backtracking vulnerability
+  // Original patterns /(\d+)H/ and /(\d+)M/ were vulnerable to polynomial runtime
+  // Using string parsing instead of regex for better performance and security
+  const hours = parseTimeUnit(iso, 'H');
+  const minutes = parseTimeUnit(iso, 'M');
   return hours * 60 + minutes;
+}
+
+/** Helper function to extract time units from ISO duration string */
+function parseTimeUnit(iso: string, unit: string): number {
+  const index = iso.indexOf(unit);
+  if (index === -1) return 0;
+  
+  // Find the start of the number by going backwards from the unit
+  let start = index - 1;
+  while (start >= 0 && /\d/.test(iso[start])) {
+    start--;
+  }
+  start++; // Move to the first digit
+  
+  const numberStr = iso.substring(start, index);
+  return numberStr ? parseInt(numberStr, 10) : 0;
 }
 
 /**

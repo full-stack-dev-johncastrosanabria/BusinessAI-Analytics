@@ -9,24 +9,11 @@
  */
 
 import React from 'react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 import * as fc from 'fast-check';
 import { ThemeProvider, useTheme } from '../../contexts/ThemeContext';
-
-// ─── localStorage mock ────────────────────────────────────────────────────────
-
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
-    clear: () => { store = {}; },
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: false });
+import { setupTestEnvironmentWithStorage } from '../../test/utils';
 
 // ─── Helper components ────────────────────────────────────────────────────────
 
@@ -40,14 +27,18 @@ const ToggleConsumer: React.FC = () => {
   return <button data-testid="toggle" onClick={toggleTheme}>toggle</button>;
 };
 
+// ─── Helper functions ─────────────────────────────────────────────────────────
+
+const resetThemeState = (localStorageMock: ReturnType<typeof setupTestEnvironmentWithStorage>) => {
+  localStorageMock.clear();
+  document.documentElement.removeAttribute('data-theme');
+  document.documentElement.classList.remove('dark');
+};
+
 // ─── Property-Based Tests ─────────────────────────────────────────────────────
 
 describe('Property 21: Dark Mode Functionality Completeness', () => {
-  beforeEach(() => {
-    localStorageMock.clear();
-    document.documentElement.removeAttribute('data-theme');
-    document.documentElement.classList.remove('dark');
-  });
+  const localStorageMock = setupTestEnvironmentWithStorage();
 
   /**
    * Property 21.1: For any sequence of theme toggles, the final theme state
@@ -60,9 +51,7 @@ describe('Property 21: Dark Mode Functionality Completeness', () => {
       fc.property(
         fc.integer({ min: 0, max: 20 }),
         (toggleCount) => {
-          localStorageMock.clear();
-          document.documentElement.removeAttribute('data-theme');
-          document.documentElement.classList.remove('dark');
+          resetThemeState(localStorageMock);
 
           const { getByTestId, unmount } = render(
             <ThemeProvider>
@@ -95,9 +84,7 @@ describe('Property 21: Dark Mode Functionality Completeness', () => {
       fc.property(
         fc.integer({ min: 0, max: 20 }),
         (toggleCount) => {
-          localStorageMock.clear();
-          document.documentElement.removeAttribute('data-theme');
-          document.documentElement.classList.remove('dark');
+          resetThemeState(localStorageMock);
 
           const { getByTestId, unmount } = render(
             <ThemeProvider>
@@ -131,9 +118,7 @@ describe('Property 21: Dark Mode Functionality Completeness', () => {
       fc.property(
         fc.integer({ min: 0, max: 20 }),
         (toggleCount) => {
-          localStorageMock.clear();
-          document.documentElement.removeAttribute('data-theme');
-          document.documentElement.classList.remove('dark');
+          resetThemeState(localStorageMock);
 
           const { getByTestId, unmount } = render(
             <ThemeProvider>
@@ -173,9 +158,7 @@ describe('Property 21: Dark Mode Functionality Completeness', () => {
           fc.string({ minLength: 0, maxLength: 20 })
         ),
         (storedValue) => {
-          localStorageMock.clear();
-          document.documentElement.removeAttribute('data-theme');
-          document.documentElement.classList.remove('dark');
+          resetThemeState(localStorageMock);
 
           if (storedValue !== null) {
             localStorageMock.setItem('theme', storedValue);
@@ -207,9 +190,7 @@ describe('Property 21: Dark Mode Functionality Completeness', () => {
       fc.property(
         fc.integer({ min: 0, max: 20 }),
         (toggleCount) => {
-          localStorageMock.clear();
-          document.documentElement.removeAttribute('data-theme');
-          document.documentElement.classList.remove('dark');
+          resetThemeState(localStorageMock);
 
           const { getByTestId, unmount } = render(
             <ThemeProvider>

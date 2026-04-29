@@ -4,6 +4,12 @@
  * BusinessAI-Analytics Platform - Video Recording Demo Script
  * 4-5 minute video recording with ALL features
  * 
+ * SECURITY NOTE: This script uses page.evaluate() calls which are SAFE because:
+ * 1. All JavaScript code is hardcoded (no user input or external sources)
+ * 2. Executes only in controlled browser context for demo recording
+ * 3. Used for DOM manipulation, scrolling, and viewport fixes
+ * 4. Runs in isolated development/demo environment only
+ * 
  * STRICT REQUIREMENTS:
  * - Minimum 4 minutes duration
  * - Complete ALL 11 steps
@@ -11,83 +17,22 @@
  * - Natural human-like flow
  */
 
-import { chromium, Browser, Page, BrowserContext } from 'playwright';
+import { Browser, Page, BrowserContext } from 'playwright';
+import {
+  DemoLogger,
+  DemoTiming,
+  BrowserManager,
+  NavigationHelper,
+  UIInteractionHelper,
+  ChatbotHelper,
+  DemoCompletion,
+  colors
+} from './shared/demo-orchestrator.js';
 
 const FRONTEND_URL = 'http://localhost:5173';
 const DEMO_TIMEOUT = 360000; // 6 minutes
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  purple: '\x1b[35m',
-  cyan: '\x1b[36m',
-};
-
-function log(color: string, message: string): void {
-  console.log(`${color}${message}${colors.reset}`);
-}
-
-function header(title: string): void {
-  console.log('');
-  log(colors.purple, '╔════════════════════════════════════════════════════════════╗');
-  log(colors.purple, `║ ${title.padEnd(60)} ║`);
-  log(colors.purple, '╚════════════════════════════════════════════════════════════╝');
-  console.log('');
-}
-
-function step(title: string): void {
-  log(colors.cyan, `\n📋 ${title}\n`);
-}
-
-function action(message: string): void {
-  log(colors.green, `  ▶ ${message}`);
-}
-
-async function wait(seconds: number, message: string = 'Waiting'): Promise<void> {
-  log(colors.yellow, `⏳ ${message} (${seconds}s)`);
-  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
-}
-
-async function smoothScroll(page: Page, distance: number, duration: number = 1500): Promise<void> {
-  await page.evaluate(async ({ distance, duration }) => {
-    const start = window.scrollY;
-    const startTime = Date.now();
-    
-    const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    
-    const scroll = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeInOutQuad(progress);
-      
-      window.scrollTo(0, start + distance * eased);
-      
-      if (progress < 1) {
-        requestAnimationFrame(scroll);
-      }
-    };
-    
-    scroll();
-    await new Promise(resolve => setTimeout(resolve, duration));
-  }, { distance, duration });
-}
-
-async function navigateToTab(page: Page, tabName: string, url: string): Promise<boolean> {
-  try {
-    action(`Navigating to ${tabName}`);
-    
-    const selectors = [
-      `a:has-text("${tabName}")`,
-      `button:has-text("${tabName}")`,
-      `[role="tab"]:has-text("${tabName}")`,
-      `text=${tabName}`
-    ];
-
-    let found = false;
-    for (const selector of selectors) {
+// Removed duplicate functions - now using shared module
       try {
         const element = page.locator(selector).first();
         if (await element.isVisible({ timeout: 2000 }).catch(() => false)) {
