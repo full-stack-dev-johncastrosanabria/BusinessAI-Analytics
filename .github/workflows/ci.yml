@@ -228,6 +228,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check SonarQube Quality Gate
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:
