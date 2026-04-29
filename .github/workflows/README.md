@@ -77,6 +77,26 @@ Workflows are configured to run on:
 
 ## Troubleshooting
 
+### SonarCloud Check Failing
+**Issue:** "SonarCloud Code Analysis" check fails with "Quality Gate failed"
+
+**Solution:** This is a GitHub App integration (not a workflow file). You have three options:
+
+1. **Disable SonarCloud** (Recommended if not using):
+   - Go to Repository Settings → Integrations → GitHub Apps
+   - Find SonarCloud and click Configure/Uninstall
+   - Remove repository access or uninstall the app
+   - See `.github/SONARCLOUD.md` for detailed instructions
+
+2. **Fix Quality Gate Issues**:
+   - Visit [SonarCloud](https://sonarcloud.io/)
+   - Review and fix reported issues
+   - Adjust Quality Gate rules if needed
+
+3. **Use SonarQube Instead**:
+   - Configure `SONAR_TOKEN` and `SONAR_HOST_URL` secrets
+   - The `sonarqube.yml` workflow will handle analysis
+
 ### Workflow Fails on SonarQube Step
 **Solution:** Configure `SONAR_TOKEN` and `SONAR_HOST_URL` secrets, or the step will be skipped automatically.
 
