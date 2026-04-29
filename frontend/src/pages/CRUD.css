@@ -2,6 +2,7 @@
   padding: 30px;
   margin: 0;
   width: 100%;
+  color: var(--text-primary, #1e293b);
 }
 
 .error-message {
@@ -10,6 +11,11 @@
   padding: 15px;
   border-radius: 4px;
   margin-bottom: 20px;
+}
+
+[data-theme="dark"] .error-message {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
 }
 
 .form {
@@ -23,6 +29,12 @@
   gap: 15px;
 }
 
+[data-theme="dark"] .form {
+  background-color: var(--bg-primary, #0f172a);
+  border: 1px solid var(--border-color, #475569);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -34,6 +46,10 @@
   color: #333;
 }
 
+[data-theme="dark"] .form-group label {
+  color: var(--text-primary, #f8fafc);
+}
+
 .form-group input,
 .form-group select {
   padding: 10px;
@@ -41,6 +57,15 @@
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
+  background-color: var(--bg-primary, #fff);
+  color: var(--text-primary, #1e293b);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
+  background-color: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #475569);
+  color: var(--text-primary, #f8fafc);
 }
 
 .form-group input:focus,
@@ -79,10 +104,24 @@
   background-color: #e0e0e0;
 }
 
+[data-theme="dark"] .btn-cancel {
+  background-color: var(--bg-tertiary, #334155);
+  color: var(--text-primary, #f8fafc);
+  border-color: var(--border-color, #475569);
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background-color: var(--bg-secondary, #1e293b);
+}
+
 .loading {
   text-align: center;
   padding: 40px;
   color: #999;
+}
+
+[data-theme="dark"] .loading {
+  color: var(--text-secondary, #cbd5e1);
 }
 
 .table-container {
@@ -90,6 +129,12 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
+}
+
+[data-theme="dark"] .table-container {
+  background-color: var(--bg-primary, #0f172a);
+  border: 1px solid var(--border-color, #475569);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 table {
@@ -103,15 +148,32 @@ th {
   text-align: left;
   font-weight: 600;
   border-bottom: 2px solid #ddd;
+  color: var(--text-primary, #1e293b);
+}
+
+[data-theme="dark"] th {
+  background-color: var(--bg-secondary, #1e293b);
+  border-bottom-color: var(--border-color, #475569);
+  color: var(--text-primary, #f8fafc);
 }
 
 td {
   padding: 12px;
   border-bottom: 1px solid #eee;
+  color: var(--text-primary, #1e293b);
+}
+
+[data-theme="dark"] td {
+  border-bottom-color: var(--border-color, #475569);
+  color: var(--text-primary, #f8fafc);
 }
 
 tr:hover {
   background-color: #f9f9f9;
+}
+
+[data-theme="dark"] tr:hover {
+  background-color: var(--bg-secondary, #1e293b);
 }
 
 .btn-edit,
@@ -160,4 +222,86 @@ tr:hover {
   td {
     padding: 8px;
   }
+}
+
+/* Inline field validation */
+.field-error {
+  font-size: 0.8rem;
+  color: #d32f2f;
+  margin-top: 2px;
+}
+
+.form-group input[aria-invalid='true'],
+.form-group select[aria-invalid='true'] {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.15);
+}
+
+/* Success feedback */
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  animation: fade-in 0.2s ease;
+}
+
+[data-theme="dark"] .success-message {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dismissible error */
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dismiss-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #d32f2f;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+[data-theme="dark"] .dismiss-btn {
+  color: #fca5a5;
+}
+
+/* Contextual help icon */
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #90a4ae;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-left: 5px;
+  cursor: default;
+  vertical-align: middle;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+[data-theme="dark"] .empty-state {
+  color: var(--text-secondary, #cbd5e1);
 }

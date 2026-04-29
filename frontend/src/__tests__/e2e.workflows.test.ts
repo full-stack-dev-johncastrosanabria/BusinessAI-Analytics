@@ -19,6 +19,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // Mock fetch
 global.fetch = vi.fn();
 
+// Mock axios for workflow tests
+const mockedAxios = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn(),
+};
+
 describe('End-to-End Workflow Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();

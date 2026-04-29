@@ -1,0 +1,76 @@
+/* ============================================================
+   Badge Component
+   ============================================================ */
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ---- Sizes ---- */
+.ui-badge--sm {
+  padding: 2px var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.ui-badge--md {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Variants ---- */
+.ui-badge--success {
+  background-color: var(--color-success-100);
+  color: var(--color-success-800);
+}
+
+[data-theme="dark"] .ui-badge--success {
+  background-color: var(--color-success-900);
+  color: var(--color-success-300);
+}
+
+.ui-badge--warning {
+  background-color: var(--color-warning-100);
+  color: var(--color-warning-800);
+}
+
+[data-theme="dark"] .ui-badge--warning {
+  background-color: var(--color-warning-900);
+  color: var(--color-warning-300);
+}
+
+.ui-badge--error {
+  background-color: var(--color-error-100);
+  color: var(--color-error-800);
+}
+
+[data-theme="dark"] .ui-badge--error {
+  background-color: var(--color-error-900);
+  color: var(--color-error-300);
+}
+
+.ui-badge--info {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
+[data-theme="dark"] .ui-badge--info {
+  background-color: var(--color-primary-900);
+  color: var(--color-primary-300);
+}
+
+.ui-badge--neutral {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+[data-theme="dark"] .ui-badge--neutral {
+  background-color: var(--color-neutral-700);
+  color: var(--color-neutral-200);
+}

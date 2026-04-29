@@ -220,11 +220,7 @@ public class CustomerService {
         
         // Check if there's a domain after @
         String domain = trimmedEmail.substring(atIndex + 1);
-        if (domain.isEmpty()) {
-            return false; // No domain after @
-        }
-        
-        // Domain should contain at least one character
-        return domain.length() > 0;
+        // Domain must be non-empty
+        return !domain.isEmpty();
     }
 }

@@ -33,10 +33,27 @@
 
 .main-content {
   flex: 1;
-  padding: 0;
   width: 100%;
   margin: 0;
   background-color: var(--bg-secondary);
+  /* Responsive padding via design tokens */
+  padding: var(--page-padding-mobile, 16px);
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding: var(--page-padding-tablet, 24px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .main-content {
+    padding: var(--page-padding-desktop, 32px);
+    max-width: var(--layout-max-width, 1440px);
+    margin-inline: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 /* Global dark mode styles */
@@ -67,8 +84,24 @@
   background-color: #64748b;
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    padding: 10px;
+/* Responsive main content is handled above via min-width queries */
+
+/* ============================================================
+   Page Transition Animations
+   Validates: Requirements 3.4 (smooth transitions between sections)
+   ============================================================ */
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition-enter {
+  animation: page-fade-in var(--transition-normal, 250ms) ease both;
 }

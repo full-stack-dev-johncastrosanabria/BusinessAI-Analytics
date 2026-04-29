@@ -20,7 +20,7 @@ import net.jqwik.api.constraints.IntRange;
  * 
  * Validates: Requirements 4.4
  */
-@Tag("Feature: business-ai-analytics, Property 10: Sales Aggregation Accuracy")
+@Tag("business-ai-analytics")
 public class SalesAggregationAccuracyProperties {
 
     /**

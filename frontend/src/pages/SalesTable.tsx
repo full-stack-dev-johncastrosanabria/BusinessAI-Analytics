@@ -1,38 +1,44 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import salesService, { SalesTransaction } from '../services/salesService'
 import './SalesTable.css'
+
+// Pagination configuration
+const DEFAULT_PAGE_SIZE = 20
 
 export default function SalesTable() {
   const [transactions, setTransactions] = useState<SalesTransaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const pageSize = 20
+  const pageSize = DEFAULT_PAGE_SIZE
 
   useEffect(() => {
     fetchTransactions()
   }, [])
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
       const data = await salesService.getSalesTransactions()
       setTransactions(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Error fetching sales:', err)
       setError(err instanceof Error ? err.message : 'Failed to load transactions')
       setTransactions([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  // Client-side pagination
-  const startIndex = (page - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  const paginatedTransactions = transactions.slice(startIndex, endIndex)
-  const totalPages = Math.ceil(transactions.length / pageSize)
+  // Client-side pagination — memoized to avoid recomputing on unrelated re-renders
+  const { paginatedTransactions, totalPages } = useMemo(() => {
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    return {
+      paginatedTransactions: transactions.slice(startIndex, endIndex),
+      totalPages: Math.ceil(transactions.length / pageSize),
+    }
+  }, [transactions, page, pageSize])
 
   if (error) {
     return (

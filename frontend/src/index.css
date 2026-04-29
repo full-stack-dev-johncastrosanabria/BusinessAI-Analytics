@@ -1,6 +1,8 @@
+@import './styles/design-tokens.css';
+
 :root {
-  color: #213547;
-  background-color: #ffffff;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
 }
 
 a {

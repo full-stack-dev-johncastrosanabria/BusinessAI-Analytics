@@ -1,6 +1,7 @@
 package com.businessai.documents.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +18,7 @@ import com.businessai.documents.repository.DocumentRepository;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
+import net.jqwik.api.Example;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Label;
 import net.jqwik.api.Property;
@@ -83,7 +85,7 @@ public class DocumentFormatValidationProperties {
         });
     }
     
-    @Property
+    @Example
     @Label("File size validation rejects files exceeding 50MB")
     void fileSizeValidationRejectsLargeFiles() {
         // Arrange
@@ -106,7 +108,7 @@ public class DocumentFormatValidationProperties {
         });
     }
     
-    @Property
+    @Example
     @Label("File size validation accepts files up to 50MB")
     void fileSizeValidationAcceptsValidSizeFiles() throws IOException {
         // Arrange
@@ -154,8 +156,8 @@ public class DocumentFormatValidationProperties {
         when(mockFile.getSize()).thenReturn(size);
         when(mockFile.isEmpty()).thenReturn(false);
         try {
-            when(mockFile.getBytes()).thenReturn(content.getBytes());
-        } catch (Exception e) {
+            when(mockFile.getBytes()).thenReturn(content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
             // Mock exception
         }
         return mockFile;

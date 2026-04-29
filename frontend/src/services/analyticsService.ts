@@ -40,21 +40,21 @@ export interface MetricsFilter {
 const analyticsService = {
   // Get business metrics with optional date range filter
   getMetrics: async (filter?: MetricsFilter): Promise<BusinessMetric[]> => {
-    const params = new URLSearchParams()
-    if (filter?.dateFrom) params.append('dateFrom', filter.dateFrom)
-    if (filter?.dateTo) params.append('dateTo', filter.dateTo)
+    const params: Record<string, string> = {}
+    if (filter?.dateFrom) params.dateFrom = filter.dateFrom
+    if (filter?.dateTo) params.dateTo = filter.dateTo
 
-    const response = await api.get('/api/analytics/metrics', { params })
+    return api.get<BusinessMetric[]>('/api/analytics/metrics', { params })
   },
 
   // Get dashboard summary
   getDashboardSummary: async (): Promise<DashboardSummary> => {
-    const response = await api.get('/api/analytics/dashboard')
+    return api.get<DashboardSummary>('/api/analytics/dashboard')
   },
 
   // Trigger aggregation of sales data into metrics
   aggregateSalesData: async (): Promise<{ message: string }> => {
-    const response = await api.post('/api/analytics/aggregate')
+    return api.post<{ message: string }>('/api/analytics/aggregate')
   },
 }
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,17 +19,20 @@ public class DocumentService {
     // Constants to avoid magic numbers
     private static final int MAX_EXTRACTED_TEXT_LENGTH = 1_000_000;
     
-    @Autowired
-    public DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
+    private final TextExtractor textExtractor;
+    private final long maxFileSize;
+    private final String allowedTypes;
     
-    @Autowired
-    public TextExtractor textExtractor;
-    
-    @Value("${document.upload.max-file-size:52428800}")
-    public long maxFileSize;
-    
-    @Value("${document.upload.allowed-types:TXT,DOCX,PDF,XLSX}")
-    public String allowedTypes;
+    public DocumentService(DocumentRepository documentRepository,
+                           TextExtractor textExtractor,
+                           @Value("${document.upload.max-file-size:52428800}") long maxFileSize,
+                           @Value("${document.upload.allowed-types:TXT,DOCX,PDF,XLSX}") String allowedTypes) {
+        this.documentRepository = documentRepository;
+        this.textExtractor = textExtractor;
+        this.maxFileSize = maxFileSize;
+        this.allowedTypes = allowedTypes;
+    }
     
     /**
      * Upload a document and extract its text
@@ -80,7 +82,7 @@ public class DocumentService {
         } catch (IOException e) {
             document.setExtractionStatus(ExtractionStatus.FAILED);
             document.setErrorMessage("Text extraction failed: " + e.getMessage());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             document.setExtractionStatus(ExtractionStatus.FAILED);
             document.setErrorMessage("Unexpected error during extraction: " + e.getMessage());
         }

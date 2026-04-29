@@ -1,0 +1,96 @@
+/* ============================================================
+   Skeleton – shimmer loading placeholder
+   Validates: Requirements 3.8
+   ============================================================ */
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skeleton {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200, #e5e7eb) 25%,
+    var(--color-neutral-100, #f3f4f6) 50%,
+    var(--color-neutral-200, #e5e7eb) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm, 4px);
+}
+
+/* Variant: text line */
+.skeleton--text {
+  border-radius: var(--radius-sm, 4px);
+  display: block;
+}
+
+/* Variant: rectangle (default) */
+.skeleton--rect {
+  border-radius: var(--radius-md, 6px);
+  display: block;
+}
+
+/* Variant: circle (avatars, icons) */
+.skeleton--circle {
+  border-radius: var(--radius-full, 9999px);
+  display: block;
+}
+
+/* Dark mode */
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-700, #374151) 25%,
+    var(--color-neutral-600, #4b5563) 50%,
+    var(--color-neutral-700, #374151) 75%
+  );
+  background-size: 800px 100%;
+}
+
+/* ---- Skeleton text block ---- */
+.skeleton-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2, 8px);
+  width: 100%;
+}
+
+/* ---- Skeleton card ---- */
+.skeleton-card {
+  background-color: var(--color-bg-primary, #fff);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: var(--radius-lg, 8px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+}
+
+[data-theme="dark"] .skeleton-card {
+  background-color: var(--color-bg-primary, #111827);
+  border-color: var(--color-border-default, #374151);
+}
+
+/* ---- Skeleton table ---- */
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+  width: 100%;
+}
+
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: repeat(var(--skeleton-cols, 4), 1fr);
+  gap: var(--spacing-4, 16px);
+  padding: var(--spacing-3, 12px) 0;
+  border-bottom: 1px solid var(--color-border-default, #e5e7eb);
+}
+
+[data-theme="dark"] .skeleton-table-row {
+  border-bottom-color: var(--color-border-default, #374151);
+}

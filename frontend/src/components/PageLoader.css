@@ -1,0 +1,65 @@
+/* ============================================================
+   PageLoader & LoadingSpinner
+   Validates: Requirements 3.4, 3.8
+   ============================================================ */
+
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Page-level loader ---- */
+.page-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4, 16px);
+  padding: var(--spacing-8, 32px);
+  min-height: 200px;
+}
+
+.page-loader--full {
+  min-height: 60vh;
+}
+
+/* ---- Spinner ring ---- */
+.page-loader__spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: var(--color-neutral-200, #e5e7eb);
+  border-top-color: var(--color-primary-500, #3b82f6);
+  animation: spinner-rotate 0.75s linear infinite;
+}
+
+.page-loader__spinner--sm { width: 24px; height: 24px; border-width: 3px; }
+.page-loader__spinner--md { width: 40px; height: 40px; border-width: 4px; }
+.page-loader__spinner--lg { width: 56px; height: 56px; border-width: 5px; }
+
+/* ---- Label ---- */
+.page-loader__label {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* ---- Inline spinner ---- */
+.loading-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: var(--color-neutral-200, #e5e7eb);
+  border-top-color: var(--color-primary-500, #3b82f6);
+  animation: spinner-rotate 0.75s linear infinite;
+  vertical-align: middle;
+}
+
+.loading-spinner--sm { width: 16px; height: 16px; border-width: 2px; }
+.loading-spinner--md { width: 24px; height: 24px; border-width: 3px; }
+.loading-spinner--lg { width: 36px; height: 36px; border-width: 4px; }
+
+/* Dark mode */
+[data-theme="dark"] .page-loader__spinner,
+[data-theme="dark"] .loading-spinner {
+  border-color: var(--color-neutral-700, #374151);
+  border-top-color: var(--color-primary-400, #60a5fa);
+}

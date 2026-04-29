@@ -2,6 +2,7 @@
   padding: 2rem;
   margin: 0;
   width: 100%;
+  color: var(--text-primary, #111827);
 }
 
 .page-header {
@@ -11,12 +12,12 @@
 .page-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary, #111827);
   margin-bottom: 0.5rem;
 }
 
 .page-description {
-  color: #6b7280;
+  color: var(--text-secondary, #6b7280);
   font-size: 1rem;
 }
 
@@ -32,6 +33,14 @@
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   font-size: 1rem;
+  background-color: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+}
+
+[data-theme="dark"] .search-input {
+  background-color: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #475569);
+  color: var(--text-primary, #f8fafc);
 }
 
 .search-input:focus {
@@ -68,11 +77,26 @@
   background: #e5e7eb;
 }
 
+[data-theme="dark"] .clear-button {
+  background: var(--bg-tertiary, #334155);
+  color: var(--text-primary, #f8fafc);
+}
+
+[data-theme="dark"] .clear-button:hover {
+  background: var(--bg-secondary, #1e293b);
+}
+
 .table-container {
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+}
+
+[data-theme="dark"] .table-container {
+  background: var(--bg-primary, #0f172a);
+  border: 1px solid var(--border-color, #475569);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .sales-table {
@@ -90,6 +114,11 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
+[data-theme="dark"] .sales-table thead {
+  background: var(--bg-secondary, #1e293b);
+  border-bottom-color: var(--border-color, #475569);
+}
+
 .sales-table th {
   padding: 1rem;
   text-align: left;
@@ -98,6 +127,10 @@
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .sales-table th {
+  color: var(--text-secondary, #cbd5e1);
 }
 
 .sales-table th.text-right {
@@ -129,13 +162,25 @@
   transition: background 0.2s;
 }
 
+[data-theme="dark"] .sales-table tbody tr {
+  border-bottom-color: var(--border-color, #475569);
+}
+
 .sales-table tbody tr:hover {
   background: #f9fafb;
+}
+
+[data-theme="dark"] .sales-table tbody tr:hover {
+  background: var(--bg-secondary, #1e293b);
 }
 
 .sales-table td {
   padding: 1rem;
   color: #111827;
+}
+
+[data-theme="dark"] .sales-table td {
+  color: var(--text-primary, #f8fafc);
 }
 
 .sales-table td.text-right {
@@ -147,6 +192,11 @@
   text-align: center;
   padding: 3rem !important;
   color: #6b7280;
+}
+
+[data-theme="dark"] .loading-cell,
+[data-theme="dark"] .empty-cell {
+  color: var(--text-secondary, #cbd5e1);
 }
 
 .loading-cell {
@@ -224,4 +274,8 @@
 .pagination-info {
   font-size: 0.9rem;
   color: #666;
+}
+
+[data-theme="dark"] .pagination-info {
+  color: var(--text-secondary, #cbd5e1);
 }

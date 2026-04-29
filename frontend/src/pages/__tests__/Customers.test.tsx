@@ -13,8 +13,6 @@ const mockCustomers = [
 describe('Customers Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Mock window.confirm
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
   })
 
   it('displays loading state initially', () => {
@@ -22,7 +20,8 @@ describe('Customers Component', () => {
 
     render(<Customers />)
 
-    expect(screen.getByText(/Loading customers/i)).toBeInTheDocument()
+    // Loading state uses aria-label="Loading customers" on the container div
+    expect(screen.getByLabelText(/Loading customers/i)).toBeInTheDocument()
   })
 
   it('renders customer table after loading', async () => {
@@ -42,7 +41,7 @@ describe('Customers Component', () => {
     render(<Customers />)
 
     await waitFor(() => {
-      expect(screen.queryByText(/Loading customers/i)).not.toBeInTheDocument()
+      expect(screen.queryByLabelText(/Loading customers/i)).not.toBeInTheDocument()
     })
 
     // Use getAllByText since labels may appear in table headers too
@@ -58,10 +57,9 @@ describe('Customers Component', () => {
     render(<Customers />)
 
     await waitFor(() => {
-      expect(screen.queryByText(/Loading customers/i)).not.toBeInTheDocument()
+      expect(screen.queryByLabelText(/Loading customers/i)).not.toBeInTheDocument()
     })
 
-    // Get inputs by their position in the form
     const inputs = document.querySelectorAll('input')
     const nameInput = inputs[0]
     const emailInput = inputs[1]
@@ -69,18 +67,16 @@ describe('Customers Component', () => {
     const countryInput = inputs[3]
 
     fireEvent.change(nameInput, { target: { value: 'Test User' } })
-    // Use a value that passes HTML email validation but fails our custom regex
-    // Actually, set an invalid email and submit the form directly
     fireEvent.change(emailInput, { target: { value: 'notanemail' } })
     fireEvent.change(segmentInput, { target: { value: 'Premium' } })
     fireEvent.change(countryInput, { target: { value: 'USA' } })
 
-    // Submit the form directly to bypass native HTML validation
     const form = document.querySelector('form') as HTMLFormElement
     fireEvent.submit(form)
 
     await waitFor(() => {
-      expect(screen.getByText(/Invalid email format/i)).toBeInTheDocument()
+      // Component shows "Enter a valid email address" for invalid emails
+      expect(screen.getByText(/Enter a valid email address/i)).toBeInTheDocument()
     })
   })
 
@@ -97,7 +93,7 @@ describe('Customers Component', () => {
     render(<Customers />)
 
     await waitFor(() => {
-      expect(screen.queryByText(/Loading customers/i)).not.toBeInTheDocument()
+      expect(screen.queryByLabelText(/Loading customers/i)).not.toBeInTheDocument()
     })
 
     const inputs = document.querySelectorAll('input')
@@ -154,8 +150,18 @@ describe('Customers Component', () => {
       expect(screen.getByText('Alice Smith')).toBeInTheDocument()
     })
 
+    // Click the Delete button to open the ConfirmDialog
     const deleteButtons = screen.getAllByText('Delete')
     fireEvent.click(deleteButtons[0])
+
+    // ConfirmDialog appears - click the confirm "Delete" button inside the dialog
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+    })
+
+    // The dialog has a confirm button with text "Delete"
+    const confirmButton = screen.getByRole('alertdialog').querySelector('.confirm-btn--danger') as HTMLElement
+    fireEvent.click(confirmButton)
 
     await waitFor(() => {
       expect(customerService.default.deleteCustomer).toHaveBeenCalledWith(1)

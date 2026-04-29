@@ -13,6 +13,8 @@ import com.businessai.sales.client.CustomerClient;
 import com.businessai.sales.client.ProductClient;
 import com.businessai.sales.dto.CustomerDTO;
 import com.businessai.sales.dto.ProductDTO;
+import com.businessai.sales.exception.CustomerServiceException;
+import com.businessai.sales.exception.ProductServiceException;
 import com.businessai.sales.entity.SalesTransaction;
 import com.businessai.sales.exception.SalesValidationException;
 import com.businessai.sales.repository.SalesRepository;
@@ -170,7 +172,7 @@ public class SalesService {
     private CustomerDTO validateCustomer(Long customerId) {
         try {
             return customerClient.getCustomerById(customerId);
-        } catch (Exception e) {
+        } catch (CustomerServiceException e) {
             logger.error("Customer validation failed for ID {}: {}", customerId, e.getMessage());
             throw new SalesValidationException("Customer validation failed: " + e.getMessage(), e);
         }
@@ -186,7 +188,7 @@ public class SalesService {
     private ProductDTO validateProduct(Long productId) {
         try {
             return productClient.getProductById(productId);
-        } catch (Exception e) {
+        } catch (ProductServiceException e) {
             logger.error("Product validation failed for ID {}: {}", productId, e.getMessage());
             throw new SalesValidationException("Product validation failed: " + e.getMessage(), e);
         }

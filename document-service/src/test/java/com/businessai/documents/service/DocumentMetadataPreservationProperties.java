@@ -1,6 +1,7 @@
 package com.businessai.documents.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -186,8 +187,8 @@ public class DocumentMetadataPreservationProperties {
         when(mockFile.getSize()).thenReturn(size);
         when(mockFile.isEmpty()).thenReturn(false);
         try {
-            when(mockFile.getBytes()).thenReturn(content.getBytes());
-        } catch (Exception e) {
+            when(mockFile.getBytes()).thenReturn(content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
             // Mock exception
         }
         return mockFile;

@@ -1,0 +1,42 @@
+/* ============================================================
+   Card Component
+   ============================================================ */
+
+.ui-card {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal);
+}
+
+.ui-card--hoverable:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.ui-card__header {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border-default);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.ui-card__body {
+  padding: var(--spacing-6);
+  color: var(--color-text-primary);
+}
+
+.ui-card__body--no-padding {
+  padding: 0;
+}
+
+.ui-card__footer {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-border-default);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

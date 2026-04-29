@@ -121,5 +121,26 @@
     "theme": "Tema",
     "notifications": "Notificaciones",
     "preferences": "Preferencias"
+  },
+  "login": {
+    "welcome": "Bienvenido al Futuro de la Analítica Empresarial",
+    "description": "Aprovecha el poder de la IA para transformar los datos de tu negocio en insights accionables. Toma decisiones más inteligentes con análisis en tiempo real y pronósticos predictivos.",
+    "feature1": "Dashboards en Tiempo Real",
+    "feature2": "Insights Impulsados por IA",
+    "feature3": "Análisis Predictivo",
+    "feature4": "Alcance Global",
+    "signIn": "Iniciar Sesión",
+    "signInDescription": "Accede a tu panel de análisis",
+    "demoMode": "Modo Demo Activo",
+    "demoInstructions": "Usa las credenciales de abajo o haz clic para auto-completar",
+    "fillDemo": "Llenar Demo",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "signingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate",
+    "mockCredentials": "Credenciales de Demo"
   }
 }

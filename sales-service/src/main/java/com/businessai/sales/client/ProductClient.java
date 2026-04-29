@@ -59,7 +59,7 @@ public class ProductClient {
             logger.error("Failed to connect to Product Service at {}: {}", url, e.getMessage());
             throw new ProductServiceException("Product Service is unavailable. Please try again later.", e);
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.error("Unexpected error calling Product Service for product ID {}: {}", productId, e.getMessage());
             throw new ProductServiceException("Failed to retrieve product information: " + e.getMessage(), e);
         }

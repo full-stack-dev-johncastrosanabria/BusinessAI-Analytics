@@ -2,6 +2,51 @@
 
 Enterprise-grade business analytics platform with AI-powered forecasting, real-time dashboards, and bilingual chatbot support.
 
+## 🛠️ Tech Stack
+
+### Frontend
+- **React** 18.3 - UI library
+- **TypeScript** 5.5 - Type-safe JavaScript
+- **Vite** 5.4 - Build tool and dev server
+- **TailwindCSS** 3.4 - Utility-first CSS framework
+- **React Query** 5.59 - Data fetching and caching
+- **Recharts** - Data visualization
+- **i18next** - Internationalization (ES/EN)
+
+### Backend
+- **Spring Boot** 3.2 - Java microservices framework
+- **Java** 17 - Programming language
+- **Maven** 3.9 - Build automation
+- **Spring Cloud Gateway** - API Gateway and routing
+- **JPA/Hibernate** - ORM for database access
+
+### AI/ML
+- **Python** 3.9+ - Programming language
+- **PyTorch** 2.5 - Deep learning framework
+- **FastAPI** 0.115 - Modern Python web framework
+- **Scikit-learn** - Machine learning utilities
+- **Pandas** - Data manipulation
+
+### Database
+- **MySQL** 8.0 - Relational database
+- **Connection Pooling** - HikariCP
+
+### DevOps & Tools
+- **Docker** - Containerization (ready)
+- **SonarQube** - Code quality and security analysis
+- **Vercel** - Frontend deployment platform
+- **GitHub Actions** - CI/CD automation
+- **Maven Wrapper** - Build consistency
+
+### Testing
+- **Vitest** 2.1 - Frontend unit testing
+- **JUnit** 5 - Backend unit testing
+- **Playwright** 1.48 - E2E testing and automation
+- **fast-check** - Property-based testing
+- **Coverage** - Code coverage reporting
+
+---
+
 ## 🎬 Demo
 
 Watch the platform in action (includes Dashboard, Sales, Customers, Products, **Forecasts**, Documents, and Chatbot):
@@ -21,26 +66,25 @@ Watch the platform in action (includes Dashboard, Sales, Customers, Products, **
 - Python 3.9+
 - MySQL 8.0+
 - Java 17+ (for API Gateway)
+- Maven 3.6+
 - ffmpeg (for demo recording)
 
-### Installation
+### Quick Setup
 
 ```bash
-# 1. Clone repository
-git clone <repository-url>
-cd BusinessAI-Analytics
-
-# 2. Configure database
+# 1. Set MySQL password
 export MYSQL_PASSWORD=your_password
+
+# 2. Initialize database
 ./scripts/setup-database.sh
 
 # 3. Start all services
 ./scripts/start-system.sh
 
 # 4. Access application
-# Frontend: http://localhost:5173
+# Frontend:    http://localhost:5173
 # API Gateway: http://localhost:8080
-# AI Service: http://localhost:8000
+# AI Service:  http://localhost:8000
 ```
 
 ### Stop Services
@@ -48,14 +92,26 @@ export MYSQL_PASSWORD=your_password
 ./scripts/stop-system.sh
 ```
 
+### Service Ports
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Frontend | 5173 | React application |
+| API Gateway | 8080 | Request routing |
+| AI Service | 8000 | ML models & chatbot |
+| Customer Service | 8081 | Customer management |
+| Product Service | 8082 | Product catalog |
+| Sales Service | 8083 | Sales transactions |
+| Analytics Service | 8084 | Business analytics |
+| Document Service | 8085 | File uploads |
+
 ---
 
 ## 📁 Project Structure
 
 ```
 BusinessAI-Analytics/
-├── README.md                    # Complete documentation (includes quality report)
-├── INSTRUCTIONS.txt             # Quick command reference
+├── README.md                    # Complete documentation (this file)
 ├── package.json                 # Demo dependencies
 ├── sonar-project.properties     # SonarQube config
 ├── preview.png                  # Demo video thumbnail
@@ -89,8 +145,12 @@ BusinessAI-Analytics/
 
 ### Documentation Structure
 
-- **README.md** (this file) - Complete project documentation
-- **INSTRUCTIONS.txt** - Quick command reference for common tasks
+- **README.md** (this file) - Complete project documentation including:
+  - Quick start guide and setup instructions
+  - Architecture and features overview
+  - Deployment strategy and Git workflow
+  - Code quality and security guidelines
+  - Troubleshooting and maintenance
 - **Service READMEs** - Detailed documentation for each service
   - `frontend/README.md` - React app, API client, hooks
   - `api-gateway/README.md` - Routing, CORS, configuration
@@ -564,6 +624,155 @@ For issues and questions:
 - Create an issue in the repository
 - Check existing documentation
 - Review troubleshooting section
+
+---
+
+## 🚢 Deployment
+
+### Branch Strategy
+
+The platform uses a multi-branch deployment strategy:
+
+```
+main (production)
+  ↑
+staging (pre-production)
+  ↑
+develop (integration)
+  ↑
+feature/* (development)
+```
+
+### Branch Descriptions
+
+- **`main`**: Production-ready code, deployed to live environment
+- **`staging`**: Pre-production testing and validation
+- **`develop`**: Integration of completed features
+- **`feature/*`**: Individual feature development
+
+### Deployment Environments
+
+#### Frontend (Vercel)
+
+| Environment | Branch | URL |
+|-------------|--------|-----|
+| Development | `develop` | `https://dev-businessai.vercel.app` |
+| Staging | `staging` | `https://staging-businessai.vercel.app` |
+| Production | `main` | `https://businessai.vercel.app` |
+
+#### Backend Services
+
+Backend services follow the same branch strategy with Docker container deployments.
+
+### Git Workflow
+
+#### Creating a Feature
+
+```bash
+# Create feature branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/my-new-feature
+
+# Make changes and commit
+git add .
+git commit -m "feat: add new feature"
+
+# Push and create PR
+git push origin feature/my-new-feature
+```
+
+#### Hotfix Process
+
+```bash
+# Create hotfix from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-issue
+
+# Fix, test, and push
+git add .
+git commit -m "hotfix: fix critical issue"
+git push origin hotfix/critical-issue
+
+# Merge to both main and develop
+```
+
+### Branch Protection Rules
+
+#### `main` Branch
+- ✅ Require 2 pull request reviews
+- ✅ Require all status checks to pass
+- ✅ Require signed commits
+- ✅ Require linear history
+- ❌ No force pushes
+- ❌ No deletions
+
+#### `staging` Branch
+- ✅ Require 1 pull request review
+- ✅ Require all status checks to pass
+- ✅ Require linear history
+- ❌ No force pushes
+
+#### `develop` Branch
+- ✅ Require 1 pull request review
+- ✅ Require tests to pass
+- ✅ Require conversation resolution
+
+### Required Status Checks
+
+All branches must pass:
+
+1. **Code Quality**
+   - SonarQube analysis (no blocker/critical issues)
+   - Security rating: A or B
+   - Code coverage: ≥ 80%
+
+2. **Tests**
+   - Unit tests: 100% passing
+   - Integration tests: 100% passing
+   - E2E tests: 100% passing
+
+3. **Build**
+   - Frontend build successful
+   - All Java services build successful
+
+4. **Security**
+   - No high/critical vulnerabilities
+   - Dependency audit passing
+
+### Rollback Procedures
+
+#### Frontend Rollback
+```bash
+# Via Vercel CLI
+vercel rollback [deployment-url]
+
+# Or via Vercel Dashboard → Deployments → Promote previous version
+```
+
+#### Backend Rollback
+```bash
+# Revert to previous commit
+git revert HEAD
+git push origin main
+```
+
+### Environment Variables
+
+Configure per environment:
+
+**Development**
+- `VITE_API_URL`: Development API endpoint
+- `VITE_ENV`: `development`
+
+**Staging**
+- `VITE_API_URL`: Staging API endpoint
+- `VITE_ENV`: `staging`
+
+**Production**
+- `VITE_API_URL`: Production API endpoint
+- `VITE_ENV`: `production`
 
 ---
 

@@ -1,36 +1,24 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from 'recharts'
 import { useDashboardSummary, useBusinessMetrics } from '../hooks/useAnalytics'
+import { useChartExport } from '../hooks/useChartExport'
+import { InteractiveChart } from '../components/ui/InteractiveChart'
+import { SkeletonCard } from '../components/Skeleton'
 import './Dashboard.css'
 
-// Chart configuration constants
-const CHART_HEIGHT = 300
-const CHART_WIDTH = "100%"
-const GRID_STROKE_DASH = "3 3"
-const MONTH_PADDING = 2
-
 // Chart colors
-const SALES_COLOR = "#8884d8"
-const COSTS_COLOR = "#82ca9d"
-const PROFIT_COLOR = "#ffc658"
-const BAR_COLOR = "#8884d8"
+const SALES_COLOR = '#8884d8'
+const COSTS_COLOR = '#82ca9d'
+const PROFIT_COLOR = '#ffc658'
+const BAR_COLOR = '#8884d8'
+
+const MONTH_PADDING = 2
 
 function Dashboard() {
   const { t } = useTranslation()
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [clickedPoint, setClickedPoint] = useState<string | null>(null)
 
   // Queries
   const summaryQuery = useDashboardSummary()
@@ -46,18 +34,6 @@ function Dashboard() {
   const isLoading = summaryQuery.isLoading || metricsQuery.isLoading
   const error = summaryQuery.error || metricsQuery.error
 
-  if (isLoading) {
-    return <div className="dashboard loading">{t('common.loading')}</div>
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard error">
-        {t('common.error')}: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
-      </div>
-    )
-  }
-
   const summary = summaryQuery.data
   const metrics = metricsQuery.data || []
 
@@ -68,7 +44,41 @@ function Dashboard() {
     profit: m.profit,
   }))
 
-  const topProductsData = summary?.topProducts || []
+  const topProductsData = (summary?.topProducts || []).map((p) => ({
+    name: p.name,
+    totalRevenue: p.totalRevenue,
+  }))
+
+  // Export hooks
+  const trendExport = useChartExport({ data: chartData, filename: 'sales-trend' })
+  const productsExport = useChartExport({ data: topProductsData, filename: 'top-products' })
+
+  if (isLoading) {
+    return (
+      <div className="dashboard">
+        <h1>{t('dashboard.title')}</h1>
+        {/* Skeleton metrics grid */}
+        <div className="metrics-grid" aria-busy="true" aria-label="Loading dashboard metrics">
+          {Array.from({ length: 5 }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+        {/* Skeleton charts */}
+        <div className="charts-section">
+          <div className="chart-container skeleton-chart-placeholder" aria-hidden="true" />
+          <div className="chart-container skeleton-chart-placeholder" aria-hidden="true" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard error">
+        {t('common.error')}: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
+      </div>
+    )
+  }
 
   return (
     <div className="dashboard">
@@ -77,16 +87,18 @@ function Dashboard() {
       {/* Date Range Filter */}
       <div className="filter-section">
         <div className="filter-group">
-          <label>From Date:</label>
+          <label htmlFor="date-from">From Date:</label>
           <input
+            id="date-from"
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
           />
         </div>
         <div className="filter-group">
-          <label>To Date:</label>
+          <label htmlFor="date-to">To Date:</label>
           <input
+            id="date-to"
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
@@ -129,37 +141,56 @@ function Dashboard() {
         </div>
       )}
 
+      {/* Clicked point feedback */}
+      {clickedPoint && (
+        <div className="dashboard-click-info" role="status" aria-live="polite">
+          Selected: {clickedPoint}
+          <button
+            className="dashboard-click-dismiss"
+            onClick={() => setClickedPoint(null)}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Charts */}
       <div className="charts-section">
         <div className="chart-container">
-          <h2>{t('dashboard.salesTrend')}</h2>
-          <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="sales" stroke={SALES_COLOR} />
-              <Line type="monotone" dataKey="costs" stroke={COSTS_COLOR} />
-              <Line type="monotone" dataKey="profit" stroke={PROFIT_COLOR} />
-            </LineChart>
-          </ResponsiveContainer>
+          <InteractiveChart
+            title={t('dashboard.salesTrend')}
+            data={chartData}
+            xDataKey="month"
+            chartType="line"
+            series={[
+              { dataKey: 'sales', color: SALES_COLOR, name: 'Sales' },
+              { dataKey: 'costs', color: COSTS_COLOR, name: 'Costs' },
+              { dataKey: 'profit', color: PROFIT_COLOR, name: 'Profit' },
+            ]}
+            onDataPointClick={(dataKey, value, entry) =>
+              setClickedPoint(`${entry.month} — ${dataKey}: ${value}`)
+            }
+            onExportCSV={trendExport.exportCSV}
+            onExportJSON={trendExport.exportJSON}
+          />
         </div>
 
         {/* Top Products */}
         {topProductsData.length > 0 && (
           <div className="chart-container">
-            <h2>{t('dashboard.topProducts')}</h2>
-            <ResponsiveContainer width={CHART_WIDTH} height={CHART_HEIGHT}>
-              <BarChart data={topProductsData}>
-                <CartesianGrid strokeDasharray={GRID_STROKE_DASH} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="totalRevenue" fill={BAR_COLOR} />
-              </BarChart>
-            </ResponsiveContainer>
+            <InteractiveChart
+              title={t('dashboard.topProducts')}
+              data={topProductsData}
+              xDataKey="name"
+              chartType="bar"
+              series={[{ dataKey: 'totalRevenue', color: BAR_COLOR, name: 'Revenue' }]}
+              onDataPointClick={(dataKey, value, entry) =>
+                setClickedPoint(`${entry.name} — ${dataKey}: ${value}`)
+              }
+              onExportCSV={productsExport.exportCSV}
+              onExportJSON={productsExport.exportJSON}
+            />
           </div>
         )}
       </div>

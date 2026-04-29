@@ -1,0 +1,134 @@
+/* ============================================================
+   Button Component
+   ============================================================ */
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    opacity var(--transition-fast);
+  position: relative;
+  user-select: none;
+}
+
+.ui-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Disabled / loading state */
+.ui-btn:disabled,
+.ui-btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---- Sizes ---- */
+.ui-btn--sm {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: 32px;
+}
+
+.ui-btn--md {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-base);
+  min-height: 40px;
+}
+
+.ui-btn--lg {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-lg);
+  min-height: 48px;
+}
+
+/* ---- Variants ---- */
+.ui-btn--primary {
+  background-color: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-action-primary);
+}
+
+.ui-btn--primary:hover:not(:disabled) {
+  background-color: var(--color-action-primary-hover);
+  border-color: var(--color-action-primary-hover);
+}
+
+.ui-btn--primary:active:not(:disabled) {
+  background-color: var(--color-action-primary-active);
+  border-color: var(--color-action-primary-active);
+}
+
+.ui-btn--secondary {
+  background-color: var(--color-action-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-default);
+}
+
+.ui-btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-action-secondary-hover);
+}
+
+.ui-btn--ghost {
+  background-color: transparent;
+  color: var(--color-action-primary);
+  border-color: transparent;
+}
+
+.ui-btn--ghost:hover:not(:disabled) {
+  background-color: var(--color-primary-50);
+}
+
+[data-theme="dark"] .ui-btn--ghost:hover:not(:disabled) {
+  background-color: var(--color-neutral-800);
+}
+
+.ui-btn--danger {
+  background-color: var(--color-action-danger);
+  color: var(--color-text-inverse);
+  border-color: var(--color-action-danger);
+}
+
+.ui-btn--danger:hover:not(:disabled) {
+  background-color: var(--color-action-danger-hover);
+  border-color: var(--color-action-danger-hover);
+}
+
+/* ---- Loading spinner ---- */
+.ui-btn__spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+  animation: ui-btn-spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ui-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Icons ---- */
+.ui-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 1.1em;
+}

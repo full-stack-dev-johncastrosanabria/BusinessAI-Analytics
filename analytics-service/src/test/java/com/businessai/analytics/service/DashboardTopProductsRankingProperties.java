@@ -24,7 +24,7 @@ import net.jqwik.api.constraints.IntRange;
  * 
  * Validates: Requirements 5.3
  */
-@Tag("Feature: business-ai-analytics, Property 12: Dashboard Top Products Ranking")
+@Tag("business-ai-analytics")
 public class DashboardTopProductsRankingProperties {
 
     /**

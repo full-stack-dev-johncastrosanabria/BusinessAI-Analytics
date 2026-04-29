@@ -18,7 +18,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-LOG_DIR="./logs"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="$SCRIPT_DIR/logs"
 PIDS_FILE="$LOG_DIR/service_pids.txt"
 FORCE_KILL=false
 

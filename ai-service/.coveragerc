@@ -1,0 +1,16 @@
+[run]
+source = .
+omit =
+    .venv/*
+    tests/*
+    */__pycache__/*
+    */trained_models/*
+    train_models.py
+    train_10x_models.sh
+
+[report]
+fail_under = 80
+show_missing = true
+
+[xml]
+output = coverage.xml

@@ -46,6 +46,19 @@ export const analyticsKeys = {
     [...analyticsKeys.all, 'metrics', filters] as const,
 }
 
+function createMetricsParams(filters?: {
+  dateFrom?: string
+  dateTo?: string
+}): Record<string, string> | undefined {
+  if (!filters) {
+    return undefined
+  }
+
+  return Object.fromEntries(
+    Object.entries(filters).filter((entry): entry is [string, string] => entry[1] !== undefined)
+  )
+}
+
 /**
  * Hook to fetch dashboard summary
  */
@@ -68,7 +81,7 @@ export function useBusinessMetrics(filters?: {
     queryKey: analyticsKeys.metrics(filters),
     queryFn: () =>
       api.get<BusinessMetric[]>('/api/analytics/metrics', {
-        params: filters as Record<string, string | undefined>,
+        params: createMetricsParams(filters),
       }),
     staleTime: METRICS_STALE_TIME_MS,
   })

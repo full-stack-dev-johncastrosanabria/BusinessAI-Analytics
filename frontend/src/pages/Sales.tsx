@@ -36,7 +36,6 @@ function Sales() {
       setProducts(Array.isArray(prods) ? prods : [])
       setCustomers(Array.isArray(custs) ? custs : [])
     } catch (err) {
-      console.error('Error fetching sales data:', err)
       setError(err instanceof Error ? err.message : 'Failed to load data')
       setTransactions([]) // Set empty arrays on error
       setProducts([])

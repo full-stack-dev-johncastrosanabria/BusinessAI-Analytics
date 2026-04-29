@@ -1,5 +1,9 @@
 package com.businessai.documents.component;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,10 +18,6 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 @Component
 public class TextExtractor {
     
@@ -29,18 +29,13 @@ public class TextExtractor {
      * @throws IOException if extraction fails
      */
     public String extractText(MultipartFile file, String fileType) throws IOException {
-        switch (fileType.toUpperCase()) {
-            case "TXT":
-                return extractTxtText(file);
-            case "DOCX":
-                return extractDocxText(file);
-            case "PDF":
-                return extractPdfText(file);
-            case "XLSX":
-                return extractXlsxText(file);
-            default:
-                throw new IllegalArgumentException("Unsupported file type: " + fileType);
-        }
+        return switch (fileType.toUpperCase()) {
+            case "TXT" -> extractTxtText(file);
+            case "DOCX" -> extractDocxText(file);
+            case "PDF" -> extractPdfText(file);
+            case "XLSX" -> extractXlsxText(file);
+            default -> throw new IllegalArgumentException("Unsupported file type: " + fileType);
+        };
     }
     
     /**
@@ -88,16 +83,10 @@ public class TextExtractor {
      * Extract text from PDF file using Apache PDFBox
      */
     private String extractPdfText(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            PDDocument document = PDDocument.load(inputStream);
-            try {
-                PDFTextStripper stripper = new PDFTextStripper();
-                return stripper.getText(document);
-            } finally {
-                if (document != null) {
-                    document.close();
-                }
-            }
+        try (InputStream inputStream = file.getInputStream();
+             PDDocument document = PDDocument.load(inputStream)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
         }
     }
     
@@ -132,17 +121,12 @@ public class TextExtractor {
      * Get cell value as string, handling different cell types
      */
     private String getCellValueAsString(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula();
-            default:
-                return "";
-        }
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            default -> "";
+        };
     }
 }

@@ -1,4 +1,5 @@
 import { useTransition } from 'react'
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query'
 import {
   LineChart,
   Line,
@@ -18,10 +19,53 @@ import {
   useCostForecast,
   useProfitForecast,
 } from '../hooks/useForecasts'
+import type { ForecastPrediction, ForecastResponse } from '../hooks/useForecasts'
 import './Forecasts.css'
 
+type ForecastMutation = UseMutationResult<ForecastResponse, Error, void, unknown>
+type AllForecastsMutation = UseMutationResult<{
+  sales: ForecastResponse
+  costs: ForecastResponse
+  profit: ForecastResponse
+}, Error, void, unknown>
+
+interface ForecastHandlersInput {
+  generateSales: ForecastMutation
+  generateCost: ForecastMutation
+  generateProfit: ForecastMutation
+  generateAll: AllForecastsMutation
+  startTransition: (callback: () => void) => void
+}
+
+interface ForecastStateInput {
+  generateSales: ForecastMutation
+  generateCost: ForecastMutation
+  generateProfit: ForecastMutation
+  generateAll: AllForecastsMutation
+  isPending: boolean
+}
+
+interface CombinedForecastDataInput {
+  salesQuery: UseQueryResult<ForecastResponse, Error>
+  costQuery: UseQueryResult<ForecastResponse, Error>
+  profitQuery: UseQueryResult<ForecastResponse, Error>
+}
+
+interface CombinedForecastPoint {
+  month: string
+  sales: number
+  cost: number
+  profit: number
+}
+
 // Helper hooks to reduce cognitive complexity
-function useForecastHandlers({ generateSales, generateCost, generateProfit, generateAll, startTransition }) {
+function useForecastHandlers({
+  generateSales,
+  generateCost,
+  generateProfit,
+  generateAll,
+  startTransition,
+}: ForecastHandlersInput) {
   const handleGenerateAll = () => {
     startTransition(() => {
       generateAll.mutate()
@@ -54,7 +98,13 @@ function useForecastHandlers({ generateSales, generateCost, generateProfit, gene
   }
 }
 
-function useForecastState({ generateSales, generateCost, generateProfit, generateAll, isPending }) {
+function useForecastState({
+  generateSales,
+  generateCost,
+  generateProfit,
+  generateAll,
+  isPending,
+}: ForecastStateInput) {
   const isLoading =
     generateSales.isPending ||
     generateCost.isPending ||
@@ -68,9 +118,13 @@ function useForecastState({ generateSales, generateCost, generateProfit, generat
   return { isLoading, error }
 }
 
-function useCombinedForecastData({ salesQuery, costQuery, profitQuery }) {
+function useCombinedForecastData({
+  salesQuery,
+  costQuery,
+  profitQuery,
+}: CombinedForecastDataInput): CombinedForecastPoint[] {
   return salesQuery.data && costQuery.data && profitQuery.data
-    ? salesQuery.data.predictions.map((item, index) => ({
+    ? salesQuery.data.predictions.map((item: ForecastPrediction, index: number) => ({
         month: item.month,
         sales: item.value,
         cost: costQuery.data.predictions[index]?.value || 0,

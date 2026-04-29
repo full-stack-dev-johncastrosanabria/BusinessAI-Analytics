@@ -1,0 +1,435 @@
+/* ============================================================
+   Design Tokens — BusinessAI Analytics Platform
+   Base unit: 4px
+   ============================================================ */
+
+:root {
+  /* ----------------------------------------------------------
+     Color Palette — Primary (Blue)
+  ---------------------------------------------------------- */
+  --color-primary-50:  #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* ----------------------------------------------------------
+     Color Palette — Secondary (Violet)
+  ---------------------------------------------------------- */
+  --color-secondary-50:  #f5f3ff;
+  --color-secondary-100: #ede9fe;
+  --color-secondary-200: #ddd6fe;
+  --color-secondary-300: #c4b5fd;
+  --color-secondary-400: #a78bfa;
+  --color-secondary-500: #8b5cf6;
+  --color-secondary-600: #7c3aed;
+  --color-secondary-700: #6d28d9;
+  --color-secondary-800: #5b21b6;
+  --color-secondary-900: #4c1d95;
+
+  /* ----------------------------------------------------------
+     Color Palette — Success (Green)
+  ---------------------------------------------------------- */
+  --color-success-50:  #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-200: #bbf7d0;
+  --color-success-300: #86efac;
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #14532d;
+
+  /* ----------------------------------------------------------
+     Color Palette — Warning (Amber)
+  ---------------------------------------------------------- */
+  --color-warning-50:  #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+
+  /* ----------------------------------------------------------
+     Color Palette — Error (Red)
+  ---------------------------------------------------------- */
+  --color-error-50:  #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+  --color-error-800: #991b1b;
+  --color-error-900: #7f1d1d;
+
+  /* ----------------------------------------------------------
+     Color Palette — Neutral (Gray)
+  ---------------------------------------------------------- */
+  --color-neutral-0:   #ffffff;
+  --color-neutral-50:  #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #030712;
+
+  /* ----------------------------------------------------------
+     Semantic Color Aliases (light mode defaults)
+  ---------------------------------------------------------- */
+  --color-bg-primary:    var(--color-neutral-0);
+  --color-bg-secondary:  var(--color-neutral-50);
+  --color-bg-tertiary:   var(--color-neutral-100);
+  --color-bg-inverse:    var(--color-neutral-900);
+
+  --color-text-primary:   var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-tertiary:  var(--color-neutral-400);
+  --color-text-inverse:   var(--color-neutral-0);
+  --color-text-link:      var(--color-primary-600);
+
+  --color-border-default: var(--color-neutral-200);
+  --color-border-strong:  var(--color-neutral-400);
+  --color-border-focus:   var(--color-primary-500);
+
+  --color-action-primary:         var(--color-primary-600);
+  --color-action-primary-hover:   var(--color-primary-700);
+  --color-action-primary-active:  var(--color-primary-800);
+  --color-action-secondary:       var(--color-neutral-100);
+  --color-action-secondary-hover: var(--color-neutral-200);
+  --color-action-danger:          var(--color-error-600);
+  --color-action-danger-hover:    var(--color-error-700);
+
+  /* ----------------------------------------------------------
+     Typography — Font Families
+  ---------------------------------------------------------- */
+  --font-family-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+                        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+                        'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-family-mono:  'SFMono-Regular', 'Consolas', 'Liberation Mono',
+                        'Menlo', 'Courier New', monospace;
+
+  /* ----------------------------------------------------------
+     Typography — Font Sizes (type scale)
+  ---------------------------------------------------------- */
+  --font-size-xs:   0.75rem;   /* 12px */
+  --font-size-sm:   0.875rem;  /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg:   1.125rem;  /* 18px */
+  --font-size-xl:   1.25rem;   /* 20px */
+  --font-size-2xl:  1.5rem;    /* 24px */
+  --font-size-3xl:  1.875rem;  /* 30px */
+  --font-size-4xl:  2.25rem;   /* 36px */
+
+  /* ----------------------------------------------------------
+     Typography — Font Weights
+  ---------------------------------------------------------- */
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* ----------------------------------------------------------
+     Typography — Line Heights
+  ---------------------------------------------------------- */
+  --line-height-tight:  1.25;
+  --line-height-snug:   1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose:  2;
+
+  /* ----------------------------------------------------------
+     Spacing Scale (4px base unit)
+  ---------------------------------------------------------- */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* ----------------------------------------------------------
+     Border Radius
+  ---------------------------------------------------------- */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+
+  /* ----------------------------------------------------------
+     Shadows
+  ---------------------------------------------------------- */
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl:  0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-focus: 0 0 0 3px rgb(59 130 246 / 0.4);
+
+  /* ----------------------------------------------------------
+     Transitions
+  ---------------------------------------------------------- */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* ----------------------------------------------------------
+     Z-Index Scale
+  ---------------------------------------------------------- */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
+}
+
+/* ============================================================
+   Dark Mode Overrides
+   ============================================================ */
+[data-theme="dark"] {
+  --color-bg-primary:    var(--color-neutral-900);
+  --color-bg-secondary:  var(--color-neutral-800);
+  --color-bg-tertiary:   var(--color-neutral-700);
+  --color-bg-inverse:    var(--color-neutral-0);
+
+  --color-text-primary:   var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-300);
+  --color-text-tertiary:  var(--color-neutral-500);
+  --color-text-inverse:   var(--color-neutral-900);
+  --color-text-link:      var(--color-primary-400);
+
+  --color-border-default: var(--color-neutral-700);
+  --color-border-strong:  var(--color-neutral-500);
+  --color-border-focus:   var(--color-primary-400);
+
+  --color-action-primary:         var(--color-primary-500);
+  --color-action-primary-hover:   var(--color-primary-400);
+  --color-action-primary-active:  var(--color-primary-300);
+  --color-action-secondary:       var(--color-neutral-700);
+  --color-action-secondary-hover: var(--color-neutral-600);
+  --color-action-danger:          var(--color-error-500);
+  --color-action-danger-hover:    var(--color-error-400);
+
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl:  0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-focus: 0 0 0 3px rgb(96 165 250 / 0.4);
+}
+
+/* ============================================================
+   Responsive Breakpoints
+   mobile:  < 768px
+   tablet:  768px – 1279px
+   desktop: ≥ 1280px
+   ============================================================ */
+
+:root {
+  --breakpoint-mobile:  0px;
+  --breakpoint-tablet:  768px;
+  --breakpoint-desktop: 1280px;
+
+  /* Layout widths */
+  --layout-max-width:        1440px;
+  --layout-content-width:    1200px;
+  --layout-sidebar-width:    240px;
+  --layout-sidebar-collapsed: 64px;
+
+  /* Responsive spacing */
+  --page-padding-mobile:  var(--spacing-4);   /* 16px */
+  --page-padding-tablet:  var(--spacing-6);   /* 24px */
+  --page-padding-desktop: var(--spacing-8);   /* 32px */
+
+  /* Navigation heights */
+  --nav-height-mobile:  56px;
+  --nav-height-tablet:  60px;
+  --nav-height-desktop: 64px;
+}
+
+/* ============================================================
+   Responsive Utility Classes
+   ============================================================ */
+
+/* Hide/show at breakpoints */
+@media (max-width: 767px) {
+  .hide-mobile  { display: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .hide-tablet  { display: none !important; }
+}
+
+@media (min-width: 1280px) {
+  .hide-desktop { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .show-mobile-only { display: none !important; }
+}
+
+@media (max-width: 767px) {
+  .show-tablet-up { display: none !important; }
+}
+
+@media (max-width: 1279px) {
+  .show-desktop-only { display: none !important; }
+}
+
+/* ============================================================
+   Responsive Grid Utilities
+   ============================================================ */
+
+.responsive-grid {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+@media (min-width: 1280px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-8);
+  }
+}
+
+.responsive-grid--2col {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid--2col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+.responsive-grid--4col {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .responsive-grid--4col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+@media (min-width: 1280px) {
+  .responsive-grid--4col {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-8);
+  }
+}
+
+/* ============================================================
+   Responsive Container
+   ============================================================ */
+
+.responsive-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--page-padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .responsive-container {
+    padding-inline: var(--page-padding-tablet);
+  }
+}
+
+@media (min-width: 1280px) {
+  .responsive-container {
+    max-width: var(--layout-max-width);
+    padding-inline: var(--page-padding-desktop);
+  }
+}
+
+/* ============================================================
+   Responsive Page Layout
+   ============================================================ */
+
+.page-layout {
+  width: 100%;
+  padding: var(--page-padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .page-layout {
+    padding: var(--page-padding-tablet);
+  }
+}
+
+@media (min-width: 1280px) {
+  .page-layout {
+    padding: var(--page-padding-desktop);
+  }
+}
+
+/* ============================================================
+   Responsive Typography Utilities
+   ============================================================ */
+
+.text-responsive-heading {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .text-responsive-heading {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (min-width: 1280px) {
+  .text-responsive-heading {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+/* ============================================================
+   Responsive Stack (flex column → row)
+   ============================================================ */
+
+.responsive-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .responsive-stack {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-6);
+  }
+}

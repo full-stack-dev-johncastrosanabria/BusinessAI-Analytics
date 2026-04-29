@@ -28,6 +28,7 @@ NC='\033[0m' # No Color
 # Configuration
 SKIP_DB_CHECK=false
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"  # Project root is one level up from scripts/
 LOG_DIR="$SCRIPT_DIR/logs"
 MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
@@ -248,14 +249,14 @@ start_spring_service() {
         return 0
     fi
     
-    cd "$service_dir"
+    cd "$ROOT_DIR/$service_dir"
     
     # Start service in background
     nohup mvn spring-boot:run > "$LOG_DIR/${service_name}.log" 2>&1 &
     local pid=$!
     echo "$service_name:$pid" >> "$PIDS_FILE"
     
-    cd - > /dev/null
+    cd "$ROOT_DIR"
     
     # Wait for service to be ready
     if wait_for_service "$service_name" "$port" 90; then
@@ -331,7 +332,7 @@ if check_port $PORT_AI; then
 else
     print_info "Starting AI Service..."
     
-    cd ai-service
+    cd "$ROOT_DIR/ai-service"
     
     # Check if virtual environment exists
     if [ ! -d ".venv" ]; then
@@ -359,7 +360,7 @@ else
     ai_pid=$!
     echo "AI Service:$ai_pid" >> "$PIDS_FILE"
     
-    cd - > /dev/null
+    cd "$ROOT_DIR"
     
     if wait_for_service "AI Service" "$PORT_AI" 60; then
         print_success "AI Service started (PID: $ai_pid)"
@@ -379,7 +380,7 @@ if check_port $PORT_FRONTEND; then
 else
     print_info "Starting Frontend..."
     
-    cd frontend
+    cd "$ROOT_DIR/frontend"
     
     # Install dependencies if needed
     if [ ! -d "node_modules" ]; then
@@ -392,7 +393,7 @@ else
     frontend_pid=$!
     echo "Frontend:$frontend_pid" >> "$PIDS_FILE"
     
-    cd - > /dev/null
+    cd "$ROOT_DIR"
     
     if wait_for_service "Frontend" "$PORT_FRONTEND" 60; then
         print_success "Frontend started (PID: $frontend_pid)"

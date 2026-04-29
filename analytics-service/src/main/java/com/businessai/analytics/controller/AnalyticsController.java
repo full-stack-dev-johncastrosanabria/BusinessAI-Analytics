@@ -1,6 +1,7 @@
 package com.businessai.analytics.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,8 @@ import com.businessai.analytics.service.AnalyticsService;
 public class AnalyticsController {
 
     // Constants for repeated strings
-    private static final String VALIDATION_FAILED = VALIDATION_FAILED;
-    private static final String NOT_FOUND = NOT_FOUND;
+    private static final String VALIDATION_FAILED = "Validation failed";
+    private static final String NOT_FOUND = "Not found";
 
     private final AnalyticsService analyticsService;
 
@@ -140,9 +141,10 @@ public class AnalyticsController {
         try {
             // Default to current year if not specified
             if (startYear == null) {
-                startYear = 2024;
+                int currentYear = LocalDate.now().getYear();
+                startYear = currentYear;
                 startMonth = 1;
-                endYear = 2024;
+                endYear = currentYear;
                 endMonth = 12;
             }
 
@@ -245,8 +247,8 @@ public class AnalyticsController {
     }
 
     public static class ErrorResponse {
-        private String error;
-        private String message;
+        private final String error;
+        private final String message;
 
         public ErrorResponse(String error, String message) {
             this.error = error;
@@ -263,7 +265,7 @@ public class AnalyticsController {
     }
 
     public static class AggregationResponse {
-        private String message;
+        private final String message;
 
         public AggregationResponse(String message) {
             this.message = message;

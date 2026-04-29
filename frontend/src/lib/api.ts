@@ -5,7 +5,7 @@
  */
 
 // Configuration constants
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080'
+const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:8080'
 const REQUEST_TIMEOUT_MS = 30_000 // 30 seconds
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 1_000 // 1 second
@@ -28,6 +28,10 @@ interface RequestConfig extends RequestInit {
   params?: Record<string, string | number | boolean>
   timeout?: number
   retries?: number
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 /**
@@ -114,15 +118,23 @@ async function request<T>(
           }
           
           throw new APIError(
-            (errorData as any)?.message || `HTTP ${response.status}: ${response.statusText}`,
+            isRecord(errorData) && typeof errorData.message === 'string'
+              ? errorData.message
+              : `HTTP ${response.status}: ${response.statusText}`,
             response.status,
             errorData,
             endpoint
           )
         }
 
-        // Parse JSON response
-        const data = await response.json()
+        if (response.status === 204) {
+          return undefined as T
+        }
+
+        const contentType = response.headers.get('content-type')
+        const data = contentType?.includes('application/json')
+          ? await response.json()
+          : await response.text()
         cleanup()
         return data as T
       } finally {
@@ -160,7 +172,10 @@ export const api = {
     request<T>(endpoint, {
       ...config,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
+      headers: data instanceof FormData
+        ? removeContentType(config?.headers)
+        : config?.headers,
     }),
 
   put: <T>(endpoint: string, data?: unknown, config?: RequestConfig) =>
@@ -177,6 +192,15 @@ export const api = {
     request<T>(endpoint, {
       ...config,
       method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
+      headers: data instanceof FormData
+        ? removeContentType(config?.headers)
+        : config?.headers,
     }),
+}
+
+function removeContentType(headers?: HeadersInit): Headers {
+  const normalizedHeaders = new Headers(headers)
+  normalizedHeaders.delete('Content-Type')
+  return normalizedHeaders
 }

@@ -1,5 +1,5 @@
 .dashboard {
-  padding: 30px;
+  padding: 0;
   margin: 0;
   width: 100%;
   background-color: var(--bg-secondary);
@@ -114,8 +114,20 @@
 
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .charts-section {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .charts-section {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  }
 }
 
 .chart-container {
@@ -147,11 +159,7 @@
   color: var(--text-primary) !important;
 }
 
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 15px;
-  }
-
+@media (max-width: 767px) {
   .filter-section {
     flex-direction: column;
   }
@@ -164,11 +172,72 @@
     grid-template-columns: 1fr;
   }
 
-  .charts-section {
-    grid-template-columns: 1fr;
-  }
-
   .chart-container {
     padding: 15px;
   }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Click-point feedback banner ---- */
+.dashboard-click-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4, 16px);
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  background-color: var(--color-primary-50, #eff6ff);
+  border: 1px solid var(--color-primary-200, #bfdbfe);
+  border-radius: var(--radius-lg, 8px);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-primary-800, #1e40af);
+}
+
+.dashboard-click-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--color-primary-600, #2563eb);
+  padding: 0 4px;
+}
+
+[data-theme="dark"] .dashboard-click-info {
+  background-color: var(--color-primary-900, #1e3a8a);
+  border-color: var(--color-primary-700, #1d4ed8);
+  color: var(--color-primary-200, #bfdbfe);
+}
+
+/* ---- Skeleton chart placeholder ---- */
+.skeleton-chart-placeholder {
+  min-height: 280px;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200, #e5e7eb) 25%,
+    var(--color-neutral-100, #f3f4f6) 50%,
+    var(--color-neutral-200, #e5e7eb) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+[data-theme="dark"] .skeleton-chart-placeholder {
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-700, #374151) 25%,
+    var(--color-neutral-600, #4b5563) 50%,
+    var(--color-neutral-700, #374151) 75%
+  );
+  background-size: 800px 100%;
 }

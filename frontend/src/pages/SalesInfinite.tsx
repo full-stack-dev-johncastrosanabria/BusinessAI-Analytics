@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import salesService, { SalesTransaction } from '../services/salesService'
 import './SalesInfinite.css'
 
+// Pagination configuration
+const PAGE_SIZE = 20
+
 function SalesInfinite() {
   const [transactions, setTransactions] = useState<SalesTransaction[]>([])
-  const [displayCount, setDisplayCount] = useState(20)
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -20,7 +23,6 @@ function SalesInfinite() {
       const data = await salesService.getSalesTransactions()
       setTransactions(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Error fetching sales:', err)
       setError(err instanceof Error ? err.message : 'Failed to load transactions')
       setTransactions([])
     } finally {
@@ -33,7 +35,7 @@ function SalesInfinite() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && displayCount < transactions.length) {
-          setDisplayCount(prev => Math.min(prev + 20, transactions.length))
+          setDisplayCount(prev => Math.min(prev + PAGE_SIZE, transactions.length))
         }
       },
       { threshold: 0, rootMargin: '100px' }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import Toast, { ToastMessage, ToastType } from './Toast'
 import './ToastContainer.css'
 
@@ -33,5 +33,3 @@ function ToastContainer() {
 }
 
 export default ToastContainer
-
-import React from 'react'

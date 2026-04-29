@@ -197,12 +197,12 @@ public class AnalyticsService {
      * Dashboard summary DTO
      */
     public static class DashboardSummary {
-        public BigDecimal totalSales;
-        public BigDecimal totalCosts;
-        public BigDecimal totalProfit;
-        public BusinessMetric bestMonth;
-        public BusinessMetric worstMonth;
-        public List<TopProduct> topProducts;
+        private final BigDecimal totalSales;
+        private final BigDecimal totalCosts;
+        private final BigDecimal totalProfit;
+        private final BusinessMetric bestMonth;
+        private final BusinessMetric worstMonth;
+        private final List<TopProduct> topProducts;
 
         public DashboardSummary(BigDecimal totalSales, BigDecimal totalCosts, BigDecimal totalProfit,
                                BusinessMetric bestMonth, BusinessMetric worstMonth, List<TopProduct> topProducts) {
@@ -243,9 +243,9 @@ public class AnalyticsService {
      * Top product DTO
      */
     public static class TopProduct {
-        public Long productId;
-        public String productName;
-        public BigDecimal revenue;
+        private final Long productId;
+        private final String productName;
+        private final BigDecimal revenue;
 
         public TopProduct(Long productId, String productName, BigDecimal revenue) {
             this.productId = productId;

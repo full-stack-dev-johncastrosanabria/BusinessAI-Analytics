@@ -1,57 +1,76 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import App from './App'
-import Dashboard from './pages/Dashboard'
-import Forecasts from './pages/Forecasts'
-import Chatbot from './pages/Chatbot'
-import Documents from './pages/Documents'
-import Products from './pages/Products'
-import Customers from './pages/Customers'
-import Sales from './pages/Sales'
-import SalesTable from './pages/SalesTable'
-import SalesInfinite from './pages/SalesInfinite'
 import ErrorBoundary from './components/ErrorBoundary'
+import ProtectedRoute from './components/ProtectedRoute'
+import { PageLoader } from './components/PageLoader'
+
+// Lazy-loaded page components — each becomes a separate JS chunk
+const Login = lazy(() => import('./pages/Login'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Forecasts = lazy(() => import('./pages/Forecasts'))
+const Chatbot = lazy(() => import('./pages/Chatbot'))
+const Documents = lazy(() => import('./pages/Documents'))
+const Products = lazy(() => import('./pages/Products'))
+const Customers = lazy(() => import('./pages/Customers'))
+const Sales = lazy(() => import('./pages/Sales'))
+const SalesTable = lazy(() => import('./pages/SalesTable'))
+const SalesInfinite = lazy(() => import('./pages/SalesInfinite'))
+
+const withSuspense = (element: React.ReactNode) => (
+  <Suspense fallback={<PageLoader />}>{element}</Suspense>
+)
 
 export const router = createBrowserRouter([
   {
+    path: '/login',
+    element: withSuspense(<Login />),
+    errorElement: <ErrorBoundary />,
+  },
+  {
     path: '/',
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: withSuspense(<Dashboard />),
       },
       {
         path: 'forecasts',
-        element: <Forecasts />,
+        element: withSuspense(<Forecasts />),
       },
       {
         path: 'chatbot',
-        element: <Chatbot />,
+        element: withSuspense(<Chatbot />),
       },
       {
         path: 'documents',
-        element: <Documents />,
+        element: withSuspense(<Documents />),
       },
       {
         path: 'products',
-        element: <Products />,
+        element: withSuspense(<Products />),
       },
       {
         path: 'customers',
-        element: <Customers />,
+        element: withSuspense(<Customers />),
       },
       {
         path: 'sales',
-        element: <Sales />,
+        element: withSuspense(<Sales />),
       },
       {
         path: 'sales-table',
-        element: <SalesTable />,
+        element: withSuspense(<SalesTable />),
       },
       {
         path: 'sales-infinite',
-        element: <SalesInfinite />,
+        element: withSuspense(<SalesInfinite />),
       },
     ],
   },

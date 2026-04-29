@@ -22,7 +22,7 @@ import net.jqwik.api.constraints.IntRange;
  * 
  * Validates: Requirements 5.2
  */
-@Tag("Feature: business-ai-analytics, Property 11: Dashboard Best and Worst Month Identification")
+@Tag("business-ai-analytics")
 public class DashboardBestWorstMonthProperties {
 
     @Property

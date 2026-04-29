@@ -14,17 +14,17 @@ export interface Document {
 const documentService = {
   // Get all documents
   getDocuments: async (): Promise<Document[]> => {
-    const response = await api.get('/api/documents')
+    return api.get<Document[]>('/api/documents')
   },
 
   // Get document by ID
   getDocument: async (id: number): Promise<Document> => {
-    const response = await api.get(`/api/documents/${id}`)
+    return api.get<Document>(`/api/documents/${id}`)
   },
 
   // Get document content (extracted text)
   getDocumentContent: async (id: number): Promise<{ content: string }> => {
-    const response = await api.get(`/api/documents/${id}/content`)
+    return api.get<{ content: string }>(`/api/documents/${id}/content`)
   },
 
   // Upload document
@@ -32,7 +32,7 @@ const documentService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await api.post('/api/documents/upload', formData, {
+    return api.post<Document>('/api/documents/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

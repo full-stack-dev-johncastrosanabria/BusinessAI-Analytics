@@ -3,7 +3,6 @@ package com.businessai.documents.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,11 +31,14 @@ import com.businessai.documents.service.DocumentService;
 public class DocumentController {
     
     // Constants for repeated strings
-    private static final String INVALID_DOCUMENT_ID = INVALID_DOCUMENT_ID;
-    private static final String DOCUMENT_NOT_FOUND = DOCUMENT_NOT_FOUND;
+    private static final String INVALID_DOCUMENT_ID = "Invalid document ID";
+    private static final String DOCUMENT_NOT_FOUND = "Document not found";
     
-    @Autowired
-    private DocumentService documentService;
+    private final DocumentService documentService;
+    
+    public DocumentController(DocumentService documentService) {
+        this.documentService = documentService;
+    }
     
     /**
      * Upload a document
@@ -57,9 +59,6 @@ public class DocumentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("Failed to upload document: " + e.getMessage()));
         }
     }
     
@@ -139,26 +138,38 @@ public class DocumentController {
     
     // Response DTOs
     public static class ErrorResponse {
-        public String error;
+        private final String error;
         
         public ErrorResponse(String error) {
             this.error = error;
         }
+        
+        public String getError() {
+            return error;
+        }
     }
     
     public static class SuccessResponse {
-        public String message;
+        private final String message;
         
         public SuccessResponse(String message) {
             this.message = message;
         }
+        
+        public String getMessage() {
+            return message;
+        }
     }
     
     public static class ContentResponse {
-        public String content;
+        private final String content;
         
         public ContentResponse(String content) {
             this.content = content;
+        }
+        
+        public String getContent() {
+            return content;
         }
     }
 }

@@ -22,7 +22,7 @@ import net.jqwik.api.constraints.IntRange;
  * 
  * Validates: Requirements 4.3
  */
-@Tag("Feature: business-ai-analytics, Property 9: Business Metric Date Range Filtering")
+@Tag("business-ai-analytics")
 public class BusinessMetricDateRangeFilteringProperties {
 
     /**

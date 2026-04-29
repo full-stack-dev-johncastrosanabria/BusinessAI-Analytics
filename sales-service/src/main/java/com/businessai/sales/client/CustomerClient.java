@@ -59,7 +59,7 @@ public class CustomerClient {
             logger.error("Failed to connect to Customer Service at {}: {}", url, e.getMessage());
             throw new CustomerServiceException("Customer Service is unavailable. Please try again later.", e);
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.error("Unexpected error calling Customer Service for customer ID {}: {}", customerId, e.getMessage());
             throw new CustomerServiceException("Failed to retrieve customer information: " + e.getMessage(), e);
         }

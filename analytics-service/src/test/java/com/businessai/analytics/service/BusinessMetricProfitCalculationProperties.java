@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * 
  * Validates: Requirements 4.2
  */
-@Tag("Feature: business-ai-analytics, Property 8: Business Metric Profit Calculation")
+@Tag("business-ai-analytics")
 public class BusinessMetricProfitCalculationProperties {
 
     @Property

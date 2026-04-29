@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     
     // Constants for repeated strings
-    private static final String BAD_REQUEST = BAD_REQUEST;
+    private static final String BAD_REQUEST = "Bad Request";
 
     /**
      * Handle SalesValidationException.
@@ -133,12 +133,12 @@ public class GlobalExceptionHandler {
      * Error response structure.
      */
     public static class ErrorResponse {
-        private LocalDateTime timestamp;
-        private int status;
-        private String error;
-        private String message;
-        private Map<String, String> details;
-        private String path;
+        private final LocalDateTime timestamp;
+        private final int status;
+        private final String error;
+        private final String message;
+        private final Map<String, String> details;
+        private final String path;
 
         public ErrorResponse(LocalDateTime timestamp, int status, String error, 
                            String message, Map<String, String> details, String path) {

@@ -19,7 +19,6 @@ function Documents() {
       const data = await documentService.getDocuments()
       setDocuments(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Error fetching documents:', err)
       setError(err instanceof Error ? err.message : 'Failed to load documents')
       setDocuments([]) // Set empty array on error
     } finally {

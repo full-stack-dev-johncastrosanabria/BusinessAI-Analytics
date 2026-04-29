@@ -121,5 +121,26 @@
     "theme": "Theme",
     "notifications": "Notifications",
     "preferences": "Preferences"
+  },
+  "login": {
+    "welcome": "Welcome to the Future of Business Analytics",
+    "description": "Harness the power of AI to transform your business data into actionable insights. Make smarter decisions with real-time analytics and predictive forecasting.",
+    "feature1": "Real-time Dashboards",
+    "feature2": "AI-Powered Insights",
+    "feature3": "Predictive Analytics",
+    "feature4": "Global Reach",
+    "signIn": "Sign In",
+    "signInDescription": "Access your analytics dashboard",
+    "demoMode": "Demo Mode Active",
+    "demoInstructions": "Use the credentials below or click to auto-fill",
+    "fillDemo": "Fill Demo",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "mockCredentials": "Demo Credentials"
   }
 }

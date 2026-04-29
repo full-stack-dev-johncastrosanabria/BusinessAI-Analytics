@@ -2,11 +2,12 @@
   padding: 2rem;
   margin: 0;
   width: 100%;
+  color: var(--text-primary, #1e293b);
 }
 
 .sales-infinite h1 {
   margin-bottom: 1rem;
-  color: #1a1a1a;
+  color: var(--text-primary, #1a1a1a);
 }
 
 .stats {
@@ -16,6 +17,12 @@
   border-radius: 8px;
   font-size: 0.95rem;
   color: #666;
+}
+
+[data-theme="dark"] .stats {
+  background: var(--bg-secondary, #1e293b);
+  color: var(--text-secondary, #cbd5e1);
+  border: 1px solid var(--border-color, #475569);
 }
 
 .loading,
@@ -29,6 +36,11 @@
   color: #d32f2f;
   background: #ffebee;
   border-radius: 8px;
+}
+
+[data-theme="dark"] .error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .transactions-list {
@@ -45,8 +57,17 @@
   transition: box-shadow 0.2s;
 }
 
+[data-theme="dark"] .transaction-card {
+  background: var(--bg-primary, #0f172a);
+  border-color: var(--border-color, #475569);
+}
+
 .transaction-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .transaction-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .transaction-header {
@@ -58,6 +79,10 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+[data-theme="dark"] .transaction-header {
+  border-bottom-color: var(--border-color, #475569);
+}
+
 .transaction-id {
   font-weight: 600;
   color: #1976d2;
@@ -67,6 +92,10 @@
 .transaction-date {
   font-size: 0.85rem;
   color: #666;
+}
+
+[data-theme="dark"] .transaction-date {
+  color: var(--text-secondary, #cbd5e1);
 }
 
 .transaction-details {
@@ -87,9 +116,17 @@
   font-weight: 500;
 }
 
+[data-theme="dark"] .detail-row .label {
+  color: var(--text-secondary, #cbd5e1);
+}
+
 .detail-row .value {
   color: #1a1a1a;
   font-weight: 600;
+}
+
+[data-theme="dark"] .detail-row .value {
+  color: var(--text-primary, #f8fafc);
 }
 
 .detail-row .revenue {
@@ -112,11 +149,19 @@
   font-size: 1rem;
 }
 
+[data-theme="dark"] .loading-more {
+  color: var(--text-secondary, #cbd5e1);
+}
+
 .end-of-list {
   text-align: center;
   padding: 2rem;
   color: #999;
   font-size: 0.9rem;
+}
+
+[data-theme="dark"] .end-of-list {
+  color: var(--text-secondary, #cbd5e1);
 }
 
 @media (max-width: 768px) {

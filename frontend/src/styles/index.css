@@ -1,0 +1,2 @@
+/* Import design tokens first so all CSS custom properties are available */
+@import './design-tokens.css';

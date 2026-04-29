@@ -533,13 +533,13 @@ class AdvancedQueryProcessor:
                 return (
                     f"📊 El {label_es} mes fue **{mn_es} {rec['year']}**\n"
                     f"• Ganancia: ${profit:,.2f}\n\n"
-                    f"💡 Esto se basa en el historial completo de métricas de negocio.",
+                    "💡 Esto se basa en el historial completo de métricas de negocio.",
                     [DB_BUSINESS_METRICS]
                 )
             return (
                 f"📊 The {label_en} performing month was **{mn} {rec['year']}**\n"
                 f"• Profit: ${profit:,.2f}\n\n"
-                f"💡 Based on the full history of business metrics.",
+                "💡 Based on the full history of business metrics.",
                 [DB_BUSINESS_METRICS]
             )
         return self._no_data("sales", language), []
@@ -881,15 +881,7 @@ class AdvancedQueryProcessor:
         return any(w in q for w in ['costs increase', 'costos suben', 'costos aumentan',
                                     'costs go up', 'increase by', 'suben un',
                                     'maintain profit', 'mantener utilidad',
-                                    'mantener ganancia', 'keep profit positive']):
-                return await self._handle_cost_increase_scenario(question, language)
-            
-            # ── Default: delegate to sales metrics ──
-            return await self._handle_sales_metrics(question, language)
-            
-        except Exception as e:
-            logger.error(f"Error in profit analysis: {e}", exc_info=True)
-            return self._err(language), []
+                                    'mantener ganancia', 'keep profit positive'])
 
     async def _handle_avg_margin(self, language: Language) -> Tuple[str, List[str]]:
         """Calculate average profit margin across all months."""
@@ -1178,18 +1170,15 @@ class AdvancedQueryProcessor:
             return (
                 f"📦 Catálogo: {len(products)} productos\n"
                 f"Categorías: {cat_str}\n\n"
-                f"💡 Pregunta por el top de productos o una categoría específica.",
-                    [DB_PRODUCTS]
-                )
-            return (
-                f"📦 Catalog: {len(products)} products\n"
-                f"Categories: {cat_str}\n\n"
-                f"💡 Ask for top products or a specific category.",
+                "💡 Pregunta por el top de productos o una categoría específica.",
                 [DB_PRODUCTS]
             )
-        except Exception as e:
-            logger.error("Error in product handler: %s", e)
-            return self._err(language), []
+        return (
+            f"📦 Catalog: {len(products)} products\n"
+            f"Categories: {cat_str}\n\n"
+            "💡 Ask for top products or a specific category.",
+            [DB_PRODUCTS]
+        )
 
     async def _handle_category_revenue(self, language: Language) -> Tuple[str, List[str]]:
         """Revenue breakdown by product category."""
@@ -1367,18 +1356,15 @@ class AdvancedQueryProcessor:
             return (
                 f"👥 Base de clientes: {len(customers)} clientes\n"
                 f"Segmentos: {seg_str}\n\n"
-                f"💡 Puedes preguntar por el mejor cliente, clientes por país o segmento.",
+                "💡 Puedes preguntar por el mejor cliente, clientes por país o segmento.",
                 [DB_CUSTOMERS]
             )
         return (
             f"👥 Customer base: {len(customers)} customers\n"
             f"Segments: {seg_str}\n\n"
-            f"💡 You can ask for top customers, customers by country or segment.",
+            "💡 You can ask for top customers, customers by country or segment.",
             [DB_CUSTOMERS]
         )
-        except Exception as e:
-            logger.error("Error in customer handler: %s", e)
-            return self._err(language), []
 
     async def _handle_customers_by_country(self, country: str,
                                             language: Language) -> Tuple[str, List[str]]:
@@ -1483,12 +1469,12 @@ class AdvancedQueryProcessor:
                 if language == Language.SPANISH:
                     return (
                         f"📂 No se encontraron documentos sobre: **{', '.join(keywords)}**.\n"
-                        f"Intenta con términos más específicos.",
+                        "Intenta con términos más específicos.",
                         []
                     )
                 return (
                     f"📂 No documents found about: **{', '.join(keywords)}**.\n"
-                    f"Try more specific terms.",
+                    "Try more specific terms.",
                     []
                 )
 
@@ -1674,9 +1660,16 @@ class AdvancedQueryProcessor:
         years_found = [int(y) for y in re.findall(r'\b(20\d{2})\b', q)]
 
         # Find all month names with their positions
+        # Pre-compile patterns once to avoid ReDoS via repeated compilation (S5852).
+        # Use re.escape + explicit space/start/end anchors instead of \b to keep
+        # linear-time matching even for non-ASCII month names.
         month_positions = []
+        compiled_months = {
+            name: re.compile(r'(?<![a-z])' + re.escape(name) + r'(?![a-z])')
+            for name, _ in all_months.items()
+        }
         for name, num in all_months.items():
-            for m in re.finditer(rf'\b{re.escape(name)}\b', q):
+            for m in compiled_months[name].finditer(q):
                 month_positions.append((m.start(), num, name))
 
         month_positions.sort(key=lambda x: x[0])
@@ -1839,7 +1832,7 @@ class AdvancedQueryProcessor:
                     f"• Ganancia: ${closest_month['profit']:,.2f}\n"
                     f"• Ventas: ${closest_month['total_sales']:,.2f}\n"
                     f"• Costos: ${closest_month['total_costs']:,.2f}\n\n"
-                    f"💡 Este mes tuvo la ganancia más cercana a cero ($0).",
+                    "💡 Este mes tuvo la ganancia más cercana a cero ($0).",
                     [DB_BUSINESS_METRICS]
                 )
             return (
@@ -1847,7 +1840,7 @@ class AdvancedQueryProcessor:
                 f"• Profit: ${closest_month['profit']:,.2f}\n"
                 f"• Sales: ${closest_month['total_sales']:,.2f}\n"
                 f"• Costs: ${closest_month['total_costs']:,.2f}\n\n"
-                f"💡 This month had profit closest to zero ($0).",
+                "💡 This month had profit closest to zero ($0).",
                 [DB_BUSINESS_METRICS]
             )
         except Exception as e:
@@ -1890,7 +1883,7 @@ class AdvancedQueryProcessor:
                     f"• Ganancia: ${first_profitable['profit']:,.2f}\n"
                     f"• Ventas: ${first_profitable['total_sales']:,.2f}\n"
                     f"• Costos: ${first_profitable['total_costs']:,.2f}\n\n"
-                    f"🎉 Este fue el primer mes en que el negocio pasó de pérdida a ganancia.",
+                    "🎉 Este fue el primer mes en que el negocio pasó de pérdida a ganancia.",
                     [DB_BUSINESS_METRICS]
                 )
             return (
@@ -1898,7 +1891,7 @@ class AdvancedQueryProcessor:
                 f"• Profit: ${first_profitable['profit']:,.2f}\n"
                 f"• Sales: ${first_profitable['total_sales']:,.2f}\n"
                 f"• Costs: ${first_profitable['total_costs']:,.2f}\n\n"
-                f"🎉 This was the first month the business moved from loss to profit.",
+                "🎉 This was the first month the business moved from loss to profit.",
                 [DB_BUSINESS_METRICS]
             )
         except Exception as e:
@@ -1922,7 +1915,7 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 return (
                     f"⚖️ Punto de equilibrio mensual estimado: **${avg_costs:,.2f}**\n\n"
-                    f"📊 Análisis basado en costos promedio:\n"
+                    "📊 Análisis basado en costos promedio:\n"
                     f"• Costos promedio mensuales: ${avg_costs:,.2f}\n"
                     f"• Ventas necesarias para equilibrio: ${avg_costs:,.2f}\n"
                     f"• Mes más reciente ({MONTH_NAMES_ES[recent['month']]} {recent['year']}):\n"
@@ -1934,7 +1927,7 @@ class AdvancedQueryProcessor:
                 )
             return (
                 f"⚖️ Estimated monthly break-even point: **${avg_costs:,.2f}**\n\n"
-                f"📊 Analysis based on average costs:\n"
+                "📊 Analysis based on average costs:\n"
                 f"• Average monthly costs: ${avg_costs:,.2f}\n"
                 f"• Sales needed for break-even: ${avg_costs:,.2f}\n"
                 f"• Most recent month ({MONTH_NAMES_EN[recent['month']]} {recent['year']}):\n"
@@ -2059,24 +2052,24 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 return (
                     f"⚠️ Año con mayor riesgo: **{riskiest_year}**\n\n"
-                    f"📊 Análisis de riesgo:\n"
+                    "📊 Análisis de riesgo:\n"
                     f"• Meses con pérdidas: {risk_data['loss_months']}/{risk_data['months_count']}\n"
                     f"• Pérdidas totales: ${risk_data['total_losses']:,.2f}\n"
                     f"• Margen promedio: {risk_data['avg_margin']:.1%}\n"
                     f"• Ganancia mínima: ${risk_data['min_profit']:,.2f}\n"
                     f"• Puntuación de riesgo: {risk_data['risk_score']:.2f}\n\n"
-                    f"💡 Este año tuvo la mayor probabilidad de operar por debajo del punto de equilibrio.",
+                    "💡 Este año tuvo la mayor probabilidad de operar por debajo del punto de equilibrio.",
                     [DB_BUSINESS_METRICS]
                 )
             return (
                 f"⚠️ Year with highest risk: **{riskiest_year}**\n\n"
-                f"📊 Risk analysis:\n"
+                "📊 Risk analysis:\n"
                 f"• Loss months: {risk_data['loss_months']}/{risk_data['months_count']}\n"
                 f"• Total losses: ${risk_data['total_losses']:,.2f}\n"
                 f"• Average margin: {risk_data['avg_margin']:.1%}\n"
                 f"• Minimum profit: ${risk_data['min_profit']:,.2f}\n"
                 f"• Risk score: {risk_data['risk_score']:.2f}\n\n"
-                f"💡 This year had the highest probability of operating below break-even.",
+                "💡 This year had the highest probability of operating below break-even.",
                 [DB_BUSINESS_METRICS]
             )
         except Exception as e:
@@ -2126,11 +2119,11 @@ class AdvancedQueryProcessor:
                         f"• Ventas actuales: ${current_sales:,.2f}\n"
                         f"• Costos actuales: ${current_costs:,.2f}\n"
                         f"• Ganancia actual: ${current_profit:,.2f}\n\n"
-                        f"📈 Después del aumento de costos:\n"
+                        "📈 Después del aumento de costos:\n"
                         f"• Nuevos costos: ${new_costs:,.2f} (+${cost_increase:,.2f})\n"
                         f"• Ventas mínimas necesarias: ${required_sales:,.2f}\n"
                         f"• Margen de seguridad actual: ${sales_buffer:,.2f} ({buffer_pct:.1f}%)\n\n"
-                        f"✅ ¡Buenas noticias! Las ventas actuales ya son suficientes para mantener "
+                        "✅ ¡Buenas noticias! Las ventas actuales ya son suficientes para mantener "
                         f"la ganancia incluso con el aumento de costos del {cost_increase_pct}%.",
                         [DB_BUSINESS_METRICS]
                     )
@@ -2140,11 +2133,11 @@ class AdvancedQueryProcessor:
                     f"• Current sales: ${current_sales:,.2f}\n"
                     f"• Current costs: ${current_costs:,.2f}\n"
                     f"• Current profit: ${current_profit:,.2f}\n\n"
-                    f"📈 After cost increase:\n"
+                    "📈 After cost increase:\n"
                     f"• New costs: ${new_costs:,.2f} (+${cost_increase:,.2f})\n"
                     f"• Minimum sales needed: ${required_sales:,.2f}\n"
                     f"• Current safety buffer: ${sales_buffer:,.2f} ({buffer_pct:.1f}%)\n\n"
-                    f"✅ Good news! Current sales are already sufficient to maintain "
+                    "✅ Good news! Current sales are already sufficient to maintain "
                     f"profit even with the {cost_increase_pct}% cost increase.",
                     [DB_BUSINESS_METRICS]
                 )
@@ -2159,7 +2152,7 @@ class AdvancedQueryProcessor:
                         f"• Ventas actuales: ${current_sales:,.2f}\n"
                         f"• Costos actuales: ${current_costs:,.2f}\n"
                         f"• Ganancia actual: ${current_profit:,.2f}\n\n"
-                        f"📈 Después del aumento de costos:\n"
+                        "📈 Después del aumento de costos:\n"
                         f"• Nuevos costos: ${new_costs:,.2f} (+${cost_increase:,.2f})\n"
                         f"• Ventas necesarias: ${required_sales:,.2f}\n"
                         f"• Aumento de ventas requerido: ${sales_increase:,.2f}\n"
@@ -2174,7 +2167,7 @@ class AdvancedQueryProcessor:
                     f"• Current sales: ${current_sales:,.2f}\n"
                     f"• Current costs: ${current_costs:,.2f}\n"
                     f"• Current profit: ${current_profit:,.2f}\n\n"
-                    f"📈 After cost increase:\n"
+                    "📈 After cost increase:\n"
                     f"• New costs: ${new_costs:,.2f} (+${cost_increase:,.2f})\n"
                     f"• Required sales: ${required_sales:,.2f}\n"
                     f"• Sales increase needed: ${sales_increase:,.2f}\n"
@@ -2264,12 +2257,8 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 answer = f"🎯 Contribución al punto de equilibrio (${avg_monthly_costs:,.2f}/mes):\n\n"
-                cumulative_contribution = 0
                 
                 for i, product in enumerate(top_products, 1):
-                    contribution_pct = (product['total_revenue'] / total_revenue * 100) if total_revenue > 0 else 0
-                    cumulative_contribution += contribution_pct
-                    
                     # Estimate monthly contribution (assuming revenue is spread over time)
                     monthly_contribution = product['total_revenue'] / len(all_metrics) if all_metrics else 0
                     breakeven_coverage = (monthly_contribution / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
@@ -2288,12 +2277,8 @@ class AdvancedQueryProcessor:
                           f"Cubre aproximadamente {coverage_top:.1f}% de los costos mensuales promedio.")
             else:
                 answer = f"🎯 Break-even contribution (${avg_monthly_costs:,.2f}/month):\n\n"
-                cumulative_contribution = 0
                 
                 for i, product in enumerate(top_products, 1):
-                    contribution_pct = (product['total_revenue'] / total_revenue * 100) if total_revenue > 0 else 0
-                    cumulative_contribution += contribution_pct
-                    
                     # Estimate monthly contribution (assuming revenue is spread over time)
                     monthly_contribution = product['total_revenue'] / len(all_metrics) if all_metrics else 0
                     breakeven_coverage = (monthly_contribution / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
@@ -2413,26 +2398,26 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 return (
                     f"📉 **Peor mes: {mn_es} {year}**\n\n"
-                    f"💰 Resultados:\n"
+                    "💰 Resultados:\n"
                     f"• Ganancia: ${worst_profit:,.2f}\n"
                     f"• Diferencia vs promedio: ${profit_diff:,.2f}\n\n"
-                    f"🔍 **¿Por qué fue malo?**\n"
+                    "🔍 **¿Por qué fue malo?**\n"
                     f"• Ganancia {abs(profit_diff):,.2f} por debajo del promedio\n"
-                    f"• Representa el peor rendimiento en nuestro historial\n"
-                    f"• Posibles causas: costos elevados, ventas bajas, o factores estacionales\n\n"
-                    f"💡 Este mes requiere análisis detallado para evitar repetir los problemas.",
+                    "• Representa el peor rendimiento en nuestro historial\n"
+                    "• Posibles causas: costos elevados, ventas bajas, o factores estacionales\n\n"
+                    "💡 Este mes requiere análisis detallado para evitar repetir los problemas.",
                     [DB_BUSINESS_METRICS]
                 )
             return (
                 f"📉 **Worst month: {mn} {year}**\n\n"
-                f"💰 Results:\n"
+                "💰 Results:\n"
                 f"• Profit: ${worst_profit:,.2f}\n"
                 f"• Difference vs average: ${profit_diff:,.2f}\n\n"
-                f"🔍 **Why was it bad?**\n"
+                "🔍 **Why was it bad?**\n"
                 f"• Profit ${abs(profit_diff):,.2f} below average\n"
-                f"• Represents worst performance in our history\n"
-                f"• Possible causes: high costs, low sales, or seasonal factors\n\n"
-                f"💡 This month requires detailed analysis to avoid repeating the issues.",
+                "• Represents worst performance in our history\n"
+                "• Possible causes: high costs, low sales, or seasonal factors\n\n"
+                "💡 This month requires detailed analysis to avoid repeating the issues.",
                 [DB_BUSINESS_METRICS]
             )
         except Exception as e:
@@ -2467,8 +2452,8 @@ class AdvancedQueryProcessor:
             high_sales_threshold = len(sorted_by_sales) * 0.3
             low_margin_threshold = len(sorted_by_margin) * 0.3
             
-            high_sales_months = set((m['year'], m['month']) for m in sorted_by_sales[:int(high_sales_threshold)])
-            low_margin_months = set((m['year'], m['month']) for m in sorted_by_margin[:int(low_margin_threshold)])
+            high_sales_months = {(m['year'], m['month']) for m in sorted_by_sales[:int(high_sales_threshold)]}
+            low_margin_months = {(m['year'], m['month']) for m in sorted_by_margin[:int(low_margin_threshold)]}
             
             # Find intersection
             problematic_months = []
@@ -2692,14 +2677,14 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 if profit >= 0:
                     answer = (f"💸 **Más cerca de perder dinero: {mn_es} {closest_month['year']}**\n\n"
-                             f"💰 Resultados:\n"
+                             "💰 Resultados:\n"
                              f"• Ganancia: ${profit:,.2f} (apenas positiva)\n"
                              f"• Ventas: ${total_sales:,.2f}\n"
                              f"• Costos: ${total_costs:,.2f}\n\n"
                              f"⚠️ Este mes estuvo a solo ${profit:,.2f} de operar con pérdidas.\n")
                 else:
                     answer = (f"💸 **Más cerca de perder dinero: {mn_es} {closest_month['year']}**\n\n"
-                             f"💰 Resultados:\n"
+                             "💰 Resultados:\n"
                              f"• Pérdida: ${abs(profit):,.2f}\n"
                              f"• Ventas: ${total_sales:,.2f}\n"
                              f"• Costos: ${total_costs:,.2f}\n\n"
@@ -2711,14 +2696,14 @@ class AdvancedQueryProcessor:
             else:
                 if profit >= 0:
                     answer = (f"💸 **Closest to losing money: {mn} {closest_month['year']}**\n\n"
-                             f"💰 Results:\n"
+                             "💰 Results:\n"
                              f"• Profit: ${profit:,.2f} (barely positive)\n"
                              f"• Sales: ${total_sales:,.2f}\n"
                              f"• Costs: ${total_costs:,.2f}\n\n"
                              f"⚠️ This month was only ${profit:,.2f} away from operating at a loss.\n")
                 else:
                     answer = (f"💸 **Closest to losing money: {mn} {closest_month['year']}**\n\n"
-                             f"💰 Results:\n"
+                             "💰 Results:\n"
                              f"• Loss: ${abs(profit):,.2f}\n"
                              f"• Sales: ${total_sales:,.2f}\n"
                              f"• Costs: ${total_costs:,.2f}\n\n"
@@ -2747,8 +2732,6 @@ class AdvancedQueryProcessor:
             current_profit = float(recent['profit'])
             
             # Calculate break-even scenarios
-            scenarios = []
-            
             # Scenario 1: Cost increase to eliminate profit
             cost_increase_to_break_even = current_profit
             cost_increase_pct = (cost_increase_to_break_even / current_costs * 100) if current_costs > 0 else 0
@@ -2833,51 +2816,51 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 if worst_profit < 0:
                     answer = (f"💥 **Mes más cerca del fracaso: {mn_es} {worst_month['year']}**\n\n"
-                             f"📉 Resultados catastróficos:\n"
+                             "📉 Resultados catastróficos:\n"
                              f"• Pérdida: ${abs(worst_profit):,.2f}\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n"
                              f"• Ratio de pérdida: {loss_ratio:.1%}\n\n"
-                             f"⚠️ **¿Qué tan grave fue?**\n"
+                             "⚠️ **¿Qué tan grave fue?**\n"
                              f"• ${abs(profit_diff):,.2f} peor que el promedio\n"
                              f"• Los costos excedieron las ventas por ${abs(worst_profit):,.2f}\n"
                              f"• Pérdida equivalente al {loss_ratio:.1%} de las ventas\n\n"
-                             f"🚨 Este mes representó el mayor riesgo de quiebra del negocio.")
+                             "🚨 Este mes representó el mayor riesgo de quiebra del negocio.")
                 else:
                     answer = (f"😰 **Mes más cerca del fracaso: {mn_es} {worst_month['year']}**\n\n"
-                             f"📉 Resultados preocupantes:\n"
+                             "📉 Resultados preocupantes:\n"
                              f"• Ganancia mínima: ${worst_profit:,.2f}\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n\n"
-                             f"⚠️ **¿Qué tan grave fue?**\n"
+                             "⚠️ **¿Qué tan grave fue?**\n"
                              f"• ${abs(profit_diff):,.2f} peor que el promedio\n"
                              f"• Apenas ${worst_profit:,.2f} de ganancia\n"
-                             f"• Cualquier gasto adicional habría causado pérdidas\n\n"
-                             f"🚨 Este mes estuvo peligrosamente cerca de la quiebra.")
+                             "• Cualquier gasto adicional habría causado pérdidas\n\n"
+                             "🚨 Este mes estuvo peligrosamente cerca de la quiebra.")
             else:
                 if worst_profit < 0:
                     answer = (f"💥 **Month closest to failure: {mn} {worst_month['year']}**\n\n"
-                             f"📉 Catastrophic results:\n"
+                             "📉 Catastrophic results:\n"
                              f"• Loss: ${abs(worst_profit):,.2f}\n"
                              f"• Sales: ${sales:,.2f}\n"
                              f"• Costs: ${costs:,.2f}\n"
                              f"• Loss ratio: {loss_ratio:.1%}\n\n"
-                             f"⚠️ **How bad was it?**\n"
+                             "⚠️ **How bad was it?**\n"
                              f"• ${abs(profit_diff):,.2f} worse than average\n"
                              f"• Costs exceeded sales by ${abs(worst_profit):,.2f}\n"
                              f"• Loss equivalent to {loss_ratio:.1%} of sales\n\n"
-                             f"🚨 This month represented the highest bankruptcy risk.")
+                             "🚨 This month represented the highest bankruptcy risk.")
                 else:
                     answer = (f"😰 **Month closest to failure: {mn} {worst_month['year']}**\n\n"
-                             f"📉 Concerning results:\n"
+                             "📉 Concerning results:\n"
                              f"• Minimal profit: ${worst_profit:,.2f}\n"
                              f"• Sales: ${sales:,.2f}\n"
                              f"• Costs: ${costs:,.2f}\n\n"
-                             f"⚠️ **How bad was it?**\n"
+                             "⚠️ **How bad was it?**\n"
                              f"• ${abs(profit_diff):,.2f} worse than average\n"
                              f"• Only ${worst_profit:,.2f} in profit\n"
-                             f"• Any additional expense would have caused losses\n\n"
-                             f"🚨 This month was dangerously close to bankruptcy.")
+                             "• Any additional expense would have caused losses\n\n"
+                             "🚨 This month was dangerously close to bankruptcy.")
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
@@ -3878,7 +3861,6 @@ class AdvancedQueryProcessor:
             for p in products:
                 sales = float(p.get('total_sales', 0))
                 quantity = float(p.get('quantity_sold', 1))
-                avg_price = sales / quantity if quantity > 0 else 0
                 # Acceptance = frequency (quantity) + consistency (low variance)
                 acceptance = quantity * (1 + (sales / max(float(p.get('total_sales', 1)), 1)))
                 acceptance_scores.append((p['name'], acceptance, quantity, sales))
