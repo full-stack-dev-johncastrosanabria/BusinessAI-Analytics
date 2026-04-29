@@ -808,6 +808,85 @@ class AdvancedIntentClassifier:
         logger.info(f"Language detected: {best_lang.value} (confidence: {confidence:.2f})")
         return best_lang, confidence
     
+    def _score_direct_keyword_matches(self, keywords_for_lang: List[str], question_normalized: str) -> Tuple[float, List[str]]:
+        """Score direct keyword matches in the question."""
+        score = 0
+        matches = []
+        for keyword in keywords_for_lang:
+            if keyword in question_normalized:
+                score += 1
+                matches.append(keyword)
+        return score, matches
+
+    def _score_fuzzy_matches(self, keywords_for_lang: List[str], keywords: List[str]) -> Tuple[float, List[str]]:
+        """Score fuzzy keyword matches for typos and variations."""
+        score = 0
+        matches = []
+        for keyword in keywords_for_lang:
+            for user_word in keywords:
+                similarity = self._calculate_similarity(keyword, user_word)
+                if similarity > 0.8:  # 80% similarity threshold
+                    score += similarity * 0.5  # Reduced weight for fuzzy matches
+                    matches.append(f"{keyword}~{user_word}")
+        return score, matches
+
+    def _score_synonym_matches(self, language: Language, keywords: List[str], keywords_for_lang: List[str]) -> Tuple[float, List[str]]:
+        """Score synonym matches."""
+        score = 0
+        matches = []
+        if language in self.synonyms:
+            for user_word in keywords:
+                for base_word, synonyms in self.synonyms[language].items():
+                    if user_word in synonyms and base_word in keywords_for_lang:
+                        score += 0.8  # Synonym match weight
+                        matches.append(f"{base_word}={user_word}")
+        return score, matches
+
+    def _calculate_intent_scores(self, question_normalized: str, keywords: List[str], language: Language) -> Tuple[Dict[Intent, float], Dict[Intent, List[str]]]:
+        """Calculate scores for all intents based on keyword matching."""
+        intent_scores = {}
+        matched_keywords = {}
+        
+        for intent, lang_keywords in self.keywords.items():
+            if language not in lang_keywords:
+                continue
+                
+            keywords_for_lang = lang_keywords[language]
+            
+            # Score different types of matches
+            direct_score, direct_matches = self._score_direct_keyword_matches(keywords_for_lang, question_normalized)
+            fuzzy_score, fuzzy_matches = self._score_fuzzy_matches(keywords_for_lang, keywords)
+            synonym_score, synonym_matches = self._score_synonym_matches(language, keywords, keywords_for_lang)
+            
+            total_score = direct_score + fuzzy_score + synonym_score
+            all_matches = direct_matches + fuzzy_matches + synonym_matches
+            
+            if total_score > 0:
+                intent_scores[intent] = total_score
+                matched_keywords[intent] = all_matches
+        
+        return intent_scores, matched_keywords
+
+    def _check_mixed_intent(self, intent_scores: Dict[Intent, float]) -> bool:
+        """Check if multiple intents have high scores (mixed intent)."""
+        max_score = max(intent_scores.values())
+        high_scoring_intents = [
+            intent for intent, score in intent_scores.items() 
+            if score >= max_score * 0.7
+        ]
+        return len(high_scoring_intents) > 1
+
+    def _calculate_confidence(self, best_intent: Intent, intent_scores: Dict[Intent, float], language: Language) -> float:
+        """Calculate normalized confidence score for the best intent."""
+        max_possible_score = len(self.keywords[best_intent][language])
+        confidence = min(intent_scores[best_intent] / max_possible_score, 1.0)
+        
+        # Boost confidence for exact matches
+        if confidence > 0.5:
+            confidence = min(confidence * 1.2, 1.0)
+        
+        return confidence
+
     def classify(self, question: str) -> Tuple[Intent, float, Language]:
         """
         Advanced multilingual intent classification with 95% accuracy
@@ -829,43 +908,8 @@ class AdvancedIntentClassifier:
         # Extract keywords
         keywords = self.extract_keywords(question_normalized, language)
         
-        # Score each intent
-        intent_scores = {}
-        matched_keywords = {}
-        
-        for intent, lang_keywords in self.keywords.items():
-            if language not in lang_keywords:
-                continue
-                
-            keywords_for_lang = lang_keywords[language]
-            score = 0
-            matches = []
-            
-            # Direct keyword matching
-            for keyword in keywords_for_lang:
-                if keyword in question_normalized:
-                    score += 1
-                    matches.append(keyword)
-            
-            # Fuzzy matching for typos and variations
-            for keyword in keywords_for_lang:
-                for user_word in keywords:
-                    similarity = self._calculate_similarity(keyword, user_word)
-                    if similarity > 0.8:  # 80% similarity threshold
-                        score += similarity * 0.5  # Reduced weight for fuzzy matches
-                        matches.append(f"{keyword}~{user_word}")
-            
-            # Synonym matching
-            if language in self.synonyms:
-                for user_word in keywords:
-                    for base_word, synonyms in self.synonyms[language].items():
-                        if user_word in synonyms and base_word in keywords_for_lang:
-                            score += 0.8  # Synonym match weight
-                            matches.append(f"{base_word}={user_word}")
-            
-            if score > 0:
-                intent_scores[intent] = score
-                matched_keywords[intent] = matches
+        # Calculate intent scores
+        intent_scores, matched_keywords = self._calculate_intent_scores(question_normalized, keywords, language)
         
         # Handle no matches
         if not intent_scores:
@@ -873,27 +917,17 @@ class AdvancedIntentClassifier:
             logger.info(f"No intent matched for question: {question}")
             return Intent.UNKNOWN, 0.0, language
         
-        # Check for mixed intent (multiple high-scoring domains)
-        max_score = max(intent_scores.values())
-        high_scoring_intents = [
-            intent for intent, score in intent_scores.items() 
-            if score >= max_score * 0.7
-        ]
-        
-        if len(high_scoring_intents) > 1:
-            logger.info(f"Mixed intent detected: {[i.value for i in high_scoring_intents]}")
+        # Check for mixed intent
+        if self._check_mixed_intent(intent_scores):
+            max_score = max(intent_scores.values())
+            logger.info(f"Mixed intent detected")
             return Intent.MIXED, max_score / 100, language
         
         # Return best intent
         best_intent = max(intent_scores, key=intent_scores.get)
         
-        # Calculate confidence (normalized)
-        max_possible_score = len(self.keywords[best_intent][language])
-        confidence = min(intent_scores[best_intent] / max_possible_score, 1.0)
-        
-        # Boost confidence for exact matches
-        if confidence > 0.5:
-            confidence = min(confidence * 1.2, 1.0)
+        # Calculate confidence
+        confidence = self._calculate_confidence(best_intent, intent_scores, language)
         
         processing_time = (datetime.now() - start_time).total_seconds()
         
@@ -959,6 +993,35 @@ class AdvancedIntentClassifier:
             urgency=urgency
         )
     
+    def _filter_keywords(self, words: List[str], stop_words: Set[str]) -> List[str]:
+        """Filter out stop words, short words, and numbers."""
+        keywords = []
+        for word in words:
+            if word in stop_words or len(word) < 3 or word.isdigit():
+                continue
+            keywords.append(word)
+        return keywords
+
+    def _extract_phrases(self, words: List[str], stop_words: Set[str]) -> List[str]:
+        """Extract 2-word phrases from the word list."""
+        phrases = []
+        for i in range(len(words) - 1):
+            if words[i] not in stop_words and words[i+1] not in stop_words:
+                phrase = f"{words[i]} {words[i+1]}"
+                if len(phrase) > 6:  # Minimum phrase length
+                    phrases.append(phrase)
+        return phrases
+
+    def _remove_duplicates(self, keywords: List[str]) -> List[str]:
+        """Remove duplicates while preserving order."""
+        seen = set()
+        unique_keywords = []
+        for keyword in keywords:
+            if keyword not in seen:
+                seen.add(keyword)
+                unique_keywords.append(keyword)
+        return unique_keywords
+
     def extract_keywords(self, question: str, language: Language = Language.AUTO) -> List[str]:
         """
         Advanced keyword extraction with context awareness
@@ -983,40 +1046,16 @@ class AdvancedIntentClassifier:
         words = re.findall(r'\b\w+\b', text_normalized.lower())
         
         # Filter keywords
-        keywords = []
-        for word in words:
-            # Skip if stop word
-            if word in stop_words:
-                continue
-            
-            # Skip if too short
-            if len(word) < 3:
-                continue
-            
-            # Skip if all numbers
-            if word.isdigit():
-                continue
-            
-            keywords.append(word)
+        keywords = self._filter_keywords(words, stop_words)
         
         # Extract phrases (2-3 word combinations)
-        phrases = []
-        for i in range(len(words) - 1):
-            if words[i] not in stop_words and words[i+1] not in stop_words:
-                phrase = f"{words[i]} {words[i+1]}"
-                if len(phrase) > 6:  # Minimum phrase length
-                    phrases.append(phrase)
+        phrases = self._extract_phrases(words, stop_words)
         
         # Combine words and phrases
         all_keywords = keywords + phrases
         
         # Remove duplicates while preserving order
-        seen = set()
-        unique_keywords = []
-        for keyword in all_keywords:
-            if keyword not in seen:
-                seen.add(keyword)
-                unique_keywords.append(keyword)
+        unique_keywords = self._remove_duplicates(all_keywords)
         
         logger.info(f"Extracted {len(unique_keywords)} keywords: {unique_keywords[:10]}...")
         return unique_keywords[:20]  # Limit to top 20 keywords
@@ -1336,6 +1375,41 @@ class AdvancedIntentClassifier:
             "overall_correct": intent_correct and language_correct
         }
     
+    def _calculate_benchmark_metrics(self, results: List[Dict[str, Any]], total_time: float) -> Dict[str, Any]:
+        """Calculate benchmark metrics from validation results."""
+        total_cases = len(results)
+        if total_cases == 0:
+            return {
+                "total_cases": 0,
+                "intent_accuracy": 0,
+                "language_accuracy": 0,
+                "overall_accuracy": 0,
+                "average_confidence": 0,
+                "average_processing_time": 0,
+                "total_benchmark_time": total_time,
+                "throughput_qps": 0,
+                "detailed_results": []
+            }
+        
+        intent_correct = sum(1 for r in results if r["intent_correct"])
+        language_correct = sum(1 for r in results if r["language_correct"])
+        overall_correct = sum(1 for r in results if r["overall_correct"])
+        
+        avg_confidence = sum(r["confidence"] for r in results) / total_cases
+        avg_processing_time = sum(r["processing_time"] for r in results) / total_cases
+        
+        return {
+            "total_cases": total_cases,
+            "intent_accuracy": intent_correct / total_cases,
+            "language_accuracy": language_correct / total_cases,
+            "overall_accuracy": overall_correct / total_cases,
+            "average_confidence": avg_confidence,
+            "average_processing_time": avg_processing_time,
+            "total_benchmark_time": total_time,
+            "throughput_qps": total_cases / total_time if total_time > 0 else 0,
+            "detailed_results": results
+        }
+
     def benchmark_performance(self, test_cases: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Benchmark classifier performance on a set of test cases
@@ -1360,25 +1434,7 @@ class AdvancedIntentClassifier:
         total_time = (datetime.now() - start_time).total_seconds()
         
         # Calculate metrics
-        total_cases = len(results)
-        intent_correct = sum(1 for r in results if r["intent_correct"])
-        language_correct = sum(1 for r in results if r["language_correct"])
-        overall_correct = sum(1 for r in results if r["overall_correct"])
-        
-        avg_confidence = sum(r["confidence"] for r in results) / total_cases if total_cases > 0 else 0
-        avg_processing_time = sum(r["processing_time"] for r in results) / total_cases if total_cases > 0 else 0
-        
-        return {
-            "total_cases": total_cases,
-            "intent_accuracy": intent_correct / total_cases if total_cases > 0 else 0,
-            "language_accuracy": language_correct / total_cases if total_cases > 0 else 0,
-            "overall_accuracy": overall_correct / total_cases if total_cases > 0 else 0,
-            "average_confidence": avg_confidence,
-            "average_processing_time": avg_processing_time,
-            "total_benchmark_time": total_time,
-            "throughput_qps": total_cases / total_time if total_time > 0 else 0,
-            "detailed_results": results
-        }
+        return self._calculate_benchmark_metrics(results, total_time)
     
     def export_keywords(self, filepath: str, format: str = "json") -> bool:
         """

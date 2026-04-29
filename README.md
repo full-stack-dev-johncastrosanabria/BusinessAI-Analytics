@@ -195,6 +195,81 @@ BusinessAI-Analytics/
 
 ## 🎥 Demo Recording
 
+### Automatic Video Recording
+
+**[🎥 See Example: Latest Demo on YouTube](https://youtu.be/i_TPjHsoOHE)** - 4-minute complete platform demonstration
+
+#### Quick Start
+
+```bash
+# 1. Start all services
+./scripts/start-system.sh
+
+# 2. Run automatic recording
+npm run demo:video
+
+# 3. Get your video
+# Location: ./recordings/
+# Format: WebM (1920x1080)
+# Duration: 4-5 minutes
+```
+
+#### Converting to MP4 (for YouTube)
+
+```bash
+# Install ffmpeg (if needed)
+brew install ffmpeg  # macOS
+sudo apt install ffmpeg  # Ubuntu/Debian
+
+# High quality (recommended for YouTube)
+ffmpeg -i recordings/your-video.webm -c:v libx264 -preset slow -crf 22 -c:a aac -b:a 192k demo-video.mp4
+
+# Batch convert all videos
+for file in recordings/*.webm; do
+  ffmpeg -i "$file" -c:v libx264 -preset slow -crf 22 -c:a aac -b:a 192k "${file%.webm}.mp4"
+done
+```
+
+#### Demo Features Recorded
+
+✅ **Login Screen** (8 seconds)  
+✅ **Dark Mode Toggle** - Light/Dark theme switching  
+✅ **Language Switch** - English/Spanish  
+✅ **Demo Login** - Credentials entry  
+✅ **Dashboard** (5 seconds) - Business metrics  
+✅ **Dashboard Filter** - Dynamic data updates  
+✅ **AI Forecasts** (15+ seconds) - Scrolling predictions  
+✅ **Chatbot** - 10 questions (5 EN + 5 ES)  
+✅ **Clients** - Customer list  
+✅ **Products** - Catalog + create product  
+✅ **Register Sale** - Sale form  
+✅ **Sales Infinite Scroll** - Transaction history
+
+#### YouTube Upload Settings
+
+**Recommended Settings:**
+- **Title:** BusinessAI Analytics Platform - Full Demo
+- **Description:** Include feature list and timestamps
+- **Tags:** business analytics, AI, dashboard, forecasting, chatbot
+- **Category:** Science & Technology
+- **Visibility:** Public/Unlisted as needed
+
+**Video Timestamps (for description):**
+```
+0:00 - Login Screen
+0:08 - Dark Mode Toggle
+0:16 - Language Switch
+0:24 - Demo Login
+0:31 - Dashboard Overview
+0:36 - Dashboard Filter
+0:42 - AI Forecasts
+1:02 - Chatbot Demo (10 questions)
+2:02 - Clients View
+2:07 - Products & Create
+2:14 - Register Sale
+2:19 - Sales Infinite Scroll
+```
+
 ### Quick Test (10 seconds)
 ```bash
 ./scripts/test-recording.sh
@@ -493,7 +568,20 @@ Comprehensive code quality analysis completed on April 27, 2026. All critical an
 
 ### SonarQube Integration
 
-To run SonarQube analysis:
+#### Quality Gate Thresholds
+
+| Metric                        | Threshold | Scope        |
+|-------------------------------|-----------|--------------|
+| Security Rating               | A         | All modules  |
+| Maintainability Rating        | A         | All modules  |
+| Reliability Rating            | A         | All modules  |
+| Line Coverage                 | >= 80%    | All modules  |
+| Duplicated Lines Density      | <= 3%     | All modules  |
+| New Blocker Issues            | 0         | New code     |
+| New Critical Issues           | 0         | New code     |
+| New Security Hotspots Reviewed| 100%      | New code     |
+
+#### Running Analysis
 
 ```bash
 # 1. Start SonarQube (Docker)
@@ -501,18 +589,40 @@ docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
 
 # 2. Generate token at http://localhost:9000
 
-# 3. Run analysis
-mvn clean verify sonar:sonar \
-  -Dsonar.projectKey=businessai-analytics \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=YOUR_TOKEN
+# 3. Run analysis (all modules from root)
+sonar-scanner
 
-# Frontend analysis
-npm run test:coverage
+# Single Java service
+cd <service-directory>
+mvn verify sonar:sonar \
+  -Dsonar.host.url=$SONAR_HOST_URL \
+  -Dsonar.token=$SONAR_TOKEN
+
+# Frontend
+cd frontend
+npx vitest run --coverage
+sonar-scanner
+
+# AI Service
+cd ai-service
+pytest --cov=. --cov-report=xml
 sonar-scanner
 ```
 
 **Configuration**: `sonar-project.properties` already configured
+
+#### Module Coverage Reports
+
+| Module            | Language       | Coverage Report Path                        |
+|-------------------|----------------|---------------------------------------------|
+| Frontend          | TypeScript     | `frontend/coverage/lcov.info`               |
+| AI Service        | Python         | `ai-service/coverage.xml`                   |
+| API Gateway       | Java 17        | `api-gateway/target/site/jacoco/jacoco.xml` |
+| Analytics Service | Java 17        | `analytics-service/target/site/jacoco/jacoco.xml` |
+| Customer Service  | Java 17        | `customer-service/target/site/jacoco/jacoco.xml`  |
+| Product Service   | Java 17        | `product-service/target/site/jacoco/jacoco.xml`   |
+| Sales Service     | Java 17        | `sales-service/target/site/jacoco/jacoco.xml`     |
+| Document Service  | Java 17        | `document-service/target/site/jacoco/jacoco.xml`  |
 
 ---
 

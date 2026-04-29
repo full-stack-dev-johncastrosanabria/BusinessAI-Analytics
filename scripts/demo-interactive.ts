@@ -2,14 +2,27 @@
 
 /**
  * BusinessAI-Analytics Platform - Interactive Browser Demo
- * Automated 2-3 minute demo showcasing all features
+ * Automated 4-5 minute video recording showcasing all features
  * Uses Playwright for reliable browser automation
+ * 
+ * Demo Flow:
+ * 1. Run applications
+ * 2. Wait 8 seconds on login screen
+ * 3. Test dark mode
+ * 4. Test language switch
+ * 5. Login with demo credentials
+ * 6. Show dashboard for ~5 seconds
+ * 7. Apply filter and see changes
+ * 8. Show forecasts for 15+ seconds with scrolling and zoom
+ * 9. Show chatbot with 5 English + 5 Spanish questions
+ * 10. Quickly show clients and products, create product, register sale
+ * 11. Show sales infinite scroll
  */
 
 import { chromium, Browser, Page, BrowserContext } from 'playwright';
 
 const FRONTEND_URL = 'http://localhost:5173';
-const DEMO_TIMEOUT = 180000; // 3 minutes in ms
+const DEMO_TIMEOUT = 360000; // 6 minutes in ms (buffer for 4-5 min demo)
 
 // Colors for console output
 const colors = {

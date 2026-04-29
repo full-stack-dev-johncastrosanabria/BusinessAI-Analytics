@@ -55,8 +55,18 @@ COUNTRY_BETTER_ES = 'país tuvo mejor'
 BUYING_LESS_ES = 'comprando menos'
 CUSTOMER_SEGMENT_SEEMS_EN = 'customer segment seems'
 SEGMENT_SEEMS_ES = 'segmento parece'
+WHICH_SEGMENT_SEEMS_EN = 'which segment seems'
+WHICH_SEGMENT_SEEMS_ES = 'qué segmento parece'
+SEEMS_MOST_VALUABLE_EN = 'seems most valuable'
+SEEMS_MOST_VALUABLE_ES = 'parece más valioso'
+BUYS_MOST_OFTEN_EN = 'buys most often'
+BUYS_MOST_OFTEN_ES = 'compra más seguido'
+BUYS_FREQUENTLY_EN = 'buys frequently'
+BUYS_FREQUENTLY_ES = 'compra frecuentemente'
 COUNTRY_SEGMENT_ES = 'qué país o segmento'
 COUNTRY_SEGMENT_EN = 'which country or segment'
+COUNTRY_OR_SEGMENT_EN = 'country or segment'
+COUNTRY_OR_SEGMENT_ES = 'país o segmento'
 COUNTRY_SEGMENT_BUYS_ES = 'país o segmento compra'
 COUNTRY_SEGMENT_BUYS_EN = 'country or segment buys'
 
@@ -190,7 +200,7 @@ class AdvancedQueryProcessor:
         """Check for customer segment questions - HIGHEST PRIORITY."""
         return any(phrase in q for phrase in [
             CUSTOMER_SEGMENT_ES, CUSTOMER_SEGMENT_EN, 
-            'qué país o segmento', 'which country or segment'
+            COUNTRY_SEGMENT_ES, COUNTRY_SEGMENT_EN
         ])
 
     def _is_marketing_analysis_query(self, q: str) -> bool:
@@ -287,7 +297,7 @@ class AdvancedQueryProcessor:
             'almost broke', 'casi se rompe', 'nearly failed', 'casi fracasa',
             'underpriced', 'muy barato', 'too cheap', 'demasiado barato',
             'sells well low profit', 'vende bien poca ganancia', 'high volume low margin',
-            MOST_VALUABLE_EN, MOST_VALUABLE_ES, MOST_OFTEN_EN, MOST_FREQUENT_ES, 'buys frequently'
+            MOST_VALUABLE_EN, MOST_VALUABLE_ES, MOST_OFTEN_EN, MOST_FREQUENT_ES, BUYS_FREQUENTLY_EN
         ]
         return any(s in q for s in breakeven_signals)
 
@@ -340,9 +350,9 @@ class AdvancedQueryProcessor:
             'segmento', 'segment', 'enterprise', 'startup', 'smb',
             'from usa', 'from canada', 'from germany', 'from india',
             'de usa', 'de canada', 'de alemania', 'de india',
-            MOST_VALUABLE_ES, 'seems most valuable', 'parece más valioso',
-            MOST_FREQUENT_ES, 'buys most often', 'compra más seguido',
-            'país o segmento', 'country or segment'
+            MOST_VALUABLE_ES, SEEMS_MOST_VALUABLE_EN, SEEMS_MOST_VALUABLE_ES,
+            MOST_FREQUENT_ES, BUYS_MOST_OFTEN_EN, BUYS_MOST_OFTEN_ES,
+            COUNTRY_OR_SEGMENT_ES, COUNTRY_OR_SEGMENT_EN
         ]
         
         sales_signals = [
@@ -1260,16 +1270,16 @@ class AdvancedQueryProcessor:
     def _is_customer_frequency_query(self, q: str) -> bool:
         """Check for customer frequency queries."""
         return any(w in q for w in [MOST_OFTEN_EN, MOST_FREQUENT_ES, 'most frequently', 'más frecuente',
-                                    'buys frequently', 'compra frecuentemente', 'frequency',
+                                    BUYS_FREQUENTLY_EN, BUYS_FREQUENTLY_ES, 'frequency',
                                     'frecuencia', 'how often', 'qué tan seguido', 'buys the most often',
-                                    'compra más seguido', 'country or segment buys', 'país o segmento compra'])
+                                    BUYS_MOST_OFTEN_ES, COUNTRY_SEGMENT_BUYS_EN, COUNTRY_SEGMENT_BUYS_ES])
 
     def _is_most_valuable_segment_query(self, q: str) -> bool:
         """Check for most valuable segment queries."""
         return any(w in q for w in [MOST_VALUABLE_EN, MOST_VALUABLE_ES, 'valuable', 'valioso',
-                                    'seems most valuable', 'parece más valioso', 'customer segment seems',
+                                    SEEMS_MOST_VALUABLE_EN, SEEMS_MOST_VALUABLE_ES, CUSTOMER_SEGMENT_SEEMS_EN,
                                     SEGMENT_SEEMS_ES, CUSTOMER_SEGMENT_EN, CUSTOMER_SEGMENT_ES,
-                                    'which segment seems', 'qué segmento parece'])
+                                    WHICH_SEGMENT_SEEMS_EN, WHICH_SEGMENT_SEEMS_ES])
 
     def _is_customer_profitability_query(self, q: str) -> bool:
         """Check for customer profitability queries."""
@@ -1631,10 +1641,27 @@ class AdvancedQueryProcessor:
         """Return (year, month) or None."""
         q = question.lower()
         # Month name + year
-        for name, num in {**MONTHS_EN, **MONTHS_ES}.items():
-            m = re.search(rf'\b{name}\b.*?(\d{{4}})', q)
+        # Use (?<![a-z]) / (?![a-z]) instead of \b to handle non-ASCII month names
+        # (e.g. Spanish months like 'enero') and avoid catastrophic backtracking
+        # (SonarQube S5852).  Replace .*? with [^0-9]* so the wildcard and the
+        # digit group are mutually exclusive, eliminating polynomial backtracking.
+        all_months = {**MONTHS_EN, **MONTHS_ES}
+        compiled_month_year = {
+            name: re.compile(
+                r'(?<![a-z])' + re.escape(name) + r'(?![a-z])[^0-9]*(\d{4})'
+            )
+            for name in all_months
+        }
+        compiled_year_month = {
+            name: re.compile(
+                r'(\d{4})[^a-z]*(?<![a-z])' + re.escape(name) + r'(?![a-z])'
+            )
+            for name in all_months
+        }
+        for name, num in all_months.items():
+            m = compiled_month_year[name].search(q)
             if not m:
-                m = re.search(rf'(\d{{4}}).*?\b{name}\b', q)
+                m = compiled_year_month[name].search(q)
             if m:
                 return int(m.group(1)), num
         # Numeric patterns
