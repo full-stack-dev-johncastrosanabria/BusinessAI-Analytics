@@ -2,13 +2,6 @@
 .DS_Store
 Thumbs.db
 
-# ── IDE ───────────────────────────────────────────────────────────────────────
-.idea/
-.vscode/
-*.iml
-*.iws
-*.ipr
-
 # ── Logs ──────────────────────────────────────────────────────────────────────
 logs/
 *.log
@@ -44,6 +37,7 @@ dist/
 .eggs/
 .tox/
 .coverage
+coverage.xml
 htmlcov/
 .pytest_cache/
 
@@ -103,6 +97,10 @@ docker-compose.override.yml
 recordings/
 *.webm
 *.mp4
+*.gif
+demo-*.webm
+demo-*.mp4
+demo-*.gif
 
 # ── OS specific ───────────────────────────────────────────────────────────────
 .AppleDouble
@@ -117,7 +115,9 @@ build/
 out/
 
 # ── IDE specific ──────────────────────────────────────────────────────────────
-.vscode/settings.json
-.vscode/launch.json
-.vscode/extensions.json
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
 *.code-workspace
