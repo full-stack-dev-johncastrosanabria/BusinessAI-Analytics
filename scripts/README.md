@@ -1,213 +1,218 @@
-# Build Orchestration Scripts
+# Demo Scripts
 
-This directory contains scripts for coordinating multi-service builds and reporting build health status for the BusinessAI Analytics Platform.
+Automated demo scripts for the BusinessAI Analytics Platform using Playwright.
 
-## Scripts Overview
+## Available Scripts
 
-### 1. build-all.sh
-
-**Purpose**: Orchestrates building all services in the correct order with dependency handling.
-
-**Features**:
-- Builds all 6 Java microservices (API Gateway, Analytics, Customer, Product, Sales, Document)
-- Builds the Frontend application (React/TypeScript)
-- Builds the AI Service (Python)
-- Handles build dependencies and proper ordering
-- Provides colored output for easy status tracking
-- Generates comprehensive build summary
-- Exits with error code if any builds fail
-
-**Usage**:
-```bash
-./scripts/build-all.sh
-```
-
-**Build Order**:
-1. API Gateway (no dependencies)
-2. Core Java services (Customer, Product, Sales, Analytics, Document)
-3. Frontend (depends on backend APIs)
-4. AI Service (independent)
-
-**Output**:
-- Real-time build progress with timestamps
-- Success/failure indicators for each service
-- Build summary showing successful and failed builds
-- Exit code 0 for success, 1 for any failures
-
-### 2. build-status.sh
-
-**Purpose**: Reports overall build health and status for all services.
-
-**Features**:
-- Checks build artifacts for all services
-- Verifies test reports and coverage
-- Checks SonarQube quality gate status
-- Calculates overall build health score
-- Provides detailed status for each service
-- Color-coded output for easy reading
-
-**Usage**:
-```bash
-./scripts/build-status.sh
-```
-
-**Health Score Calculation**:
-- 90-100%: Excellent build health
-- 70-89%: Good build health (could be improved)
-- 50-69%: Build health needs attention
-- 0-49%: Poor build health (immediate action required)
-
-**Exit Codes**:
-- 0: Health score >= 70%
-- 1: Health score < 70%
-
-**Checks Performed**:
-- Java services: JAR artifacts in target/ directory
-- Frontend: dist/ build directory
-- AI Service: Virtual environment configuration
-- Test reports: JUnit reports, coverage files
-- SonarQube: Recent scan detection
-
-## Integration with CI/CD
-
-These scripts are integrated into the GitHub Actions CI workflow (`.github/workflows/ci.yml`):
-
-### Quality Gate Job
-
-The `quality-gate` job in the CI workflow:
-1. Runs after all build and test jobs complete
-2. Checks SonarQube quality gate status
-3. Executes `build-status.sh` to report overall health
-4. Generates a comprehensive summary in GitHub Actions
-
-### Usage in CI
-
-```yaml
-- name: Run Build Status Check
-  run: |
-    chmod +x scripts/build-status.sh
-    ./scripts/build-status.sh || true
-  continue-on-error: true
-```
-
-## Requirements
-
-### For build-all.sh:
-- **Java**: JDK 17 or higher
-- **Maven**: 3.6 or higher
-- **Node.js**: 20.x or higher
-- **Python**: 3.11 or higher
-- **npm**: Latest version
-
-### For build-status.sh:
-- **Bash**: 3.x or higher (compatible with macOS default bash)
-- **Basic Unix utilities**: find, ls, wc
-
-### Optional:
-- **SONAR_TOKEN**: SonarQube authentication token
-- **SONAR_HOST_URL**: SonarQube server URL
-
-## Environment Variables
-
-### SonarQube Configuration
-
-Set these environment variables for quality gate checks:
+### 1. Video Recording Demo (4-5 minutes)
+**File:** `demo-video-recording.ts`  
+**Purpose:** Optimized for video recording with proper timing and comprehensive feature showcase
 
 ```bash
-export SONAR_TOKEN="your-sonarqube-token"
-export SONAR_HOST_URL="https://your-sonarqube-server.com"
+npm run demo:video
+# or
+npm run demo:record
 ```
 
-## Examples
+**Features Demonstrated:**
+1. ✅ Login screen (8 seconds display)
+2. ✅ Dark mode toggle test
+3. ✅ Language switch test (English/Spanish)
+4. ✅ Login with demo credentials
+5. ✅ Dashboard overview (~5 seconds)
+6. ✅ Dashboard filter application
+7. ✅ AI Forecasts with scrolling (15+ seconds)
+8. ✅ Chatbot with 10 questions (5 English + 5 Spanish)
+9. ✅ Clients quick view
+10. ✅ Products quick view + create product
+11. ✅ Register sale
+12. ✅ Sales infinite scroll
 
-### Full Build and Status Check
+**Total Duration:** 4-5 minutes
+
+### 2. Interactive Demo (Original)
+**File:** `demo-interactive.ts`  
+**Purpose:** Original 2-3 minute quick demo
 
 ```bash
-# Build all services
-./scripts/build-all.sh
-
-# Check build status
-./scripts/build-status.sh
+npm run demo
 ```
 
-### CI/CD Pipeline Usage
+## Prerequisites
 
+### 1. Install Dependencies
 ```bash
-# In GitHub Actions or other CI systems
-chmod +x scripts/build-all.sh scripts/build-status.sh
-./scripts/build-all.sh && ./scripts/build-status.sh
+npm install
 ```
 
-### Selective Service Build
+### 2. Install Playwright Browsers
+```bash
+npx playwright install chromium
+```
 
-For building individual services, navigate to the service directory and use the appropriate build command:
+### 3. Start All Services
+Before running the demo, ensure all services are running:
 
 ```bash
-# Java service
-cd analytics-service
-mvn clean package
+# Terminal 1: Start MySQL
+./scripts/start-mysql.sh
 
-# Frontend
-cd frontend
-npm ci && npm run build
+# Terminal 2: Start all microservices
+./scripts/start-all.sh
 
-# AI Service
+# Terminal 3: Start AI service
 cd ai-service
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python app.py
+
+# Terminal 4: Start frontend
+cd frontend
+npm run dev
+```
+
+Wait for all services to be fully started before running the demo.
+
+## Running the Video Recording Demo
+
+### Step 1: Prepare for Recording
+1. Close unnecessary applications
+2. Clear browser cache if needed
+3. Ensure all services are running and healthy
+4. Check that frontend is accessible at http://localhost:5173
+
+### Step 2: Start Screen Recording
+Use your preferred screen recording software:
+
+**macOS:**
+- QuickTime Player: File → New Screen Recording
+- Screenshot app: Cmd + Shift + 5
+- OBS Studio (recommended for professional recording)
+
+**Windows:**
+- Xbox Game Bar: Win + G
+- OBS Studio
+
+**Linux:**
+- SimpleScreenRecorder
+- OBS Studio
+- Kazam
+
+### Step 3: Run the Demo
+```bash
+npm run demo:video
+```
+
+### Step 4: Stop Recording
+The demo will automatically close the browser when complete. Stop your screen recording.
+
+## Demo Flow Details
+
+### Timing Breakdown (4-5 minutes total)
+
+| Step | Feature | Duration | Notes |
+|------|---------|----------|-------|
+| 0 | Browser launch | 2s | Fullscreen setup |
+| 1 | Login screen | 8s | Display login interface |
+| 2 | Dark mode toggle | 8s | Toggle dark/light mode |
+| 3 | Language switch | 8s | Switch EN/ES |
+| 4 | Login | 7s | Enter credentials and login |
+| 5 | Dashboard | 5s | Overview display |
+| 6 | Dashboard filter | 6s | Apply filter and see changes |
+| 7 | Forecasts | 20s | Scroll through AI predictions |
+| 8 | Chatbot | 60s | 10 questions (5 EN + 5 ES) |
+| 9 | Clients | 5s | Quick view |
+| 10 | Products | 7s | View + create product |
+| 11 | Register sale | 5s | Sale form |
+| 12 | Sales infinite | 12s | Infinite scroll demo |
+| - | Closing | 3s | Final showcase |
+
+**Total:** ~4-5 minutes
+
+## Customization
+
+### Adjust Timing
+Edit the `wait()` function calls in `demo-video-recording.ts`:
+
+```typescript
+await wait(8, 'LOGIN SCREEN - 8 seconds');  // Change 8 to desired seconds
+```
+
+### Modify Questions
+Edit the `queries` array in Step 8:
+
+```typescript
+const queries = [
+  // Add your English questions here
+  'Your custom question?',
+  // Add your Spanish questions here
+  '¿Tu pregunta personalizada?'
+];
+```
+
+### Change Demo Credentials
+Edit Step 4:
+
+```typescript
+await input.fill('your-email@example.com');
+await passwordInput.fill('your-password');
 ```
 
 ## Troubleshooting
 
-### Build Failures
+### Demo Fails to Start
+- Ensure all services are running
+- Check that frontend is accessible at http://localhost:5173
+- Verify Playwright is installed: `npx playwright install chromium`
 
-If `build-all.sh` fails:
-1. Check the error messages for the specific service
-2. Verify all dependencies are installed
-3. Ensure you're in the project root directory
-4. Check that all service directories exist
+### Browser Not in Fullscreen
+- The script automatically sets viewport to 1920x1080
+- If issues persist, manually maximize the browser window when it opens
 
-### Status Check Issues
+### Steps Are Skipped
+- Some steps are optional and will be skipped if elements aren't found
+- Check console output for warnings (⚠️)
+- Ensure you're using the latest version of the frontend
 
-If `build-status.sh` reports poor health:
-1. Run `build-all.sh` to build all services
-2. Check individual service build logs
-3. Verify test reports are being generated
-4. Ensure artifacts are in expected locations
+### Demo Runs Too Fast/Slow
+- Adjust `wait()` durations in the script
+- Default timeout is 6 minutes (can be changed in `DEMO_TIMEOUT`)
 
-### Permission Issues
+### Chatbot Questions Fail
+- Ensure AI service is running on port 8000
+- Check that chatbot input field is visible
+- Verify API gateway is routing requests correctly
 
-If you get permission denied errors:
-```bash
-chmod +x scripts/build-all.sh scripts/build-status.sh
-```
+## Tips for Best Video Quality
 
-## Maintenance
+1. **Resolution:** Use 1920x1080 (Full HD) for recording
+2. **Frame Rate:** 30 FPS minimum, 60 FPS recommended
+3. **Audio:** Consider adding voiceover narration after recording
+4. **Lighting:** Ensure good screen visibility (avoid glare)
+5. **Editing:** Trim the beginning/end if needed
+6. **Compression:** Use H.264 codec for YouTube compatibility
 
-### Adding New Services
+## Output
 
-To add a new service to the build orchestration:
+The demo will:
+- ✅ Run automatically through all steps
+- ✅ Display colored console output showing progress
+- ✅ Close the browser when complete
+- ✅ Show total duration at the end
 
-1. **In build-all.sh**: Add a new build function following the existing patterns
-2. **In build-status.sh**: Add the service to the appropriate service array
-3. Update this README with the new service information
-
-### Modifying Build Order
-
-Edit the `main()` function in `build-all.sh` to change the build order. Ensure dependencies are built before dependent services.
-
-## Related Documentation
-
-- [CI/CD Pipeline](.github/workflows/ci.yml)
-- [SonarQube Configuration](../sonar-project.properties)
-- [Deployment Guide](../DEPLOYMENT.md)
-- [Project README](../README.md)
+Console output includes:
+- 🔵 Blue: System messages
+- 🟢 Green: Success messages
+- 🟡 Yellow: Warnings
+- 🔴 Red: Errors
+- 🟣 Purple: Section headers
 
 ## Support
 
-For issues or questions about the build scripts:
-1. Check the troubleshooting section above
-2. Review the CI/CD workflow logs
-3. Consult the project documentation
-4. Contact the development team
+For issues or questions:
+1. Check the console output for error messages
+2. Verify all services are running
+3. Review the troubleshooting section above
+4. Check the main README.md for service-specific issues
+
+## License
+
+Part of the BusinessAI Analytics Platform project.

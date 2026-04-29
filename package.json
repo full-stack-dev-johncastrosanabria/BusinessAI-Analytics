@@ -1,4 +1,12 @@
 {
+  "name": "businessai-analytics-demo",
+  "version": "1.0.0",
+  "description": "Demo scripts for BusinessAI Analytics Platform",
+  "scripts": {
+    "demo": "ts-node scripts/demo-interactive.ts",
+    "demo:video": "ts-node scripts/demo-video-recording.ts",
+    "demo:record": "ts-node scripts/demo-video-recording.ts"
+  },
   "dependencies": {
     "playwright": "^1.59.1"
   },
