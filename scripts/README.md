@@ -2,17 +2,26 @@
 
 Automated demo scripts for the BusinessAI Analytics Platform using Playwright.
 
+**[🎥 Watch the Latest Demo on YouTube](https://youtu.be/i_TPjHsoOHE)** - 4-minute complete platform demonstration
+
 ## Available Scripts
 
-### 1. Video Recording Demo (4-5 minutes)
+### 1. Video Recording Demo (4-5 minutes) - **AUTOMATIC RECORDING**
 **File:** `demo-video-recording.ts`  
-**Purpose:** Optimized for video recording with proper timing and comprehensive feature showcase
+**Purpose:** Automatically records video while demonstrating all features
 
 ```bash
 npm run demo:video
 # or
 npm run demo:record
 ```
+
+**✨ AUTOMATIC VIDEO RECORDING:**
+- Video is automatically recorded by Playwright
+- Saved to `./recordings/` directory
+- Format: WebM video file
+- Resolution: 1920x1080 (Full HD)
+- No external screen recorder needed!
 
 **Features Demonstrated:**
 1. ✅ Login screen (8 seconds display)
@@ -74,35 +83,36 @@ Wait for all services to be fully started before running the demo.
 ## Running the Video Recording Demo
 
 ### Step 1: Prepare for Recording
-1. Close unnecessary applications
-2. Clear browser cache if needed
-3. Ensure all services are running and healthy
-4. Check that frontend is accessible at http://localhost:5173
+1. Ensure all services are running and healthy
+2. Check that frontend is accessible at http://localhost:5173
+3. Make sure the `recordings` directory exists (will be created automatically)
 
-### Step 2: Start Screen Recording
-Use your preferred screen recording software:
-
-**macOS:**
-- QuickTime Player: File → New Screen Recording
-- Screenshot app: Cmd + Shift + 5
-- OBS Studio (recommended for professional recording)
-
-**Windows:**
-- Xbox Game Bar: Win + G
-- OBS Studio
-
-**Linux:**
-- SimpleScreenRecorder
-- OBS Studio
-- Kazam
-
-### Step 3: Run the Demo
+### Step 2: Run the Demo (Automatic Recording)
 ```bash
 npm run demo:video
 ```
 
-### Step 4: Stop Recording
-The demo will automatically close the browser when complete. Stop your screen recording.
+**The script will:**
+- ✅ Automatically start video recording
+- ✅ Run through all demo steps
+- ✅ Save the video to `./recordings/` directory
+- ✅ Display the video file location when complete
+
+### Step 3: Find Your Video
+After the demo completes, your video will be in:
+```
+./recordings/
+```
+
+The video file will be named with a timestamp (e.g., `video-2024-01-15-14-30-45.webm`)
+
+### Step 4: Convert Video (Optional)
+If you need MP4 format for YouTube:
+
+```bash
+# Using ffmpeg (install if needed: brew install ffmpeg)
+ffmpeg -i recordings/your-video.webm -c:v libx264 -preset slow -crf 22 demo-video.mp4
+```
 
 ## Demo Flow Details
 
@@ -193,10 +203,17 @@ await passwordInput.fill('your-password');
 ## Output
 
 The demo will:
+- ✅ Automatically record video to `./recordings/` directory
 - ✅ Run automatically through all steps
 - ✅ Display colored console output showing progress
 - ✅ Close the browser when complete
-- ✅ Show total duration at the end
+- ✅ Show total duration and video location at the end
+
+**Video Output:**
+- Format: WebM (can be converted to MP4)
+- Resolution: 1920x1080 (Full HD)
+- Location: `./recordings/` directory
+- Filename: Timestamped (e.g., `video-2024-01-15-14-30-45.webm`)
 
 Console output includes:
 - 🔵 Blue: System messages

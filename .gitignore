@@ -99,6 +99,11 @@ docker-compose.override.yml
 *~
 .DS_Store
 
+# ── Demo recordings ───────────────────────────────────────────────────────────
+recordings/
+*.webm
+*.mp4
+
 # ── OS specific ───────────────────────────────────────────────────────────────
 .AppleDouble
 .LSOverride
