@@ -7,12 +7,7 @@ omit =
     */trained_models/*
     train_models.py
     train_10x_models.sh
-    models/*
-    database.py
     conftest.py
-    chatbot/query_processor.py
-    chatbot/advanced_query_processor.py
-    chatbot/intent_classifier.py
 
 [report]
 fail_under = 80
