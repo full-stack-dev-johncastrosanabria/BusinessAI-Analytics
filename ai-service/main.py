@@ -168,7 +168,7 @@ async def startup_event() -> None:
 
 
 @app.on_event("shutdown")
-async def shutdown_event() -> None:
+def shutdown_event() -> None:
     """Clean up resources on shutdown."""
     if _db_connection:
         _db_connection.close()
@@ -185,7 +185,7 @@ async def shutdown_event() -> None:
         503: {"description": "Sales model not loaded"},
     },
 )
-async def forecast_sales() -> ForecastResponse:
+def forecast_sales() -> ForecastResponse:
     """
     Generate 12-month sales forecast.
 
@@ -224,7 +224,7 @@ async def forecast_sales() -> ForecastResponse:
     except Exception as e:
         logger.error("Error generating sales forecast: %s", e, exc_info=True)
         raise HTTPException(
-            status_code=500, detail="Internal server error."
+            status_code=500, detail=INTERNAL_SERVER_ERROR
         ) from e
 
 
@@ -285,7 +285,7 @@ async def forecast_costs() -> ForecastResponse:
     except Exception as e:
         logger.error("Error generating cost forecast: %s", e, exc_info=True)
         raise HTTPException(
-            status_code=500, detail="Internal server error."
+            status_code=500, detail=INTERNAL_SERVER_ERROR
         ) from e
 
 
@@ -353,7 +353,7 @@ async def forecast_profit() -> ForecastResponse:
             "Error generating profit forecast: %s", e, exc_info=True
         )
         raise HTTPException(
-            status_code=500, detail="Internal server error."
+            status_code=500, detail=INTERNAL_SERVER_ERROR
         ) from e
 
 
@@ -412,7 +412,7 @@ async def process_chatbot_query(
             "Error processing chatbot query: %s", e, exc_info=True
         )
         raise HTTPException(
-            status_code=500, detail="Internal server error."
+            status_code=500, detail=INTERNAL_SERVER_ERROR
         ) from e
 
 
@@ -427,7 +427,7 @@ async def process_chatbot_query(
     },
 )
 async def train_models(
-    request: TrainingRequest = None,  # noqa: ARG001
+    _request: TrainingRequest = None,
 ) -> TrainingResponse:
     """
     Train both sales and cost forecasting models.
@@ -479,7 +479,7 @@ async def train_models(
     except Exception as e:
         logger.error("Error during model training: %s", e, exc_info=True)
         raise HTTPException(
-            status_code=500, detail="Internal server error."
+            status_code=500, detail=INTERNAL_SERVER_ERROR
         ) from e
 
 
