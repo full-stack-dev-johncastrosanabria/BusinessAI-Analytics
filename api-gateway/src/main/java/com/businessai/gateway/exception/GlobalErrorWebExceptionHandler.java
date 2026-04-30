@@ -173,7 +173,7 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
             return;
         }
         
-        String method = exchange.getRequest().getMethod() != null ? exchange.getRequest().getMethod().toString() : "UNKNOWN";
+        String method = exchange.getRequest().getMethod().name();
         String path = exchange.getRequest().getURI().getPath();
         String message = ex.getMessage() != null ? ex.getMessage() : "No message";
         

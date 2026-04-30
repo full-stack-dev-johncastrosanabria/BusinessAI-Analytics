@@ -248,6 +248,8 @@ public class AnalyticsControllerTest {
 
     @Test
     public void testGetDashboard_DefaultDateRange() throws Exception {
+        int currentYear = java.time.LocalDate.now().getYear();
+        
         AnalyticsService.DashboardSummary summary = new AnalyticsService.DashboardSummary(
                 BigDecimal.valueOf(50000),
                 BigDecimal.valueOf(30000),
@@ -257,14 +259,14 @@ public class AnalyticsControllerTest {
                 new ArrayList<>()
         );
 
-        when(analyticsService.getDashboardSummary(2024, 1, 2024, 12))
+        when(analyticsService.getDashboardSummary(currentYear, 1, currentYear, 12))
                 .thenReturn(summary);
 
         mockMvc.perform(get("/api/analytics/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalSales", is(50000)));
 
-        verify(analyticsService, times(1)).getDashboardSummary(2024, 1, 2024, 12);
+        verify(analyticsService, times(1)).getDashboardSummary(currentYear, 1, currentYear, 12);
     }
 
     @Test

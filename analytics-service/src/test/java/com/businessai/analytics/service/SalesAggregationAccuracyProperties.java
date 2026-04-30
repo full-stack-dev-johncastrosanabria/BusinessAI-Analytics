@@ -27,12 +27,12 @@ public class SalesAggregationAccuracyProperties {
      * Simulates a sales transaction for testing
      */
     static class SalesTransaction {
-        public Long id;
-        public Long customerId;
-        public Long productId;
-        public Integer month;
-        public Integer year;
-        public BigDecimal amount;
+        private Long id;
+        private Long customerId;
+        private Long productId;
+        private Integer month;
+        private Integer year;
+        private BigDecimal amount;
 
         public SalesTransaction(Long id, Long customerId, Long productId, 
                                Integer month, Integer year, BigDecimal amount) {
@@ -41,6 +41,54 @@ public class SalesAggregationAccuracyProperties {
             this.productId = productId;
             this.month = month;
             this.year = year;
+            this.amount = amount;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public Long getCustomerId() {
+            return customerId;
+        }
+
+        public void setCustomerId(Long customerId) {
+            this.customerId = customerId;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
+        }
+
+        public Integer getMonth() {
+            return month;
+        }
+
+        public void setMonth(Integer month) {
+            this.month = month;
+        }
+
+        public Integer getYear() {
+            return year;
+        }
+
+        public void setYear(Integer year) {
+            this.year = year;
+        }
+
+        public BigDecimal getAmount() {
+            return amount;
+        }
+
+        public void setAmount(BigDecimal amount) {
             this.amount = amount;
         }
     }
@@ -159,8 +207,8 @@ public class SalesAggregationAccuracyProperties {
      */
     private BigDecimal aggregateSalesForMonth(List<SalesTransaction> transactions, Integer month, Integer year) {
         return transactions.stream()
-                .filter(t -> t.month.equals(month) && t.year.equals(year))
-                .map(t -> t.amount)
+                .filter(t -> t.getMonth().equals(month) && t.getYear().equals(year))
+                .map(t -> t.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
