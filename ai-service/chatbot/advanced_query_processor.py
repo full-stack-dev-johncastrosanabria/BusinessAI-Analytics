@@ -5,7 +5,7 @@ Handles complex business queries in English and Spanish with real database data.
 
 import re
 import logging
-from typing import Tuple, List, Optional, Dict
+from typing import List, Tuple, Optional, Dict
 from chatbot.intent_classifier import AdvancedIntentClassifier, Intent, Language
 
 logger = logging.getLogger(__name__)
@@ -179,6 +179,20 @@ class AdvancedQueryProcessor:
         """Keyword-based routing that fires regardless of classifier output."""
         
         # Check high-priority patterns first
+        high_priority_intent = self._check_high_priority_patterns(q)
+        if high_priority_intent:
+            return high_priority_intent
+        
+        # Check break-even and specialized patterns
+        specialized_intent = self._check_specialized_patterns(q)
+        if specialized_intent:
+            return specialized_intent
+        
+        # Route by signal type
+        return self._route_by_signal_type(q, intent)
+    
+    def _check_high_priority_patterns(self, q: str) -> Optional[Intent]:
+        """Check high-priority query patterns and return appropriate intent."""
         if self._is_customer_segment_query(q):
             return Intent.CUSTOMER_INFO
         
@@ -200,20 +214,20 @@ class AdvancedQueryProcessor:
         if self._is_trend_analysis_query(q):
             return Intent.TREND_ANALYSIS
         
-        # Check break-even signals
+        return None
+    
+    def _check_specialized_patterns(self, q: str) -> Optional[Intent]:
+        """Check specialized query patterns like break-even and customer segments."""
         if self._is_breakeven_query(q):
             return self._route_breakeven_query(q)
         
-        # Check for customer segment questions
         if self._is_specific_customer_segment_query(q):
             return Intent.CUSTOMER_INFO
         
-        # Check for high sales low profit
         if self._is_high_sales_low_profit_query(q):
             return Intent.PROFIT_ANALYSIS
         
-        # Route by signal type
-        return self._route_by_signal_type(q, intent)
+        return None
 
     def _is_customer_segment_query(self, q: str) -> bool:
         """Check for customer segment questions - HIGHEST PRIORITY."""
@@ -429,47 +443,19 @@ class AdvancedQueryProcessor:
             q = question.lower()
 
             # Route to specific handlers
-            if self._is_highest_transaction_query(q):
-                return self._handle_highest_transaction(language)
+            specific_handler_result = await self._route_to_specific_sales_handler(q, question, language)
+            if specific_handler_result:
+                return specific_handler_result
             
-            if self._is_sales_by_day_query(q):
-                return self._handle_sales_by_day(language)
+            # Handle time-based queries
+            time_based_result = self._handle_time_based_sales_queries(question, language)
+            if time_based_result:
+                return time_based_result
             
-            if self._is_small_transactions_query(q):
-                return self._handle_small_transactions(language)
-            
-            if self._is_monthly_sales_count_query(q):
-                return self._handle_monthly_sales_count(language)
-            
-            if self._is_current_month_billing_query(q):
-                return await self._handle_current_month_billing(language)
-
-            if self._is_best_worst_month_query(q):
-                return self._handle_best_worst_month_query(q, language)
-
-            if self._is_quarter_query(question):
-                quarter_data = self._extract_quarter(question)
-                if quarter_data:
-                    year, months = quarter_data
-                    return self._handle_quarter(year, months, language)
-
-            if self._is_year_only_query(question):
-                year_only = self._extract_year_only(question)
-                if year_only:
-                    return self._handle_year_total(year_only, language)
-
-            if self._is_specific_month_query(question):
-                return self._handle_specific_month_query(question, language)
-
-            if self._is_average_margin_query(q):
-                return self._handle_avg_margin(language)
-
-            if self._is_transaction_count_query(q):
-                return self._handle_transaction_count(question, language)
-
-            if self._is_trend_query(q):
-                metrics = self.db.get_sales_metrics()
-                return self._analyze_sales_trends(metrics, language)
+            # Handle analysis queries
+            analysis_result = self._handle_sales_analysis_queries(q, question, language)
+            if analysis_result:
+                return analysis_result
 
             # Default: recent month
             return self._handle_recent_month_metrics(language)
@@ -477,6 +463,60 @@ class AdvancedQueryProcessor:
         except Exception as e:
             logger.error("Error in sales handler: %s", e, exc_info=True)
             return self._err(language), []
+    
+    async def _route_to_specific_sales_handler(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Route to specific sales handlers based on query type."""
+        if self._is_highest_transaction_query(q):
+            return self._handle_highest_transaction(language)
+        
+        if self._is_sales_by_day_query(q):
+            return self._handle_sales_by_day(language)
+        
+        if self._is_small_transactions_query(q):
+            return self._handle_small_transactions(language)
+        
+        if self._is_monthly_sales_count_query(q):
+            return self._handle_monthly_sales_count(language)
+        
+        if self._is_current_month_billing_query(q):
+            return await self._handle_current_month_billing(language)
+
+        if self._is_best_worst_month_query(q):
+            return self._handle_best_worst_month_query(q, language)
+        
+        return None
+    
+    def _handle_time_based_sales_queries(self, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Handle time-based sales queries (quarters, years, specific months)."""
+        if self._is_quarter_query(question):
+            quarter_data = self._extract_quarter(question)
+            if quarter_data:
+                year, months = quarter_data
+                return self._handle_quarter(year, months, language)
+
+        if self._is_year_only_query(question):
+            year_only = self._extract_year_only(question)
+            if year_only:
+                return self._handle_year_total(year_only, language)
+
+        if self._is_specific_month_query(question):
+            return self._handle_specific_month_query(question, language)
+        
+        return None
+    
+    def _handle_sales_analysis_queries(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Handle sales analysis queries (margins, transactions, trends)."""
+        if self._is_average_margin_query(q):
+            return self._handle_avg_margin(language)
+
+        if self._is_transaction_count_query(q):
+            return self._handle_transaction_count(question, language)
+
+        if self._is_trend_query(q):
+            metrics = self.db.get_sales_metrics()
+            return self._analyze_sales_trends(metrics, language)
+        
+        return None
 
     def _is_highest_transaction_query(self, q: str) -> bool:
         """Check for highest transaction queries."""
@@ -759,47 +799,9 @@ class AdvancedQueryProcessor:
             q = question.lower()
             
             # Route to specific analysis handlers
-            if self._is_worst_month_analysis_query(q):
-                return self._handle_worst_month_analysis(language)
-            
-            if self._is_closest_to_loss_query(q):
-                return self._handle_closest_to_loss(language)
-            
-            if self._is_accounting_analysis_detailed_query(q):
-                return self._handle_accounting_analysis(question, language)
-            
-            if self._is_high_sales_low_profit_detailed_query(q):
-                return self._handle_high_sales_low_profit(language)
-            
-            if self._is_surprising_performance_query(q):
-                return self._handle_surprising_performance(language)
-            
-            if self._is_suspicious_months_query(q):
-                return self._handle_suspicious_months(language)
-            
-            if self._is_business_failure_query(q):
-                return self._handle_failure_scenarios(language)
-            
-            if self._is_near_failure_query(q):
-                return self._handle_near_failure_month(language)
-            
-            if self._is_breakeven_point_query(q):
-                return self._handle_breakeven_point(language)
-            
-            if self._is_breakeven_closest_query(q):
-                return self._handle_breakeven_closest(language)
-            
-            if self._is_first_profitable_query(q):
-                return self._handle_first_profitable_month(language)
-            
-            if self._is_loss_months_query(q):
-                return self._handle_loss_months(language)
-            
-            if self._is_risk_analysis_query(q):
-                return self._handle_risk_analysis(language)
-            
-            if self._is_cost_increase_scenario_query(q):
-                return self._handle_cost_increase_scenario(question, language)
+            specific_result = self._route_to_profit_analysis_handler(q, question, language)
+            if specific_result:
+                return specific_result
             
             # Default: delegate to sales metrics
             return await self._handle_sales_metrics(question, language)
@@ -807,6 +809,71 @@ class AdvancedQueryProcessor:
         except Exception as e:
             logger.error(f"Error in profit analysis: {e}", exc_info=True)
             return self._err(language), []
+    
+    def _route_to_profit_analysis_handler(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Route to specific profit analysis handlers based on query type."""
+        # Check worst month and loss-related queries
+        if self._is_worst_month_analysis_query(q):
+            return self._handle_worst_month_analysis(language)
+        
+        if self._is_closest_to_loss_query(q):
+            return self._handle_closest_to_loss(language)
+        
+        if self._is_accounting_analysis_detailed_query(q):
+            return self._handle_accounting_analysis(question, language)
+        
+        if self._is_high_sales_low_profit_detailed_query(q):
+            return self._handle_high_sales_low_profit(language)
+        
+        # Check performance and risk queries
+        performance_result = self._check_performance_queries(q, language)
+        if performance_result:
+            return performance_result
+        
+        # Check break-even queries
+        breakeven_result = self._check_breakeven_queries(q, question, language)
+        if breakeven_result:
+            return breakeven_result
+        
+        return None
+    
+    def _check_performance_queries(self, q: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Check performance-related queries."""
+        if self._is_surprising_performance_query(q):
+            return self._handle_surprising_performance(language)
+        
+        if self._is_suspicious_months_query(q):
+            return self._handle_suspicious_months(language)
+        
+        if self._is_business_failure_query(q):
+            return self._handle_failure_scenarios(language)
+        
+        if self._is_near_failure_query(q):
+            return self._handle_near_failure_month(language)
+        
+        return None
+    
+    def _check_breakeven_queries(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Check break-even related queries."""
+        if self._is_breakeven_point_query(q):
+            return self._handle_breakeven_point(language)
+        
+        if self._is_breakeven_closest_query(q):
+            return self._handle_breakeven_closest(language)
+        
+        if self._is_first_profitable_query(q):
+            return self._handle_first_profitable_month(language)
+        
+        if self._is_loss_months_query(q):
+            return self._handle_loss_months(language)
+        
+        if self._is_risk_analysis_query(q):
+            return self._handle_risk_analysis(language)
+        
+        if self._is_cost_increase_scenario_query(q):
+            return self._handle_cost_increase_scenario(question, language)
+        
+        return None
 
     def _is_worst_month_analysis_query(self, q: str) -> bool:
         """Check for worst month analysis queries."""
@@ -1053,26 +1120,9 @@ class AdvancedQueryProcessor:
             q = question.lower()
 
             # Route to specific handlers
-            if self._is_top_product_revenue_query(q):
-                return self._handle_top_product_by_revenue(language)
-
-            if self._is_underpriced_products_query(q):
-                return self._handle_underpriced_products(language)
-
-            if self._is_high_volume_low_margin_query(q):
-                return self._handle_high_volume_low_margin_products(language)
-
-            if self._is_product_margin_query(q):
-                return self._handle_product_margins(language)
-
-            if self._is_product_breakeven_query(q):
-                return self._handle_product_breakeven_contribution(language)
-
-            if self._is_category_revenue_query(q):
-                return self._handle_category_revenue(language)
-
-            if self._is_top_products_query(q):
-                return self._handle_top_products_list(language)
+            specific_result = self._route_to_product_handler(q, language)
+            if specific_result:
+                return specific_result
 
             # Try specific product search
             product_result = self._handle_product_search(question, language)
@@ -1085,6 +1135,31 @@ class AdvancedQueryProcessor:
         except Exception as e:
             logger.error("Error in product handler: %s", e)
             return self._err(language), []
+    
+    def _route_to_product_handler(self, q: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Route to specific product handlers based on query type."""
+        if self._is_top_product_revenue_query(q):
+            return self._handle_top_product_by_revenue(language)
+
+        if self._is_underpriced_products_query(q):
+            return self._handle_underpriced_products(language)
+
+        if self._is_high_volume_low_margin_query(q):
+            return self._handle_high_volume_low_margin_products(language)
+
+        if self._is_product_margin_query(q):
+            return self._handle_product_margins(language)
+
+        if self._is_product_breakeven_query(q):
+            return self._handle_product_breakeven_contribution(language)
+
+        if self._is_category_revenue_query(q):
+            return self._handle_category_revenue(language)
+
+        if self._is_top_products_query(q):
+            return self._handle_top_products_list(language)
+        
+        return None
 
     def _is_top_product_revenue_query(self, q: str) -> bool:
         """Check for top product by revenue queries."""
@@ -1370,19 +1445,21 @@ class AdvancedQueryProcessor:
         for c in customers:
             segs[c.get('segment', 'Unknown')] = segs.get(c.get('segment', 'Unknown'), 0) + 1
         seg_str = ', '.join(f"{v} {k}" for k, v in sorted(segs.items(), key=lambda x: -x[1]))
+        
         if language == Language.SPANISH:
-            return (
+            message = (
                 f"👥 Base de clientes: {len(customers)} clientes\n"
                 f"Segmentos: {seg_str}\n\n"
-                "💡 Puedes preguntar por el mejor cliente, clientes por país o segmento.",
-                [DB_CUSTOMERS]
+                "💡 Puedes preguntar por el mejor cliente, clientes por país o segmento."
             )
-        return (
-            f"👥 Customer base: {len(customers)} customers\n"
-            f"Segments: {seg_str}\n\n"
-            "💡 You can ask for top customers, customers by country or segment.",
-            [DB_CUSTOMERS]
-        )
+        else:
+            message = (
+                f"👥 Customer base: {len(customers)} customers\n"
+                f"Segments: {seg_str}\n\n"
+                "💡 You can ask for top customers, customers by country or segment."
+            )
+        
+        return message, [DB_CUSTOMERS]
 
     def _handle_customers_by_country(self, country: str,
                                             language: Language) -> Tuple[str, List[str]]:

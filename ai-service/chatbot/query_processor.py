@@ -38,7 +38,7 @@ class QueryProcessor:
             Tuple of (answer, sources)
         """
         try:
-            intent, _confidence, _language = self.intent_classifier.classify(
+            intent, _, _ = self.intent_classifier.classify(
                 question
             )
             logger.info("Processing query with intent: %s", intent.value)
