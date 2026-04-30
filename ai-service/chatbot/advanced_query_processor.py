@@ -1446,16 +1446,16 @@ class AdvancedQueryProcessor:
                 return self._no_data("customers", language), []
             if language == Language.SPANISH:
                 ans = "🔢 Top 5 clientes por número de pedidos:\n\n"
-                for i, c in enumerate(top, 1):
-                    ans += (f"{i}. {c['name']}\n"
-                            f"   • Pedidos: {c['transaction_count']}\n"
-                            f"   • Total comprado: ${c['total_purchases']:,.2f}\n\n")
+                label_orders = "Pedidos"
+                label_total = "Total comprado"
             else:
                 ans = "🔢 Top 5 customers by number of orders:\n\n"
-                for i, c in enumerate(top, 1):
-                    ans += (f"{i}. {c['name']}\n"
-                            f"   • Orders: {c['transaction_count']}\n"
-                            f"   • Total spent: ${c['total_purchases']:,.2f}\n\n")
+                label_orders = "Orders"
+                label_total = "Total spent"
+            for i, c in enumerate(top, 1):
+                ans += (f"{i}. {c['name']}\n"
+                        f"   • {label_orders}: {c['transaction_count']}\n"
+                        f"   • {label_total}: ${c['total_purchases']:,.2f}\n\n")
             return ans, [DB_CUSTOMERS, DB_SALES_TRANSACTIONS]
         except Exception as e:
             logger.error("Error in top customers by orders: %s", e)
@@ -2922,41 +2922,41 @@ class AdvancedQueryProcessor:
             mn_es = MONTH_NAMES_ES[recent['month']]
             
             if language == Language.SPANISH:
-                answer = (f"⚠️ **Escenarios de riesgo para el negocio**\n"
+                answer = ("⚠️ **Escenarios de riesgo para el negocio**\n"
                          f"Basado en {mn_es} {recent['year']} (ganancia actual: ${current_profit:,.2f})\n\n"
-                         f"🔴 **Escenario 1: Aumento de costos**\n"
+                         "🔴 **Escenario 1: Aumento de costos**\n"
                          f"• Si los costos suben ${cost_increase_to_break_even:,.2f} ({cost_increase_pct:.1f}%)\n"
                          f"• El negocio llegaría al {BREAKEVEN_POINT_ES} (ganancia = $0)\n\n"
-                         f"🔴 **Escenario 2: Caída de ventas**\n"
+                         "🔴 **Escenario 2: Caída de ventas**\n"
                          f"• Si las ventas bajan ${sales_decrease_to_break_even:,.2f} ({sales_decrease_pct:.1f}%)\n"
                          f"• El negocio llegaría al {BREAKEVEN_POINT_ES}\n\n"
-                         f"🔴 **Escenario 3: Combinado (más realista)**\n"
+                         "🔴 **Escenario 3: Combinado (más realista)**\n"
                          f"• Costos suben 15% (+${moderate_cost_increase:,.2f})\n"
                          f"• Y ventas bajan {abs(required_sales_drop_pct):.1f}% (-${abs(required_sales_drop):,.2f})\n"
-                         f"• Resultado: negocio no rentable\n\n"
-                         f"💡 **Factores de riesgo principales:**\n"
-                         f"• Inflación de costos operativos\n"
-                         f"• Competencia que reduzca ventas\n"
-                         f"• Recesión económica\n"
-                         f"• Pérdida de clientes clave")
+                         "• Resultado: negocio no rentable\n\n"
+                         "💡 **Factores de riesgo principales:**\n"
+                         "• Inflación de costos operativos\n"
+                         "• Competencia que reduzca ventas\n"
+                         "• Recesión económica\n"
+                         "• Pérdida de clientes clave")
             else:
-                answer = (f"⚠️ **Business Risk Scenarios**\n"
+                answer = ("⚠️ **Business Risk Scenarios**\n"
                          f"Based on {mn} {recent['year']} (current profit: ${current_profit:,.2f})\n\n"
-                         f"🔴 **Scenario 1: Cost increase**\n"
+                         "🔴 **Scenario 1: Cost increase**\n"
                          f"• If costs increase by ${cost_increase_to_break_even:,.2f} ({cost_increase_pct:.1f}%)\n"
-                         f"• Business would reach break-even (profit = $0)\n\n"
-                         f"🔴 **Scenario 2: Sales decline**\n"
+                         "• Business would reach break-even (profit = $0)\n\n"
+                         "🔴 **Scenario 2: Sales decline**\n"
                          f"• If sales drop by ${sales_decrease_to_break_even:,.2f} ({sales_decrease_pct:.1f}%)\n"
-                         f"• Business would reach break-even\n\n"
-                         f"🔴 **Scenario 3: Combined (more realistic)**\n"
+                         "• Business would reach break-even\n\n"
+                         "🔴 **Scenario 3: Combined (more realistic)**\n"
                          f"• Costs increase 15% (+${moderate_cost_increase:,.2f})\n"
                          f"• And sales drop {abs(required_sales_drop_pct):.1f}% (-${abs(required_sales_drop):,.2f})\n"
-                         f"• Result: business becomes unprofitable\n\n"
-                         f"💡 **Main risk factors:**\n"
-                         f"• Operational cost inflation\n"
-                         f"• Competition reducing sales\n"
-                         f"• Economic recession\n"
-                         f"• Loss of key customers")
+                         "• Result: business becomes unprofitable\n\n"
+                         "💡 **Main risk factors:**\n"
+                         "• Operational cost inflation\n"
+                         "• Competition reducing sales\n"
+                         "• Economic recession\n"
+                         "• Loss of key customers")
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
@@ -3746,18 +3746,18 @@ class AdvancedQueryProcessor:
             if not high_spending_months:
                 if language == Language.SPANISH:
                     return (
-                        f"✅ No se detectaron meses con gastos anormalmente altos.\n"
+                        "✅ No se detectaron meses con gastos anormalmente altos.\n"
                         f"Costo promedio mensual: ${avg_costs:,.2f}",
                         [DB_BUSINESS_METRICS]
                     )
                 return (
-                    f"✅ No months with abnormally high spending detected.\n"
+                    "✅ No months with abnormally high spending detected.\n"
                     f"Average monthly cost: ${avg_costs:,.2f}",
                     [DB_BUSINESS_METRICS]
                 )
             
             if language == Language.SPANISH:
-                answer = f"💸 **Meses con gastos más altos de lo normal:**\n"
+                answer = "💸 **Meses con gastos más altos de lo normal:**\n"
                 answer += f"(Promedio: ${avg_costs:,.2f})\n\n"
                 
                 for i, month in enumerate(high_spending_months[:8], 1):
@@ -3771,7 +3771,7 @@ class AdvancedQueryProcessor:
                 mn_worst = MONTH_NAMES_ES[worst['month']]
                 answer += f"⚠️ **{WORST_MONTH_ES.capitalize()}: {mn_worst} {worst['year']}** con ${worst['costs']:,.2f} en costos (+{worst['deviation']:.1f}%)"
             else:
-                answer = f"💸 **Months with higher than normal spending:**\n"
+                answer = "💸 **Months with higher than normal spending:**\n"
                 answer += f"(Average: ${avg_costs:,.2f})\n\n"
                 
                 for i, month in enumerate(high_spending_months[:8], 1):
@@ -3809,7 +3809,7 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 if profit > 0:
                     answer = (f"✅ **Sí, las ventas {COST_COVERAGE_ES} en {mn_es} {recent['year']}**\n\n"
-                             f"📊 Análisis de cobertura:\n"
+                             "📊 Análisis de cobertura:\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n"
                              f"• Ganancia: ${profit:,.2f}\n"
@@ -3818,7 +3818,7 @@ class AdvancedQueryProcessor:
                              f"dejando ${profit:,.2f} de ganancia.")
                 else:
                     answer = (f"❌ **No, las ventas NO {COST_COVERAGE_ES} en {mn_es} {recent['year']}**\n\n"
-                             f"📊 Análisis de cobertura:\n"
+                             "📊 Análisis de cobertura:\n"
                              f"• Ventas: ${sales:,.2f}\n"
                              f"• Costos: ${costs:,.2f}\n"
                              f"• Pérdida: ${abs(profit):,.2f}\n"
@@ -3827,7 +3827,7 @@ class AdvancedQueryProcessor:
             else:
                 if profit > 0:
                     answer = (f"✅ **Yes, sales covered costs in {mn} {recent['year']}**\n\n"
-                             f"📊 Coverage analysis:\n"
+                             "📊 Coverage analysis:\n"
                              f"• Sales: ${sales:,.2f}\n"
                              f"• Costs: ${costs:,.2f}\n"
                              f"• Profit: ${profit:,.2f}\n"
@@ -3836,7 +3836,7 @@ class AdvancedQueryProcessor:
                              f"leaving ${profit:,.2f} in profit.")
                 else:
                     answer = (f"❌ **No, sales did NOT cover costs in {mn} {recent['year']}**\n\n"
-                             f"📊 Coverage analysis:\n"
+                             "📊 Coverage analysis:\n"
                              f"• Sales: ${sales:,.2f}\n"
                              f"• Costs: ${costs:,.2f}\n"
                              f"• Loss: ${abs(profit):,.2f}\n"
@@ -3869,29 +3869,29 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 answer = (f"💰 **Lo que nos quedó después de costos y gastos ({mn_es} {recent['year']}):**\n\n"
-                         f"📊 Desglose financiero:\n"
+                         "📊 Desglose financiero:\n"
                          f"• Ingresos brutos: ${sales:,.2f} (100%)\n"
                          f"• Costos y gastos: ${costs:,.2f} ({cost_percentage:.1f}%)\n"
                          f"• **Ganancia neta: ${profit:,.2f} ({profit_percentage:.1f}%)**\n\n")
                 
                 if profit > 0:
-                    answer += (f"✅ **Resultado positivo**\n"
+                    answer += ("✅ **Resultado positivo**\n"
                               f"Por cada $100 de ventas, nos quedaron ${profit_percentage:.1f} de ganancia neta.")
                 else:
-                    answer += (f"❌ **Resultado negativo**\n"
+                    answer += ("❌ **Resultado negativo**\n"
                               f"Tuvimos una pérdida de ${abs(profit):,.2f} este mes.")
             else:
                 answer = (f"💰 **What's left after costs and expenses ({mn} {recent['year']}):**\n\n"
-                         f"📊 Financial breakdown:\n"
+                         "📊 Financial breakdown:\n"
                          f"• Gross revenue: ${sales:,.2f} (100%)\n"
                          f"• Costs and expenses: ${costs:,.2f} ({cost_percentage:.1f}%)\n"
                          f"• **Net profit: ${profit:,.2f} ({profit_percentage:.1f}%)**\n\n")
                 
                 if profit > 0:
-                    answer += (f"✅ **Positive result**\n"
+                    answer += ("✅ **Positive result**\n"
                               f"For every $100 in sales, we kept ${profit_percentage:.1f} in net profit.")
                 else:
-                    answer += (f"❌ **Negative result**\n"
+                    answer += ("❌ **Negative result**\n"
                               f"We had a loss of ${abs(profit):,.2f} this month.")
             
             return answer, [DB_BUSINESS_METRICS]
@@ -3931,13 +3931,13 @@ class AdvancedQueryProcessor:
             if language == Language.SPANISH:
                 answer = f"🎯 **Clientes {CAMPAIGN_INTEREST_ES}:**\n\n"
                 answer += f"📊 Segmento {MOST_VALUABLE_ES}: **{top_segment}** (${segment_avg[top_segment]:,.2f} promedio)\n\n"
-                answer += f"👥 Top 3 clientes para contactar:\n"
+                answer += "👥 Top 3 clientes para contactar:\n"
                 for i, c in enumerate(top_customers, 1):
                     answer += f"{i}. {c['name']} ({c['country']}) - ${float(c.get('total_purchases', 0)):,.2f}\n"
             else:
-                answer = f"🎯 **Interesting customers for campaigns:**\n\n"
+                answer = "🎯 **Interesting customers for campaigns:**\n\n"
                 answer += f"📊 {MOST_VALUABLE_EN} segment: **{top_segment}** (${segment_avg[top_segment]:,.2f} average)\n\n"
-                answer += f"👥 Top 3 customers to contact:\n"
+                answer += "👥 Top 3 customers to contact:\n"
                 for i, c in enumerate(top_customers, 1):
                     answer += f"{i}. {c['name']} ({c['country']}) - ${float(c.get('total_purchases', 0)):,.2f}\n"
             
@@ -3970,12 +3970,12 @@ class AdvancedQueryProcessor:
             sorted_segments = sorted(segment_avg.items(), key=lambda x: x[1])
             
             if language == Language.SPANISH:
-                answer = f"📉 **Análisis de actividad por segmento:**\n\n"
+                answer = "📉 **Análisis de actividad por segmento:**\n\n"
                 for seg, avg in sorted_segments:
                     answer += f"• **{seg}**: ${avg:,.2f} promedio por cliente\n"
                 answer += f"\n💡 El segmento **{sorted_segments[0][0]}** tiene menor actividad de compra."
             else:
-                answer = f"📉 **Segment activity analysis:**\n\n"
+                answer = "📉 **Segment activity analysis:**\n\n"
                 for seg, avg in sorted_segments:
                     answer += f"• **{seg}**: ${avg:,.2f} average per customer\n"
                 answer += f"\n💡 The **{sorted_segments[0][0]}** segment has lower purchase activity."
@@ -4011,7 +4011,7 @@ class AdvancedQueryProcessor:
                 answer += f"⚠️ {mn_worst_es} es el mes más lento (${worst_sales:,.2f})\n"
                 answer += f"💡 Considera promociones agresivas en {mn_worst_es} para estimular ventas."
             else:
-                answer = f"📅 **Best month to launch promotions:**\n\n"
+                answer = "📅 **Best month to launch promotions:**\n\n"
                 answer += f"🚀 **{mn_best}** is the best month (${best_sales:,.2f} in sales)\n"
                 answer += f"💡 Launch promotions in {mn_best} to leverage natural momentum.\n\n"
                 answer += f"⚠️ {mn_worst} is the slowest month (${worst_sales:,.2f})\n"
@@ -4048,7 +4048,7 @@ class AdvancedQueryProcessor:
                     answer += f"   • Unidades vendidas: {int(qty)}\n"
                     answer += f"   • Ingresos: ${sales:,.2f}\n\n"
             else:
-                answer = f"✨ **Products with best acceptance:**\n\n"
+                answer = "✨ **Products with best acceptance:**\n\n"
                 for i, (name, score, qty, sales) in enumerate(top_products, 1):
                     answer += f"{i}. **{name}**\n"
                     answer += f"   • Units sold: {int(qty)}\n"
@@ -4084,14 +4084,14 @@ class AdvancedQueryProcessor:
                 answer = f"💎 **Segmento para {EXPENSIVE_PRODUCTS_ES}:**\n\n"
                 answer += f"🎯 **{premium_segment}** es el segmento premium\n"
                 answer += f"💰 Valor promedio por cliente: ${premium_value:,.2f}\n\n"
-                answer += f"💡 Este segmento tiene mayor capacidad de compra.\n"
-                answer += f"📈 Recomendación: Ofrece productos premium a este segmento."
+                answer += "💡 Este segmento tiene mayor capacidad de compra.\n"
+                answer += "📈 Recomendación: Ofrece productos premium a este segmento."
             else:
-                answer = f"💎 **Segment for selling premium products:**\n\n"
+                answer = "💎 **Segment for selling premium products:**\n\n"
                 answer += f"🎯 **{premium_segment}** is the premium segment\n"
                 answer += f"💰 Average customer value: ${premium_value:,.2f}\n\n"
-                answer += f"💡 This segment has higher purchasing power.\n"
-                answer += f"📈 Recommendation: Offer premium products to this segment."
+                answer += "💡 This segment has higher purchasing power.\n"
+                answer += "📈 Recommendation: Offer premium products to this segment."
             
             return answer, [DB_CUSTOMERS, DB_SALES_TRANSACTIONS]
         except Exception as e:
@@ -4118,7 +4118,7 @@ class AdvancedQueryProcessor:
             negative_months.sort(key=lambda x: x[2])
             
             if language == Language.SPANISH:
-                answer = f"❌ **Meses con utilidad negativa:**\n\n"
+                answer = "❌ **Meses con utilidad negativa:**\n\n"
                 if negative_months:
                     for month, year, profit in negative_months:
                         mn = MONTH_NAMES_ES[month]
@@ -4126,7 +4126,7 @@ class AdvancedQueryProcessor:
                 else:
                     answer = "✅ ¡Excelente! No hay meses con pérdidas."
             else:
-                answer = f"❌ **Months with negative profit:**\n\n"
+                answer = "❌ **Months with negative profit:**\n\n"
                 if negative_months:
                     for month, year, profit in negative_months:
                         mn = MONTH_NAMES_EN[month]
@@ -4154,31 +4154,31 @@ class AdvancedQueryProcessor:
             costs_growth = ((costs_list[0] - costs_list[-1]) / costs_list[-1] * 100) if costs_list[-1] > 0 else 0
             
             if language == Language.SPANISH:
-                answer = f"📊 **Análisis de crecimiento de costos vs ventas:**\n\n"
+                answer = "📊 **Análisis de crecimiento de costos vs ventas:**\n\n"
                 answer += f"📈 Crecimiento de ventas: {sales_growth:+.1f}%\n"
                 answer += f"📈 Crecimiento de costos: {costs_growth:+.1f}%\n\n"
                 
                 if costs_growth > sales_growth:
-                    answer += f"⚠️ **Los costos crecen más rápido que las ventas**\n"
+                    answer += "⚠️ **Los costos crecen más rápido que las ventas**\n"
                     answer += f"Diferencia: {costs_growth - sales_growth:.1f}%\n"
-                    answer += f"💡 Necesitas optimizar costos o aumentar ventas."
+                    answer += "💡 Necesitas optimizar costos o aumentar ventas."
                 else:
-                    answer += f"✅ **Las ventas crecen más rápido que los costos**\n"
+                    answer += "✅ **Las ventas crecen más rápido que los costos**\n"
                     answer += f"Diferencia: {sales_growth - costs_growth:.1f}%\n"
-                    answer += f"💡 Buena tendencia de rentabilidad."
+                    answer += "💡 Buena tendencia de rentabilidad."
             else:
-                answer = f"📊 **Cost vs Sales growth analysis:**\n\n"
+                answer = "📊 **Cost vs Sales growth analysis:**\n\n"
                 answer += f"📈 Sales growth: {sales_growth:+.1f}%\n"
                 answer += f"📈 Cost growth: {costs_growth:+.1f}%\n\n"
                 
                 if costs_growth > sales_growth:
-                    answer += f"⚠️ **Costs are growing faster than sales**\n"
+                    answer += "⚠️ **Costs are growing faster than sales**\n"
                     answer += f"Difference: {costs_growth - sales_growth:.1f}%\n"
-                    answer += f"💡 You need to optimize costs or increase sales."
+                    answer += "💡 You need to optimize costs or increase sales."
                 else:
-                    answer += f"✅ **Sales are growing faster than costs**\n"
+                    answer += "✅ **Sales are growing faster than costs**\n"
                     answer += f"Difference: {sales_growth - costs_growth:.1f}%\n"
-                    answer += f"💡 Good profitability trend."
+                    answer += "💡 Good profitability trend."
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
@@ -4205,17 +4205,17 @@ class AdvancedQueryProcessor:
             best_profit = year_profits[best_year]
             
             if language == Language.SPANISH:
-                answer = f"🏆 **Año más rentable:**\n\n"
+                answer = "🏆 **Año más rentable:**\n\n"
                 answer += f"**{best_year}** fue el mejor año\n"
                 answer += f"💰 Ganancia total: ${best_profit:,.2f}\n\n"
-                answer += f"📊 Comparación de años:\n"
+                answer += "📊 Comparación de años:\n"
                 for year in sorted(year_profits.keys(), reverse=True):
                     answer += f"• {year}: ${year_profits[year]:,.2f}\n"
             else:
-                answer = f"🏆 **Most profitable year:**\n\n"
+                answer = "🏆 **Most profitable year:**\n\n"
                 answer += f"**{best_year}** was the best year\n"
                 answer += f"💰 Total profit: ${best_profit:,.2f}\n\n"
-                answer += f"📊 Year comparison:\n"
+                answer += "📊 Year comparison:\n"
                 for year in sorted(year_profits.keys(), reverse=True):
                     answer += f"• {year}: ${year_profits[year]:,.2f}\n"
             
@@ -4238,11 +4238,11 @@ class AdvancedQueryProcessor:
             
             if profit > 0:
                 if language == Language.SPANISH:
-                    answer = f"✅ **Ya estamos en positivo**\n\n"
+                    answer = "✅ **Ya estamos en positivo**\n\n"
                     answer += f"Ganancia actual: ${profit:,.2f}\n"
                     answer += f"Margen: {(profit/sales*100):.1f}%"
                 else:
-                    answer = f"✅ **Already profitable**\n\n"
+                    answer = "✅ **Already profitable**\n\n"
                     answer += f"Current profit: ${profit:,.2f}\n"
                     answer += f"Margin: {(profit/sales*100):.1f}%"
             else:
@@ -4250,21 +4250,21 @@ class AdvancedQueryProcessor:
                 reduction_percent = (reduction_needed / costs * 100) if costs > 0 else 0
                 
                 if language == Language.SPANISH:
-                    answer = f"❌ **Necesitamos reducir costos para ser rentables**\n\n"
+                    answer = "❌ **Necesitamos reducir costos para ser rentables**\n\n"
                     answer += f"Pérdida actual: ${abs(profit):,.2f}\n"
                     answer += f"Costos actuales: ${costs:,.2f}\n\n"
-                    answer += f"📉 **Opciones para quedar en positivo:**\n"
+                    answer += "📉 **Opciones para quedar en positivo:**\n"
                     answer += f"1. Reducir costos en ${reduction_needed:,.2f} ({reduction_percent:.1f}%)\n"
                     answer += f"2. Aumentar ventas en ${reduction_needed:,.2f}\n"
-                    answer += f"3. Combinación de ambas estrategias"
+                    answer += "3. Combinación de ambas estrategias"
                 else:
-                    answer = f"❌ **We need to reduce costs to be profitable**\n\n"
+                    answer = "❌ **We need to reduce costs to be profitable**\n\n"
                     answer += f"Current loss: ${abs(profit):,.2f}\n"
                     answer += f"Current costs: ${costs:,.2f}\n\n"
-                    answer += f"📉 **Options to become profitable:**\n"
+                    answer += "📉 **Options to become profitable:**\n"
                     answer += f"1. Reduce costs by ${reduction_needed:,.2f} ({reduction_percent:.1f}%)\n"
                     answer += f"2. Increase sales by ${reduction_needed:,.2f}\n"
-                    answer += f"3. Combination of both strategies"
+                    answer += "3. Combination of both strategies"
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
@@ -4287,35 +4287,35 @@ class AdvancedQueryProcessor:
             profit_percent = (profit / sales * 100) if sales > 0 else 0
             
             if language == Language.SPANISH:
-                answer = f"💸 **Análisis de flujo de dinero:**\n\n"
-                answer += f"📊 De cada $100 de ventas:\n"
+                answer = "💸 **Análisis de flujo de dinero:**\n\n"
+                answer += "📊 De cada $100 de ventas:\n"
                 answer += f"• ${cost_percent:.2f} se va en costos y gastos\n"
                 answer += f"• ${profit_percent:.2f} queda como ganancia\n\n"
                 
                 if cost_percent > 80:
                     answer += f"⚠️ **Alerta**: Los costos son muy altos ({cost_percent:.1f}%)\n"
-                    answer += f"💡 Necesitas optimizar operaciones o aumentar precios."
+                    answer += "💡 Necesitas optimizar operaciones o aumentar precios."
                 elif cost_percent > 60:
                     answer += f"⚠️ **Atención**: Los costos están en nivel moderado ({cost_percent:.1f}%)\n"
-                    answer += f"💡 Hay margen para mejorar."
+                    answer += "💡 Hay margen para mejorar."
                 else:
                     answer += f"✅ **Bueno**: Los costos están controlados ({cost_percent:.1f}%)\n"
-                    answer += f"💡 Mantén esta eficiencia."
+                    answer += "💡 Mantén esta eficiencia."
             else:
-                answer = f"💸 **Money flow analysis:**\n\n"
-                answer += f"📊 For every $100 in sales:\n"
+                answer = "💸 **Money flow analysis:**\n\n"
+                answer += "📊 For every $100 in sales:\n"
                 answer += f"• ${cost_percent:.2f} goes to costs and expenses\n"
                 answer += f"• ${profit_percent:.2f} remains as profit\n\n"
                 
                 if cost_percent > 80:
                     answer += f"⚠️ **Alert**: Costs are very high ({cost_percent:.1f}%)\n"
-                    answer += f"💡 You need to optimize operations or increase prices."
+                    answer += "💡 You need to optimize operations or increase prices."
                 elif cost_percent > 60:
                     answer += f"⚠️ **Attention**: Costs are at moderate level ({cost_percent:.1f}%)\n"
-                    answer += f"💡 There's room for improvement."
+                    answer += "💡 There's room for improvement."
                 else:
                     answer += f"✅ **Good**: Costs are controlled ({cost_percent:.1f}%)\n"
-                    answer += f"💡 Maintain this efficiency."
+                    answer += "💡 Maintain this efficiency."
             
             return answer, [DB_BUSINESS_METRICS]
         except Exception as e:
@@ -4336,35 +4336,35 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 answer = f"💰 **¿Estamos {PROFIT_VS_SALES_ES}?**\n\n"
-                answer += f"📊 Análisis del mes:\n"
+                answer += "📊 Análisis del mes:\n"
                 answer += f"• Ventas: ${sales:,.2f}\n"
                 answer += f"• Ganancia: ${profit:,.2f}\n"
                 answer += f"• Margen: {profit_margin:.1f}%\n\n"
                 
                 if profit_margin > 20:
-                    answer += f"✅ **¡Excelente!** Estamos ganando bien\n"
+                    answer += "✅ **¡Excelente!** Estamos ganando bien\n"
                     answer += f"Por cada $100 vendidos, ganamos ${profit_margin:.1f}"
                 elif profit_margin > 10:
-                    answer += f"⚠️ **Moderado** Vendemos mucho pero ganamos poco\n"
+                    answer += "⚠️ **Moderado** Vendemos mucho pero ganamos poco\n"
                     answer += f"Por cada $100 vendidos, ganamos solo ${profit_margin:.1f}"
                 else:
-                    answer += f"❌ **Problema** Solo estamos vendiendo, no ganando\n"
+                    answer += "❌ **Problema** Solo estamos vendiendo, no ganando\n"
                     answer += f"Por cada $100 vendidos, ganamos solo ${profit_margin:.1f}"
             else:
-                answer = f"💰 **Are we earning or just selling a lot?**\n\n"
-                answer += f"📊 Month analysis:\n"
+                answer = "💰 **Are we earning or just selling a lot?**\n\n"
+                answer += "📊 Month analysis:\n"
                 answer += f"• Sales: ${sales:,.2f}\n"
                 answer += f"• Profit: ${profit:,.2f}\n"
                 answer += f"• Margin: {profit_margin:.1f}%\n\n"
                 
                 if profit_margin > 20:
-                    answer += f"✅ **Excellent!** We're earning well\n"
+                    answer += "✅ **Excellent!** We're earning well\n"
                     answer += f"For every $100 sold, we earn ${profit_margin:.1f}"
                 elif profit_margin > 10:
-                    answer += f"⚠️ **Moderate** We sell a lot but earn little\n"
+                    answer += "⚠️ **Moderate** We sell a lot but earn little\n"
                     answer += f"For every $100 sold, we earn only ${profit_margin:.1f}"
                 else:
-                    answer += f"❌ **Problem** We're just selling, not earning\n"
+                    answer += "❌ **Problem** We're just selling, not earning\n"
                     answer += f"For every $100 sold, we earn only ${profit_margin:.1f}"
             
             return answer, [DB_BUSINESS_METRICS]
@@ -4383,26 +4383,26 @@ class AdvancedQueryProcessor:
             
             if language == Language.SPANISH:
                 return (
-                    f"💰 **Venta más alta registrada:**\n\n"
-                    f"📊 Detalles:\n"
+                    "💰 **Venta más alta registrada:**\n\n"
+                    "📊 Detalles:\n"
                     f"• Monto: ${transaction['total_amount']:,.2f}\n"
                     f"• Cliente: {transaction['customer_name']}\n"
                     f"• Producto: {transaction['product_name']}\n"
                     f"• Cantidad: {transaction['quantity']} unidades\n"
                     f"• Fecha: {date_str}\n\n"
-                    f"✨ Esta es la transacción individual más grande en nuestro historial.",
+                    "✨ Esta es la transacción individual más grande en nuestro historial.",
                     [DB_SALES_TRANSACTIONS, DB_CUSTOMERS, DB_PRODUCTS]
                 )
             else:
                 return (
-                    f"💰 **Highest transaction recorded:**\n\n"
-                    f"📊 Details:\n"
+                    "💰 **Highest transaction recorded:**\n\n"
+                    "📊 Details:\n"
                     f"• Amount: ${transaction['total_amount']:,.2f}\n"
                     f"• Customer: {transaction['customer_name']}\n"
                     f"• Product: {transaction['product_name']}\n"
                     f"• Quantity: {transaction['quantity']} units\n"
                     f"• Date: {date_str}\n\n"
-                    f"✨ This is the largest individual transaction in our history.",
+                    "✨ This is the largest individual transaction in our history.",
                     [DB_SALES_TRANSACTIONS, DB_CUSTOMERS, DB_PRODUCTS]
                 )
         except Exception as e:
@@ -4419,7 +4419,7 @@ class AdvancedQueryProcessor:
             top = products[0]
             
             if language == Language.SPANISH:
-                answer = f"🏆 **Producto más facturado:**\n\n"
+                answer = "🏆 **Producto más facturado:**\n\n"
                 answer += f"📦 {top['name']}\n"
                 answer += f"• Categoría: {top['category']}\n"
                 answer += f"• Ingresos totales: ${top['total_revenue']:,.2f}\n"
@@ -4429,13 +4429,13 @@ class AdvancedQueryProcessor:
                 answer += f"• Ganancia estimada: ${top['estimated_profit']:,.2f}\n"
                 
                 if len(products) > 1:
-                    answer += f"\n📊 **Otros productos principales:**\n"
+                    answer += "\n📊 **Otros productos principales:**\n"
                     for i, p in enumerate(products[1:3], 2):
                         answer += f"{i}. {p['name']}: ${p['total_revenue']:,.2f}\n"
                 
                 return answer, [DB_PRODUCTS, DB_SALES_TRANSACTIONS]
             else:
-                answer = f"🏆 **Top product by revenue:**\n\n"
+                answer = "🏆 **Top product by revenue:**\n\n"
                 answer += f"📦 {top['name']}\n"
                 answer += f"• Category: {top['category']}\n"
                 answer += f"• Total revenue: ${top['total_revenue']:,.2f}\n"
@@ -4445,7 +4445,7 @@ class AdvancedQueryProcessor:
                 answer += f"• Estimated profit: ${top['estimated_profit']:,.2f}\n"
                 
                 if len(products) > 1:
-                    answer += f"\n📊 **Other top products:**\n"
+                    answer += "\n📊 **Other top products:**\n"
                     for i, p in enumerate(products[1:3], 2):
                         answer += f"{i}. {p['name']}: ${p['total_revenue']:,.2f}\n"
                 
@@ -4464,7 +4464,7 @@ class AdvancedQueryProcessor:
             top_day = sales_by_day[0]
             
             if language == Language.SPANISH:
-                answer = f"📅 **Día con más ventas:**\n\n"
+                answer = "📅 **Día con más ventas:**\n\n"
                 answer += f"📊 {top_day['sale_date']}\n"
                 answer += f"• Ingresos: ${top_day['daily_revenue']:,.2f}\n"
                 answer += f"• Transacciones: {top_day['transaction_count']}\n"
@@ -4472,13 +4472,13 @@ class AdvancedQueryProcessor:
                 answer += f"• Promedio por transacción: ${top_day['daily_revenue'] / top_day['transaction_count']:,.2f}\n"
                 
                 if len(sales_by_day) > 1:
-                    answer += f"\n📈 **Otros días principales:**\n"
+                    answer += "\n📈 **Otros días principales:**\n"
                     for i, day in enumerate(sales_by_day[1:4], 2):
                         answer += f"{i}. {day['sale_date']}: ${day['daily_revenue']:,.2f}\n"
                 
                 return answer, [DB_SALES_TRANSACTIONS]
             else:
-                answer = f"📅 **Day with highest sales:**\n\n"
+                answer = "📅 **Day with highest sales:**\n\n"
                 answer += f"📊 {top_day['sale_date']}\n"
                 answer += f"• Revenue: ${top_day['daily_revenue']:,.2f}\n"
                 answer += f"• Transactions: {top_day['transaction_count']}\n"
@@ -4486,7 +4486,7 @@ class AdvancedQueryProcessor:
                 answer += f"• Average per transaction: ${top_day['daily_revenue'] / top_day['transaction_count']:,.2f}\n"
                 
                 if len(sales_by_day) > 1:
-                    answer += f"\n📈 **Other top days:**\n"
+                    answer += "\n📈 **Other top days:**\n"
                     for i, day in enumerate(sales_by_day[1:4], 2):
                         answer += f"{i}. {day['sale_date']}: ${day['daily_revenue']:,.2f}\n"
                 
@@ -4510,31 +4510,31 @@ class AdvancedQueryProcessor:
             total_all_sales = sum(float(s['total_sales']) for s in all_sales) if all_sales else 1
             
             if language == Language.SPANISH:
-                answer = f"💸 **Ventas muy pequeñas:**\n\n"
+                answer = "💸 **Ventas muy pequeñas:**\n\n"
                 answer += f"📊 Encontramos {len(small_txns)} transacciones pequeñas:\n\n"
                 
                 for i, txn in enumerate(small_txns[:3], 1):
                     answer += f"{i}. ${float(txn['total_amount']):,.2f} - {txn['product_name']} ({txn['customer_name']})\n"
                 
-                answer += f"\n💡 **Análisis:**\n"
+                answer += "\n💡 **Análisis:**\n"
                 answer += f"• Monto promedio: ${avg_small:,.2f}\n"
                 answer += f"• Total de estas ventas: ${total_small:,.2f}\n"
                 answer += f"• Representan el {(total_small / total_all_sales) * 100:.2f}% del total\n"
-                answer += f"\n⚠️ Considera si vale la pena procesar transacciones tan pequeñas."
+                answer += "\n⚠️ Considera si vale la pena procesar transacciones tan pequeñas."
                 
                 return answer, [DB_SALES_TRANSACTIONS, DB_PRODUCTS, DB_CUSTOMERS]
             else:
-                answer = f"💸 **Small transactions:**\n\n"
+                answer = "💸 **Small transactions:**\n\n"
                 answer += f"📊 Found {len(small_txns)} small transactions:\n\n"
                 
                 for i, txn in enumerate(small_txns[:3], 1):
                     answer += f"{i}. ${float(txn['total_amount']):,.2f} - {txn['product_name']} ({txn['customer_name']})\n"
                 
-                answer += f"\n💡 **Analysis:**\n"
+                answer += "\n💡 **Analysis:**\n"
                 answer += f"• Average amount: ${avg_small:,.2f}\n"
                 answer += f"• Total of these sales: ${total_small:,.2f}\n"
                 answer += f"• Represent {(total_small / total_all_sales) * 100:.2f}% of total\n"
-                answer += f"\n⚠️ Consider if it's worth processing such small transactions."
+                answer += "\n⚠️ Consider if it's worth processing such small transactions."
                 
                 return answer, [DB_SALES_TRANSACTIONS, DB_PRODUCTS, DB_CUSTOMERS]
         except Exception as e:
@@ -4552,7 +4552,7 @@ class AdvancedQueryProcessor:
             recent_months = sales_by_month[:12]
             
             if language == Language.SPANISH:
-                answer = f"📊 **Ventas por mes (últimos 12 meses):**\n\n"
+                answer = "📊 **Ventas por mes (últimos 12 meses):**\n\n"
                 
                 for month_data in recent_months:
                     month_name = MONTH_NAMES_ES[month_data['month']]
@@ -4561,14 +4561,14 @@ class AdvancedQueryProcessor:
                 avg_txns = sum(m['transaction_count'] for m in recent_months) / len(recent_months)
                 total_txns = sum(m['transaction_count'] for m in recent_months)
                 
-                answer += f"\n📈 **Resumen:**\n"
+                answer += "\n📈 **Resumen:**\n"
                 answer += f"• Total de transacciones: {total_txns}\n"
                 answer += f"• Promedio por mes: {avg_txns:.0f}\n"
                 answer += f"• Ingresos totales: ${sum(m['monthly_revenue'] for m in recent_months):,.2f}\n"
                 
                 return answer, [DB_SALES_TRANSACTIONS]
             else:
-                answer = f"📊 **Sales per month (last 12 months):**\n\n"
+                answer = "📊 **Sales per month (last 12 months):**\n\n"
                 
                 for month_data in recent_months:
                     month_name = MONTH_NAMES_EN[month_data['month']]
@@ -4577,7 +4577,7 @@ class AdvancedQueryProcessor:
                 avg_txns = sum(m['transaction_count'] for m in recent_months) / len(recent_months)
                 total_txns = sum(m['transaction_count'] for m in recent_months)
                 
-                answer += f"\n📈 **Summary:**\n"
+                answer += "\n📈 **Summary:**\n"
                 answer += f"• Total transactions: {total_txns}\n"
                 answer += f"• Average per month: {avg_txns:.0f}\n"
                 answer += f"• Total revenue: ${sum(m['monthly_revenue'] for m in recent_months):,.2f}\n"

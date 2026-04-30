@@ -81,10 +81,11 @@ function Sales() {
 
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
-          <label>Customer</label>
+          <label htmlFor="sale-customer">Customer</label>
           <select
+            id="sale-customer"
             value={formData.customerId}
-            onChange={(e) => setFormData({ ...formData, customerId: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, customerId: Number.parseInt(e.target.value) })}
             required
           >
             <option value={0}>Select Customer</option>
@@ -96,10 +97,11 @@ function Sales() {
           </select>
         </div>
         <div className="form-group">
-          <label>Product</label>
+          <label htmlFor="sale-product">Product</label>
           <select
+            id="sale-product"
             value={formData.productId}
-            onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, productId: Number.parseInt(e.target.value) })}
             required
           >
             <option value={0}>Select Product</option>
@@ -111,8 +113,9 @@ function Sales() {
           </select>
         </div>
         <div className="form-group">
-          <label>Date</label>
+          <label htmlFor="sale-date">Date</label>
           <input
+            id="sale-date"
             type="date"
             value={formData.transactionDate}
             onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
@@ -120,12 +123,13 @@ function Sales() {
           />
         </div>
         <div className="form-group">
-          <label>Quantity</label>
+          <label htmlFor="sale-quantity">Quantity</label>
           <input
+            id="sale-quantity"
             type="number"
             min="1"
             value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, quantity: Number.parseInt(e.target.value) })}
             required
           />
         </div>
@@ -136,16 +140,18 @@ function Sales() {
 
       <div className="filter-section">
         <div className="form-group">
-          <label>From Date:</label>
+          <label htmlFor="filter-date-from">From Date:</label>
           <input
+            id="filter-date-from"
             type="date"
             value={filterDateFrom}
             onChange={(e) => setFilterDateFrom(e.target.value)}
           />
         </div>
         <div className="form-group">
-          <label>To Date:</label>
+          <label htmlFor="filter-date-to">To Date:</label>
           <input
+            id="filter-date-to"
             type="date"
             value={filterDateTo}
             onChange={(e) => setFilterDateTo(e.target.value)}

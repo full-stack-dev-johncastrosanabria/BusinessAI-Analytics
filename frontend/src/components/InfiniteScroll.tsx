@@ -3,13 +3,13 @@ import { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
 import './InfiniteScroll.css'
 
 interface InfiniteScrollProps<T> {
-  query: UseInfiniteQueryResult<InfiniteData<{ data: T[]; hasMore: boolean }>, Error>
-  renderItem: (item: T, index: number) => React.ReactNode
-  loadingComponent?: React.ReactNode
-  emptyComponent?: React.ReactNode
-  errorComponent?: (error: Error) => React.ReactNode
-  threshold?: number
-  className?: string
+  readonly query: UseInfiniteQueryResult<InfiniteData<{ data: T[]; hasMore: boolean }>, Error>
+  readonly renderItem: (item: T, index: number) => React.ReactNode
+  readonly loadingComponent?: React.ReactNode
+  readonly emptyComponent?: React.ReactNode
+  readonly errorComponent?: (error: Error) => React.ReactNode
+  readonly threshold?: number
+  readonly className?: string
 }
 
 export function InfiniteScroll<T>({
@@ -94,7 +94,7 @@ export function InfiniteScroll<T>({
     <div className={`infinite-scroll-container ${className}`}>
       <div className="infinite-scroll-list">
         {allItems.map((item: T, index: number) => (
-          <div key={index} className="infinite-scroll-item">
+          <div key={`item-${index}`} className="infinite-scroll-item">
             {renderItem(item, index)}
           </div>
         ))}

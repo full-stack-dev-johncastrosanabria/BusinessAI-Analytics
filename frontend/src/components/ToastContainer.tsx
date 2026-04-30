@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo, createContext } from 'react'
 import Toast, { ToastMessage, ToastType } from './Toast'
 import './ToastContainer.css'
 
@@ -6,7 +6,7 @@ interface ToastContextType {
   showToast: (message: string, type: ToastType, duration?: number) => void
 }
 
-export const ToastContext = React.createContext<ToastContextType | undefined>(undefined)
+export const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
 function ToastContainer() {
   const [toasts, setToasts] = useState<ToastMessage[]>([])
@@ -21,8 +21,10 @@ function ToastContainer() {
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
 
+  const contextValue = useMemo(() => ({ showToast }), [showToast])
+
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={contextValue}>
       <div className="toast-container">
         {toasts.map((toast) => (
           <Toast key={toast.id} toast={toast} onClose={removeToast} />

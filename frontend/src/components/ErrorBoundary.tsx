@@ -50,7 +50,7 @@ export default function ErrorBoundary() {
         {errorMessage}
       </p>
       <button
-        onClick={() => window.location.href = '/'}
+        onClick={() => { globalThis.location.href = '/' }}
         style={{
           marginTop: BUTTON_MARGIN_TOP,
           padding: BUTTON_PADDING,

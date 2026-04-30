@@ -89,7 +89,7 @@ function Products() {
     })
     setFormErrors({})
     setEditingId(product.id)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    globalThis.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleDeleteConfirm = async () => {
@@ -181,7 +181,7 @@ function Products() {
             min="0"
             value={formData.cost}
             onChange={(e) => {
-              setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })
+              setFormData({ ...formData, cost: Number.parseFloat(e.target.value) || 0 })
               if (formErrors.cost) setFormErrors({ ...formErrors, cost: undefined })
             }}
             aria-invalid={!!formErrors.cost}
@@ -208,7 +208,7 @@ function Products() {
             min="0"
             value={formData.price}
             onChange={(e) => {
-              setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
+              setFormData({ ...formData, price: Number.parseFloat(e.target.value) || 0 })
               if (formErrors.price) setFormErrors({ ...formErrors, price: undefined })
             }}
             aria-invalid={!!formErrors.price}

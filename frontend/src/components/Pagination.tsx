@@ -2,12 +2,12 @@ import { PaginatedResponse } from '../hooks/usePagination'
 import './Pagination.css'
 
 interface PaginationProps {
-  pagination: PaginatedResponse<unknown>['pagination']
-  onPageChange: (page: number) => void
-  onPageSizeChange?: (pageSize: number) => void
-  pageSizeOptions?: number[]
-  showPageSize?: boolean
-  showInfo?: boolean
+  readonly pagination: PaginatedResponse<unknown>['pagination']
+  readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange?: (pageSize: number) => void
+  readonly pageSizeOptions?: number[]
+  readonly showPageSize?: boolean
+  readonly showInfo?: boolean
 }
 
 export function Pagination({
@@ -78,7 +78,7 @@ export function Pagination({
         <div className="pagination-pages">
           {getPageNumbers().map((pageNum, index) =>
             pageNum === '...' ? (
-              <span key={`dots-${index}`} className="pagination-dots">
+              <span key={`dots-${pageNum}-${index}`} className="pagination-dots">
                 ...
               </span>
             ) : (

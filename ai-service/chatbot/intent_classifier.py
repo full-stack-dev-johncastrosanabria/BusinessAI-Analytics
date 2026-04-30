@@ -900,7 +900,7 @@ class AdvancedIntentClassifier:
         start_time = datetime.now()
         
         # Detect language first
-        language, lang_confidence = self.detect_language(question)
+        language, _lang_confidence = self.detect_language(question)
         
         # Normalize and clean text
         question_normalized = self._normalize_text(question)

@@ -322,7 +322,6 @@ public class DocumentExtractionIntegrationTest {
     @DisplayName("Should accept files up to 50MB")
     void testFileSizeValidationAccepts50MB() throws Exception {
         // Arrange - Create a file close to 50MB (using sparse content)
-        String largeContent = "x".repeat(1000); // 1KB repeated
         byte[] content = new byte[1024 * 1024]; // 1MB for practical testing
         for (int i = 0; i < content.length; i++) {
             content[i] = (byte) 'x';

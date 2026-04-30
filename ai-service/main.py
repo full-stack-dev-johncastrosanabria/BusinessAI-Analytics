@@ -13,7 +13,10 @@ from pydantic import BaseModel, field_validator
 
 from database import DatabaseConnection
 from models.hybrid_forecast import HybridForecastModel
-from chatbot.intent_classifier import IntentClassifier, AdvancedIntentClassifier
+from chatbot.intent_classifier import (
+    AdvancedIntentClassifier,
+    IntentClassifier,
+)
 from chatbot.query_processor import QueryProcessor
 from chatbot.advanced_query_processor import AdvancedQueryProcessor
 
@@ -29,6 +32,7 @@ INSUFFICIENT_TRAINING_DATA = (
     "Insufficient training data. "
     "Need at least 24 months of historical data."
 )
+INTERNAL_SERVER_ERROR = "Internal server error."
 MIN_TRAINING_MONTHS = 24
 FORECAST_MONTHS = 12
 GROWTH_RATE = 1.02
@@ -175,7 +179,6 @@ async def shutdown_event() -> None:
 
 @app.post(
     "/api/ai/forecast/sales",
-    response_model=ForecastResponse,
     responses={
         400: {"description": "Insufficient training data"},
         500: {"description": "Internal server error"},
@@ -227,7 +230,6 @@ async def forecast_sales() -> ForecastResponse:
 
 @app.post(
     "/api/ai/forecast/costs",
-    response_model=ForecastResponse,
     responses={
         400: {"description": "Insufficient training data"},
         500: {"description": "Internal server error"},
@@ -289,7 +291,6 @@ async def forecast_costs() -> ForecastResponse:
 
 @app.post(
     "/api/ai/forecast/profit",
-    response_model=ForecastResponse,
     responses={
         400: {"description": "Insufficient training data"},
         500: {"description": "Internal server error"},
@@ -360,7 +361,6 @@ async def forecast_profit() -> ForecastResponse:
 
 @app.post(
     "/api/ai/chatbot/query",
-    response_model=ChatbotQueryResponse,
     responses={
         500: {"description": "Internal server error"},
         503: {"description": "Chatbot not initialized"},
@@ -420,7 +420,6 @@ async def process_chatbot_query(
 
 @app.post(
     "/api/ai/train",
-    response_model=TrainingResponse,
     responses={
         400: {"description": "Insufficient training data"},
         500: {"description": "Internal server error"},
@@ -428,7 +427,7 @@ async def process_chatbot_query(
     },
 )
 async def train_models(
-    request: TrainingRequest = None,
+    request: TrainingRequest = None,  # noqa: ARG001
 ) -> TrainingResponse:
     """
     Train both sales and cost forecasting models.

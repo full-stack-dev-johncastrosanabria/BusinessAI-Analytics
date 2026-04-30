@@ -50,7 +50,7 @@ function Documents() {
   }
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this document?')) return
+    if (!globalThis.confirm('Are you sure you want to delete this document?')) return
     try {
       await documentService.deleteDocument(id)
       await fetchDocuments()
@@ -78,11 +78,11 @@ function Documents() {
         />
       </div>
 
-      {loading ? (
-        <div className="loading">Loading documents...</div>
-      ) : documents.length === 0 ? (
+      {loading && <div className="loading">Loading documents...</div>}
+      {!loading && documents.length === 0 && (
         <div className="empty">No documents uploaded yet</div>
-      ) : (
+      )}
+      {!loading && documents.length > 0 && (
         <div className="documents-list">
           <table>
             <thead>

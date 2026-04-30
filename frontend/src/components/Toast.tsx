@@ -14,8 +14,8 @@ export interface ToastMessage {
 }
 
 interface ToastProps {
-  toast: ToastMessage
-  onClose: (id: string) => void
+  readonly toast: ToastMessage
+  readonly onClose: (id: string) => void
 }
 
 function Toast({ toast, onClose }: ToastProps) {

@@ -126,8 +126,8 @@ function Chatbot() {
                       <div className="message-sources">
                         <strong>Sources:</strong>
                         <ul>
-                          {message.sources.map((source, idx) => (
-                            <li key={idx}>{source}</li>
+                          {message.sources.map((source) => (
+                            <li key={source}>{source}</li>
                           ))}
                         </ul>
                       </div>

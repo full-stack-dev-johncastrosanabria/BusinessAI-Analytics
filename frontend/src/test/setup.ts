@@ -8,7 +8,7 @@ afterEach(() => {
 })
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(globalThis, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,
@@ -23,10 +23,10 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 // Mock scrollIntoView (not implemented in jsdom)
-window.HTMLElement.prototype.scrollIntoView = vi.fn()
+globalThis.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 // Mock window.confirm
-window.confirm = vi.fn(() => true)
+globalThis.confirm = vi.fn(() => true)
 
 // Mock ResizeObserver (used by recharts, not implemented in jsdom)
 globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({

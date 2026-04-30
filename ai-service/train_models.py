@@ -76,8 +76,8 @@ def main():
         
         sales_mape = sales_model.train(sales_data, epochs=100)
 
-        logger.info(f"Sales Model Training Complete")
-        logger.info(f"Sales Model Validation MAPE: {sales_mape:.4f}%")
+        logger.info("Sales Model Training Complete")
+        logger.info("Sales Model Validation MAPE: %.4f%%", sales_mape)
 
         if sales_mape < 15:
             logger.info("✓ Sales model EXCELLENT (< 15% MAPE)")
@@ -103,8 +103,8 @@ def main():
         try:
             cost_mape = cost_model.train(cost_data, epochs=100)
 
-            logger.info(f"Cost Model Training Complete")
-            logger.info(f"Cost Model Validation MAPE: {cost_mape:.4f}%")
+            logger.info("Cost Model Training Complete")
+            logger.info("Cost Model Validation MAPE: %.4f%%", cost_mape)
 
             if cost_mape < 15:
                 logger.info("✓ Cost model EXCELLENT (< 15% MAPE)")

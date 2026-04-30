@@ -167,4 +167,37 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- coverage profile: activated by -Pcoverage in CI/CD (e.g. mvn verify -Pcoverage).
+         Ensures JaCoCo agent is attached and the XML report is generated so SonarQube
+         can pick it up from target/site/jacoco/jacoco.xml. -->
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.11</version>
+                        <executions>
+                            <execution>
+                                <id>coverage-prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>coverage-report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

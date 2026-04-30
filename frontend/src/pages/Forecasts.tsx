@@ -230,10 +230,10 @@ function Forecasts() {
                 </LineChart>
               </ResponsiveContainer>
             </>
-          ) : salesQuery.isLoading ? (
-            <div className="placeholder">Loading...</div>
           ) : (
-            <div className="placeholder">Click "Generate" to create forecast</div>
+            <div className="placeholder">
+              {salesQuery.isLoading ? 'Loading...' : 'Click "Generate" to create forecast'}
+            </div>
           )}
         </div>
 
@@ -267,10 +267,10 @@ function Forecasts() {
                 </LineChart>
               </ResponsiveContainer>
             </>
-          ) : costQuery.isLoading ? (
-            <div className="placeholder">Loading...</div>
           ) : (
-            <div className="placeholder">Click "Generate" to create forecast</div>
+            <div className="placeholder">
+              {costQuery.isLoading ? 'Loading...' : 'Click "Generate" to create forecast'}
+            </div>
           )}
         </div>
 
@@ -304,10 +304,10 @@ function Forecasts() {
                 </LineChart>
               </ResponsiveContainer>
             </>
-          ) : profitQuery.isLoading ? (
-            <div className="placeholder">Loading...</div>
           ) : (
-            <div className="placeholder">Click "Generate" to create forecast</div>
+            <div className="placeholder">
+              {profitQuery.isLoading ? 'Loading...' : 'Click "Generate" to create forecast'}
+            </div>
           )}
         </div>
       </div>

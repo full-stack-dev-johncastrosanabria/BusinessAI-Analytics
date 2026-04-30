@@ -42,7 +42,7 @@ export class ReactErrorBoundary extends Component<Props, State> {
             {this.state.error?.message || 'An unexpected error occurred'}
           </p>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => { globalThis.location.href = '/' }}
             style={{
               marginTop: '2rem',
               padding: '0.75rem 1.5rem',

@@ -102,7 +102,7 @@ function Customers() {
     })
     setFormErrors({})
     setEditingId(customer.id)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    globalThis.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleDeleteConfirm = async () => {

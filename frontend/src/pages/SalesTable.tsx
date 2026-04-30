@@ -72,21 +72,27 @@ export default function SalesTable() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="loading-cell">
-                  <div className="spinner" />
-                  Loading...
-                </td>
-              </tr>
-            ) : paginatedTransactions.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="empty-cell">
-                  No transactions found
-                </td>
-              </tr>
-            ) : (
-              paginatedTransactions.map((transaction) => (
+            {(() => {
+              if (loading) {
+                return (
+                  <tr>
+                    <td colSpan={6} className="loading-cell">
+                      <div className="spinner" />
+                      Loading...
+                    </td>
+                  </tr>
+                )
+              }
+              if (paginatedTransactions.length === 0) {
+                return (
+                  <tr>
+                    <td colSpan={6} className="empty-cell">
+                      No transactions found
+                    </td>
+                  </tr>
+                )
+              }
+              return paginatedTransactions.map((transaction) => (
                 <tr key={transaction.id}>
                   <td>{transaction.id}</td>
                   <td>
@@ -100,7 +106,7 @@ export default function SalesTable() {
                   </td>
                 </tr>
               ))
-            )}
+            })()}
           </tbody>
         </table>
       </div>
