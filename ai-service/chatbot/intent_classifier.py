@@ -920,7 +920,7 @@ class AdvancedIntentClassifier:
         # Check for mixed intent
         if self._check_mixed_intent(intent_scores):
             max_score = max(intent_scores.values())
-            logger.info(f"Mixed intent detected")
+            logger.info("Mixed intent detected")
             return Intent.MIXED, max_score / 100, language
         
         # Return best intent
