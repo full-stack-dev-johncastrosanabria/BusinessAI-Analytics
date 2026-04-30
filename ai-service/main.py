@@ -117,7 +117,7 @@ class TrainingResponse(BaseModel):
 
 
 @app.on_event("startup")
-async def startup_event() -> None:
+def startup_event() -> None:
     """Initialize database connection and load models on startup."""
     global _db_connection, _sales_model, _cost_model
     global _intent_classifier, _query_processor
@@ -236,7 +236,7 @@ def forecast_sales() -> ForecastResponse:
         503: {"description": "Cost model not loaded"},
     },
 )
-async def forecast_costs() -> ForecastResponse:
+def forecast_costs() -> ForecastResponse:
     """
     Generate 12-month cost forecast.
 
@@ -297,7 +297,7 @@ async def forecast_costs() -> ForecastResponse:
         503: {"description": "Models not loaded"},
     },
 )
-async def forecast_profit() -> ForecastResponse:
+def forecast_profit() -> ForecastResponse:
     """
     Generate 12-month profit forecast by subtracting cost from sales.
 
@@ -426,7 +426,7 @@ async def process_chatbot_query(
         503: {"description": "Models not initialized"},
     },
 )
-async def train_models(
+def train_models(
     _request: TrainingRequest = None,
 ) -> TrainingResponse:
     """
@@ -486,7 +486,7 @@ async def train_models(
 # Health Check Endpoint
 
 @app.get("/health")
-async def health_check() -> dict:
+def health_check() -> dict:
     """Health check endpoint."""
     return {
         "status": "healthy",
