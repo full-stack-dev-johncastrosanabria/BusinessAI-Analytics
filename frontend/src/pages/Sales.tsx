@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, SubmitEvent } from 'react'
 import salesService, { SalesTransaction, CreateSalesTransactionRequest } from '../services/salesService'
 import productService, { Product } from '../services/productService'
 import customerService, { Customer } from '../services/customerService'
@@ -45,7 +45,7 @@ function Sales() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       await salesService.createSalesTransaction(formData)

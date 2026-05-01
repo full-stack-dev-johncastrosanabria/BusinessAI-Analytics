@@ -2,17 +2,17 @@ import React from 'react';
 import './Card.css';
 
 export interface CardProps {
-  header?: React.ReactNode;
-  footer?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
+  readonly header?: React.ReactNode;
+  readonly footer?: React.ReactNode;
+  readonly children: React.ReactNode;
+  readonly className?: string;
   /** Removes default padding from the body */
-  noPadding?: boolean;
+  readonly noPadding?: boolean;
   /** Adds a hover shadow effect */
-  hoverable?: boolean;
-  role?: string;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
+  readonly hoverable?: boolean;
+  readonly role?: string;
+  readonly 'aria-label'?: string;
+  readonly 'aria-labelledby'?: string;
 }
 
 export const Card: React.FC<CardProps> = ({

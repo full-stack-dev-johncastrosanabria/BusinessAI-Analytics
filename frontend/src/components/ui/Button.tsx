@@ -1,17 +1,17 @@
-import React from 'react';
+import React from 'react'
 import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  loading?: boolean;
+  readonly variant?: ButtonVariant;
+  readonly size?: ButtonSize;
+  readonly loading?: boolean;
   /** Icon rendered before the label */
-  startIcon?: React.ReactNode;
+  readonly startIcon?: React.ReactNode;
   /** Icon rendered after the label */
-  endIcon?: React.ReactNode;
+  readonly endIcon?: React.ReactNode;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

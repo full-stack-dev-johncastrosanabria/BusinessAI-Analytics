@@ -41,11 +41,7 @@ public class DocumentFormatValidationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         MultipartFile mockFile = createMockFile("test." + fileType.toLowerCase(), 1000, "test content");
         
@@ -71,11 +67,7 @@ public class DocumentFormatValidationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         MultipartFile mockFile = createMockFile("test." + fileType.toLowerCase(), 1000, "test content");
         
@@ -92,11 +84,7 @@ public class DocumentFormatValidationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         // 51MB file
         long oversizeFileSize = 52428800 + 1;
@@ -115,11 +103,7 @@ public class DocumentFormatValidationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         // Exactly 50MB
         long validFileSize = 52428800;
@@ -157,7 +141,7 @@ public class DocumentFormatValidationProperties {
         when(mockFile.isEmpty()).thenReturn(false);
         try {
             when(mockFile.getBytes()).thenReturn(content.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             // Mock exception
         }
         return mockFile;

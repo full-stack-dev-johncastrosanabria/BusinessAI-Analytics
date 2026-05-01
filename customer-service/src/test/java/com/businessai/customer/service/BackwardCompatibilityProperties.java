@@ -52,7 +52,7 @@ class BackwardCompatibilityProperties {
             customerService.createCustomer(customer);
         } catch (CustomerValidationException e) {
             fail("Valid email '" + email + "' should not cause CustomerValidationException: " + e.getMessage());
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             // Other exceptions (e.g. from null repository) are acceptable — validation passed
         }
     }

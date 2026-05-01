@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, SubmitEvent } from 'react'
 import productService, { Product, CreateProductRequest } from '../services/productService'
 import { SkeletonTable } from '../components/Skeleton'
 import { Tooltip, ConfirmDialog } from '../components/ui'
@@ -60,7 +60,7 @@ function Products() {
     setTimeout(() => setSuccessMessage(null), 3000)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!validateForm()) return
     try {

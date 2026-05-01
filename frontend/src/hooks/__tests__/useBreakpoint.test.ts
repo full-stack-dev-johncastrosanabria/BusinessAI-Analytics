@@ -11,14 +11,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useBreakpoint, BREAKPOINTS } from '../useBreakpoint'
 
-// Helper to set window.innerWidth and fire resize
+// Helper to set globalThis.innerWidth and fire resize
 function setViewportWidth(width: number) {
-  Object.defineProperty(window, 'innerWidth', {
+  Object.defineProperty(globalThis, 'innerWidth', {
     writable: true,
     configurable: true,
     value: width,
   })
-  window.dispatchEvent(new Event('resize'))
+  globalThis.dispatchEvent(new Event('resize'))
 }
 
 describe('useBreakpoint', () => {

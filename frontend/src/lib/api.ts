@@ -25,9 +25,9 @@ export class APIError extends Error {
 }
 
 interface RequestConfig extends RequestInit {
-  params?: Record<string, string | number | boolean>
-  timeout?: number
-  retries?: number
+  readonly params?: Record<string, string | number | boolean>
+  readonly timeout?: number
+  readonly retries?: number
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -168,15 +168,25 @@ export const api = {
   get: <T>(endpoint: string, config?: RequestConfig) =>
     request<T>(endpoint, { ...config, method: 'GET' }),
 
-  post: <T>(endpoint: string, data?: unknown, config?: RequestConfig) =>
-    request<T>(endpoint, {
+  post: <T>(endpoint: string, data?: unknown, config?: RequestConfig) => {
+    let body: BodyInit | undefined
+    if (data instanceof FormData) {
+      body = data
+    } else if (data) {
+      body = JSON.stringify(data)
+    } else {
+      body = undefined
+    }
+
+    return request<T>(endpoint, {
       ...config,
       method: 'POST',
-      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
+      body,
       headers: data instanceof FormData
         ? removeContentType(config?.headers)
         : config?.headers,
-    }),
+    })
+  },
 
   put: <T>(endpoint: string, data?: unknown, config?: RequestConfig) =>
     request<T>(endpoint, {
@@ -188,15 +198,25 @@ export const api = {
   delete: <T>(endpoint: string, config?: RequestConfig) =>
     request<T>(endpoint, { ...config, method: 'DELETE' }),
 
-  patch: <T>(endpoint: string, data?: unknown, config?: RequestConfig) =>
-    request<T>(endpoint, {
+  patch: <T>(endpoint: string, data?: unknown, config?: RequestConfig) => {
+    let body: BodyInit | undefined
+    if (data instanceof FormData) {
+      body = data
+    } else if (data) {
+      body = JSON.stringify(data)
+    } else {
+      body = undefined
+    }
+
+    return request<T>(endpoint, {
       ...config,
       method: 'PATCH',
-      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
+      body,
       headers: data instanceof FormData
         ? removeContentType(config?.headers)
         : config?.headers,
-    }),
+    })
+  },
 }
 
 function removeContentType(headers?: HeadersInit): Headers {

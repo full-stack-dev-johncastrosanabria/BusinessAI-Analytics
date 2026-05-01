@@ -168,7 +168,11 @@ function Chatbot() {
             </div>
           )}
           <div className="input-group">
+            <label htmlFor="chat-question-input" className="visually-hidden">
+              {t('chatbot.askQuestion')}
+            </label>
             <input
+              id="chat-question-input"
               type="text"
               name="question"
               placeholder={t('chatbot.askQuestion')}

@@ -19,15 +19,14 @@
  * 11. Show sales infinite scroll
  */
 
-import { Browser, Page } from 'playwright';
+import { Browser, Page, chromium, BrowserContext } from 'playwright';
 import {
-  DemoLogger,
-  DemoTiming,
-  BrowserManager,
-  NavigationHelper,
-  UIInteractionHelper,
-  ChatbotHelper,
-  DemoCompletion,
+  log,
+  header,
+  step,
+  action,
+  wait,
+  navigateToTab,
   colors
 } from './shared/demo-orchestrator.js';
 
@@ -90,7 +89,7 @@ async function runDemo(): Promise<void> {
       `;
       
       // Scroll to top-left
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
     });
     
     await page.waitForTimeout(1500);
@@ -106,9 +105,9 @@ async function runDemo(): Promise<void> {
         top: rect.top,
         width: rect.width,
         height: rect.height,
-        bodyMargin: window.getComputedStyle(body).margin,
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
+        bodyMargin: globalThis.getComputedStyle(body).margin,
+        windowWidth: globalThis.innerWidth,
+        windowHeight: globalThis.innerHeight,
       };
     });
     
@@ -144,7 +143,7 @@ async function runDemo(): Promise<void> {
     
     // Ensure we're at top-left corner - minimal CSS
     await page.evaluate(() => {
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
       
       // Remove existing override if present
       const existingStyle = document.getElementById('fullscreen-override');
@@ -169,7 +168,7 @@ async function runDemo(): Promise<void> {
     await wait(3, 'Dashboard loading and rendering');
     
     action('📊 Scrolling to see all metrics');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(3, 'Viewing dashboard content - viewers can see all metrics');
 
     // ====================================================================
@@ -185,20 +184,20 @@ async function runDemo(): Promise<void> {
     await wait(2, 'Page rendering');
     
     // Scroll to top first
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => globalThis.scrollTo(0, 0));
     await wait(1, 'Positioned at top');
     
     // Scroll down to see forecasts - multiple scrolls for visibility
     action('📈 Scrolling to reveal forecast charts');
-    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.evaluate(() => globalThis.scrollBy(0, 500));
     await wait(3, 'Forecasts visible - viewers can see predictions');
     
     action('📈 Scrolling more to see all forecast details');
-    await page.evaluate(() => window.scrollBy(0, 600));
+    await page.evaluate(() => globalThis.scrollBy(0, 600));
     await wait(3, 'Viewing detailed forecasts - viewers can see all data');
     
     action('📈 Scrolling to see bottom of forecasts');
-    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.evaluate(() => globalThis.scrollBy(0, 500));
     await wait(2, 'All forecast data visible');
 
     // ====================================================================
@@ -310,7 +309,7 @@ async function runDemo(): Promise<void> {
     await wait(3, '✓ Product creation complete - viewers can see the new product');
     
     action('📦 Scrolling through product list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(3, 'Viewing product details - viewers can see products');
 
     // Try to interact with product actions
@@ -343,7 +342,7 @@ async function runDemo(): Promise<void> {
     }
 
     action('📦 Scrolling to see more products');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(2, 'Viewing more products');
 
     // ====================================================================
@@ -363,7 +362,7 @@ async function runDemo(): Promise<void> {
     await wait(3, '✓ Customer creation complete - viewers can see the new customer');
     
     action('👥 Scrolling through customer list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(3, 'Viewing customer details - viewers can see customers');
 
     // Try to interact with customer actions
@@ -396,7 +395,7 @@ async function runDemo(): Promise<void> {
     }
 
     action('👥 Scrolling to see more customers');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(2, 'Viewing more customers');
 
     // ====================================================================
@@ -412,7 +411,7 @@ async function runDemo(): Promise<void> {
     await wait(2, 'Observing sales data');
     
     action('💰 Scrolling through transactions');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(3, 'Viewing transaction details - viewers can see the sales');
 
     // Try to interact with sales actions
@@ -445,7 +444,7 @@ async function runDemo(): Promise<void> {
     }
 
     action('💰 Scrolling to see more transactions');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(2, 'Viewing more transactions');
 
     // ====================================================================
@@ -461,7 +460,7 @@ async function runDemo(): Promise<void> {
     await wait(2, 'Observing documents');
     
     action('📄 Scrolling through document list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await wait(2, 'Viewing document details - viewers can see the documents');
 
     // ====================================================================

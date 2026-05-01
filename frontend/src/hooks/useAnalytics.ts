@@ -6,35 +6,35 @@ const DASHBOARD_STALE_TIME_MS = 2 * 60 * 1000 // 2 minutes
 const METRICS_STALE_TIME_MS = 5 * 60 * 1000 // 5 minutes
 
 export interface DashboardSummary {
-  totalSales: number
-  totalCosts: number
-  totalProfit: number
-  bestMonth: {
-    month: number
-    year: number
-    profit: number
+  readonly totalSales: number
+  readonly totalCosts: number
+  readonly totalProfit: number
+  readonly bestMonth: {
+    readonly month: number
+    readonly year: number
+    readonly profit: number
   }
-  worstMonth: {
-    month: number
-    year: number
-    profit: number
+  readonly worstMonth: {
+    readonly month: number
+    readonly year: number
+    readonly profit: number
   }
-  topProducts: Array<{
-    id: number
-    name: string
-    category: string
-    totalRevenue: number
+  readonly topProducts: Array<{
+    readonly id: number
+    readonly name: string
+    readonly category: string
+    readonly totalRevenue: number
   }>
 }
 
 export interface BusinessMetric {
-  id: number
-  month: number
-  year: number
-  totalSales: number
-  totalCosts: number
-  totalExpenses: number
-  profit: number
+  readonly id: number
+  readonly month: number
+  readonly year: number
+  readonly totalSales: number
+  readonly totalCosts: number
+  readonly totalExpenses: number
+  readonly profit: number
 }
 
 // Query keys
