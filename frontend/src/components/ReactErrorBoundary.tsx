@@ -1,12 +1,12 @@
 import { Component, ReactNode } from 'react'
 
 interface Props {
-  children: ReactNode
+  readonly children: ReactNode
 }
 
 interface State {
-  hasError: boolean
-  error?: Error
+  readonly hasError: boolean
+  readonly error?: Error
 }
 
 export class ReactErrorBoundary extends Component<Props, State> {

@@ -117,7 +117,7 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: #666;
 }
 
 [data-theme="dark"] .loading {
@@ -286,7 +286,7 @@ tr:hover {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #90a4ae;
+  background-color: #6b7280;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -299,7 +299,7 @@ tr:hover {
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: #666;
 }
 
 [data-theme="dark"] .empty-state {

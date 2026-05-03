@@ -2,11 +2,11 @@ import './PageLoader.css'
 
 interface PageLoaderProps {
   /** Optional label shown below the spinner */
-  label?: string
+  readonly label?: string
   /** Size variant */
-  size?: 'sm' | 'md' | 'lg'
+  readonly size?: 'sm' | 'md' | 'lg'
   /** Fill the full viewport height */
-  fullPage?: boolean
+  readonly fullPage?: boolean
 }
 
 /**

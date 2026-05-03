@@ -5,12 +5,12 @@ export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
 export type BadgeSize = 'sm' | 'md';
 
 export interface BadgeProps {
-  variant?: BadgeVariant;
-  size?: BadgeSize;
-  children: React.ReactNode;
-  className?: string;
+  readonly variant?: BadgeVariant;
+  readonly size?: BadgeSize;
+  readonly children: React.ReactNode;
+  readonly className?: string;
   /** Accessible label override when the visual text isn't descriptive enough */
-  'aria-label'?: string;
+  readonly 'aria-label'?: string;
 }
 
 export const Badge: React.FC<BadgeProps> = ({

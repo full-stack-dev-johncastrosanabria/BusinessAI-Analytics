@@ -12,7 +12,7 @@
  * - Natural human-like flow
  */
 
-import { Browser, Page } from 'playwright';
+import { Browser } from 'playwright';
 import {
   DemoLogger,
   DemoTiming,

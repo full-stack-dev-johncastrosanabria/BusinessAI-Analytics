@@ -6,22 +6,22 @@ import { api } from '../lib/api'
  * Generic pagination types
  */
 export interface PaginationParams {
-  page: number
-  pageSize: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-  search?: string
+  readonly page: number
+  readonly pageSize: number
+  readonly sortBy?: string
+  readonly sortOrder?: 'asc' | 'desc'
+  readonly search?: string
 }
 
 export interface PaginatedResponse<T> {
-  data: T[]
-  pagination: {
-    page: number
-    pageSize: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
+  readonly data: T[]
+  readonly pagination: {
+    readonly page: number
+    readonly pageSize: number
+    readonly totalItems: number
+    readonly totalPages: number
+    readonly hasNextPage: boolean
+    readonly hasPreviousPage: boolean
   }
 }
 

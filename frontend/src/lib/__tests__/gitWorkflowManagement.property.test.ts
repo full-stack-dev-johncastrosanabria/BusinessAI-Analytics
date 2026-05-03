@@ -56,13 +56,13 @@ type BranchName = 'main' | 'staging' | 'develop' | 'feature/*' | 'fix/*' | 'hotf
 type ProtectionLevel = 'highest' | 'high' | 'moderate' | 'basic' | 'none'
 
 interface BranchConfig {
-  name: BranchName
-  expectedProtection: ProtectionLevel
-  requiresReviews: boolean
-  minimumReviews?: number
-  requiresStatusChecks: boolean
-  canForcePush: boolean
-  canDelete: boolean
+  readonly name: BranchName
+  readonly expectedProtection: ProtectionLevel
+  readonly requiresReviews: boolean
+  readonly minimumReviews?: number
+  readonly requiresStatusChecks: boolean
+  readonly canForcePush: boolean
+  readonly canDelete: boolean
 }
 
 // ─── Expected Branch Configurations ──────────────────────────────────────────

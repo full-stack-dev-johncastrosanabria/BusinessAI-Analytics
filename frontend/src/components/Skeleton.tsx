@@ -2,13 +2,13 @@ import './Skeleton.css'
 
 interface SkeletonProps {
   /** Width of the skeleton element (default: '100%') */
-  width?: string | number
+  readonly width?: string | number
   /** Height of the skeleton element (default: '1em') */
-  height?: string | number
+  readonly height?: string | number
   /** Border radius variant */
-  variant?: 'text' | 'rect' | 'circle'
+  readonly variant?: 'text' | 'rect' | 'circle'
   /** Extra class names */
-  className?: string
+  readonly className?: string
 }
 
 /**

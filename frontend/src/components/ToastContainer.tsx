@@ -3,7 +3,7 @@ import Toast, { ToastMessage, ToastType } from './Toast'
 import './ToastContainer.css'
 
 interface ToastContextType {
-  showToast: (message: string, type: ToastType, duration?: number) => void
+  readonly showToast: (message: string, type: ToastType, duration?: number) => void
 }
 
 export const ToastContext = createContext<ToastContextType | undefined>(undefined)

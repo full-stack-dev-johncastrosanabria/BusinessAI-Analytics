@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import Dashboard from '../Dashboard'
 import { 
   renderWithQueryClient, 
@@ -91,7 +91,7 @@ describe('Dashboard Component', () => {
     fireEvent.click(screen.getByText('Filter'))
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalled()
+      expect(globalThis.fetch).toHaveBeenCalled()
     })
   })
 })

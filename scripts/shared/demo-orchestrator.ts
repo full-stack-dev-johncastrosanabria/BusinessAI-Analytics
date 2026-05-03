@@ -1,4 +1,4 @@
-/**
+check/**
  * Shared Demo Orchestration Utilities
  * 
  * This module provides common functionality for demo scripts to eliminate duplication:
@@ -69,7 +69,7 @@ export class DemoTiming {
 
   static async smoothScroll(page: Page, distance: number, duration: number = 1500): Promise<void> {
     await page.evaluate(async ({ distance, duration }) => {
-      const start = window.scrollY;
+      const start = globalThis.scrollY;
       const startTime = Date.now();
       
       const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
@@ -79,7 +79,7 @@ export class DemoTiming {
         const progress = Math.min(elapsed / duration, 1);
         const eased = easeInOutQuad(progress);
         
-        window.scrollTo(0, start + distance * eased);
+        globalThis.scrollTo(0, start + distance * eased);
         
         if (progress < 1) {
           requestAnimationFrame(scroll);
@@ -147,7 +147,7 @@ export class BrowserManager {
       `;
       
       // Scroll to top-left
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
     });
     
     await page.waitForTimeout(1500);

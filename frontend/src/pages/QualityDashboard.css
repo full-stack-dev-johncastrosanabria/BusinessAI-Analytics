@@ -83,7 +83,7 @@
 
 .qd-timestamp {
   font-size: 0.8rem;
-  color: #888;
+  color: #666;
 }
 
 /* Quality gate badge */
@@ -205,7 +205,7 @@
 
 .qd-metric-label {
   font-size: 0.78rem;
-  color: #777;
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -221,7 +221,7 @@
 .qd-metric-unit {
   font-size: 0.85rem;
   font-weight: 400;
-  color: #888;
+  color: #666;
 }
 
 /* Trend indicators */
@@ -386,7 +386,7 @@
 }
 
 [data-theme="dark"] .qd-timestamp {
-  color: #888;
+  color: #aaa;
 }
 
 [data-theme="dark"] .qd-rating-label {
@@ -398,7 +398,7 @@
 }
 
 [data-theme="dark"] .qd-metric-unit {
-  color: #888;
+  color: #aaa;
 }
 
 [data-theme="dark"] .qd-rec-description {

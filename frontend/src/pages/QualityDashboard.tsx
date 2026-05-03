@@ -17,8 +17,8 @@ import './QualityDashboard.css';
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 interface RatingBadgeProps {
-  rating: Rating;
-  label: string;
+  readonly rating: Rating;
+  readonly label: string;
 }
 
 function RatingBadge({ rating, label }: RatingBadgeProps) {
@@ -33,7 +33,7 @@ function RatingBadge({ rating, label }: RatingBadgeProps) {
 }
 
 interface TrendIndicatorProps {
-  direction: TrendDirection;
+  readonly direction: TrendDirection;
 }
 
 function TrendIndicator({ direction }: TrendIndicatorProps) {
@@ -54,10 +54,10 @@ function TrendIndicator({ direction }: TrendIndicatorProps) {
 }
 
 interface MetricCardProps {
-  label: string;
-  value: string | number;
-  trend?: TrendDirection;
-  unit?: string;
+  readonly label: string;
+  readonly value: string | number;
+  readonly trend?: TrendDirection;
+  readonly unit?: string;
 }
 
 function MetricCard({ label, value, trend, unit }: MetricCardProps) {
@@ -74,7 +74,7 @@ function MetricCard({ label, value, trend, unit }: MetricCardProps) {
 }
 
 interface QualityGateBadgeProps {
-  status: 'PASSED' | 'FAILED' | 'NONE';
+  readonly status: 'PASSED' | 'FAILED' | 'NONE';
 }
 
 function QualityGateBadge({ status }: QualityGateBadgeProps) {
@@ -87,7 +87,7 @@ function QualityGateBadge({ status }: QualityGateBadgeProps) {
 }
 
 interface RecommendationListProps {
-  recommendations: Recommendation[];
+  readonly recommendations: Recommendation[];
 }
 
 function RecommendationList({ recommendations }: RecommendationListProps) {
@@ -125,15 +125,15 @@ function RecommendationList({ recommendations }: RecommendationListProps) {
 
 export interface QualityDashboardProps {
   /** Current quality metrics snapshot. */
-  metrics: QualityMetrics;
+  readonly metrics: QualityMetrics;
   /** Optional historical trend data for trend indicators. */
-  trends?: HistoricalTrendData;
+  readonly trends?: HistoricalTrendData;
   /** Actionable recommendations derived from current issues. */
-  recommendations?: Recommendation[];
+  readonly recommendations?: Recommendation[];
   /** Whether metrics are being refreshed. */
-  isLoading?: boolean;
+  readonly isLoading?: boolean;
   /** Error message if metrics could not be loaded. */
-  error?: string | null;
+  readonly error?: string | null;
 }
 
 export function QualityDashboard({

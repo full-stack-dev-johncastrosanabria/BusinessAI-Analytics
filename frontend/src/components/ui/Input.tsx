@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 import './Input.css';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  helperText?: string;
+  readonly label?: string;
+  readonly error?: string;
+  readonly helperText?: string;
   /** Renders a full-width input */
-  fullWidth?: boolean;
+  readonly fullWidth?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(

@@ -51,7 +51,7 @@ const DEMO_TIMEOUT = 360000; // 6 minutes
 
     // Ensure content is centered and not pushed right
     await page.evaluate(() => {
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
       // Remove any transforms or margins that might push content
       document.body.style.transform = 'none';
       document.body.style.margin = '0';
@@ -109,7 +109,7 @@ async function runDemo(): Promise<void> {
       document.body.style.transform = 'none';
       document.documentElement.style.margin = '0';
       document.documentElement.style.padding = '0';
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
     });
     
     log(colors.green, `✅ Browser ready - viewport centered`);
@@ -125,7 +125,7 @@ async function runDemo(): Promise<void> {
     
     // Fix positioning on login screen
     await page.evaluate(() => {
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
       document.body.style.margin = '0';
       document.body.style.padding = '0';
       document.body.style.transform = 'none';
@@ -252,7 +252,7 @@ async function runDemo(): Promise<void> {
     
     // Fix positioning
     await page.evaluate(() => {
-      window.scrollTo(0, 0);
+      globalThis.scrollTo(0, 0);
       document.body.style.margin = '0';
       document.body.style.padding = '0';
       document.body.style.transform = 'none';
@@ -425,7 +425,7 @@ async function runDemo(): Promise<void> {
       
       // Fix positioning
       await page.evaluate(() => {
-        window.scrollTo(0, 0);
+        globalThis.scrollTo(0, 0);
         document.body.style.margin = '0';
         document.body.style.padding = '0';
       }).catch(() => {});
@@ -458,7 +458,7 @@ async function runDemo(): Promise<void> {
       
       // Fix positioning
       await page.evaluate(() => {
-        window.scrollTo(0, 0);
+        globalThis.scrollTo(0, 0);
         document.body.style.margin = '0';
         document.body.style.padding = '0';
       }).catch(() => {});
@@ -505,7 +505,7 @@ async function runDemo(): Promise<void> {
       
       // Fix positioning
       await page.evaluate(() => {
-        window.scrollTo(0, 0);
+        globalThis.scrollTo(0, 0);
         document.body.style.margin = '0';
         document.body.style.padding = '0';
       }).catch(() => {});
