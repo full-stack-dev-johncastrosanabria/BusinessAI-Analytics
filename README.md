@@ -977,6 +977,8 @@ Configure per environment:
 
 ## 📚 Additional Documentation
 
+- **[Security Fixes Summary](./SECURITY-FIXES-SUMMARY.md)** - Complete overview of all security issues fixed (30+ hotspots resolved)
+- **[SonarCloud Fix Details](./docs/SONARCLOUD-FIX-SUMMARY.md)** - Detailed SonarCloud configuration and test exclusions
 - **[CI/CD & Security Fixes](./CI-CD-SECURITY-FIXES.md)** - Comprehensive guide to CI/CD pipeline configuration, security enhancements, and quality improvements
 - **[Frontend Documentation](./frontend/README.md)** - React application architecture and development guide
 - **[API Gateway Documentation](./api-gateway/README.md)** - Gateway configuration and routing
