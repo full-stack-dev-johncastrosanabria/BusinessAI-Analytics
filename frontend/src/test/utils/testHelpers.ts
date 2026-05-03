@@ -10,7 +10,7 @@ import { setupLocalStorageMock } from './mockStorage';
 export const setupTestEnvironment = () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
   });
 };
 
@@ -19,7 +19,7 @@ export const setupTestEnvironmentWithStorage = () => {
   
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
     localStorageMock.clear();
     document.documentElement.removeAttribute('data-theme');
     document.documentElement.classList.remove('dark');

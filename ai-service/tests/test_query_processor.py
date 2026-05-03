@@ -1,10 +1,366 @@
 """
-Unit tests for QueryProcessor._extract_excerpt
+Unit tests for QueryProcessor module
 Tests various inputs including edge cases and critical paths.
 """
 
 import pytest
+from unittest.mock import Mock, MagicMock
 from chatbot.query_processor import QueryProcessor
+from chatbot.intent_classifier import Intent
+
+
+class TestQueryProcessorInit:
+    """Tests for QueryProcessor initialization"""
+
+    def test_init_with_db_connection(self):
+        """Test QueryProcessor initializes with database connection."""
+        mock_db = Mock()
+        processor = QueryProcessor(mock_db)
+        assert processor.db == mock_db
+        assert processor.intent_classifier is not None
+
+    def test_init_creates_intent_classifier(self):
+        """Test QueryProcessor creates IntentClassifier instance."""
+        processor = QueryProcessor(Mock())
+        assert hasattr(processor, 'intent_classifier')
+
+
+class TestProcessQuery:
+    """Tests for QueryProcessor.process_query"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_process_query_sales_metrics_intent(self):
+        """Test process_query routes to sales metrics handler."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.SALES_METRICS, 0.9, 'en'))
+        
+        answer, sources = self.processor.process_query("What are our sales?")
+        assert isinstance(answer, str)
+        assert isinstance(sources, list)
+        assert len(answer) > 0
+
+    def test_process_query_product_info_intent(self):
+        """Test process_query routes to product info handler."""
+        self.mock_db.get_products.return_value = [
+            {'name': 'Product A', 'category': 'Electronics'}
+        ]
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.PRODUCT_INFO, 0.9, 'en'))
+        
+        answer, sources = self.processor.process_query("Tell me about products")
+        assert isinstance(answer, str)
+        assert isinstance(sources, list)
+
+    def test_process_query_customer_info_intent(self):
+        """Test process_query routes to customer info handler."""
+        self.mock_db.get_customers.return_value = [
+            {'name': 'Customer A', 'segment': 'Enterprise', 'country': 'USA'}
+        ]
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.CUSTOMER_INFO, 0.9, 'en'))
+        
+        answer, sources = self.processor.process_query("Who are our customers?")
+        assert isinstance(answer, str)
+        assert isinstance(sources, list)
+
+    def test_process_query_document_search_intent(self):
+        """Test process_query routes to document search handler."""
+        self.mock_db.search_documents.return_value = []
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.DOCUMENT_SEARCH, 0.9, 'en'))
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['contract'])
+        
+        answer, sources = self.processor.process_query("Find contract documents")
+        assert isinstance(answer, str)
+        assert isinstance(sources, list)
+
+    def test_process_query_mixed_intent(self):
+        """Test process_query routes to mixed query handler."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.mock_db.search_documents.return_value = []
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.MIXED, 0.9, 'en'))
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['sales'])
+        
+        answer, sources = self.processor.process_query("Sales and documents")
+        assert isinstance(answer, str)
+        assert isinstance(sources, list)
+
+    def test_process_query_unknown_intent(self):
+        """Test process_query handles unknown intent."""
+        self.processor.intent_classifier.classify = Mock(return_value=(Intent.UNKNOWN, 0.5, 'en'))
+        
+        answer, sources = self.processor.process_query("Random question")
+        assert "not sure how to answer" in answer
+        assert sources == []
+
+    def test_process_query_exception_handling(self):
+        """Test process_query handles exceptions gracefully."""
+        self.processor.intent_classifier.classify = Mock(side_effect=Exception("Test error"))
+        
+        answer, sources = self.processor.process_query("Test question")
+        assert "error processing" in answer.lower()
+        assert sources == []
+
+
+class TestHandleSalesMetrics:
+    """Tests for QueryProcessor._handle_sales_metrics"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_handle_sales_metrics_no_data(self):
+        """Test sales metrics handler with no data."""
+        self.mock_db.get_sales_metrics.return_value = []
+        
+        answer, sources = self.processor._handle_sales_metrics("What are sales?")
+        assert "No sales metrics data available" in answer
+        assert sources == []
+
+    def test_handle_sales_metrics_best_month(self):
+        """Test sales metrics handler for best month query."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.mock_db.get_best_worst_months.return_value = {
+            'best_month': {'month': 6, 'year': 2024, 'profit': 25000}
+        }
+        
+        answer, sources = self.processor._handle_sales_metrics("What was the best month?")
+        assert "best performing month" in answer.lower()
+        assert "6/2024" in answer
+        assert "$25,000" in answer
+
+    def test_handle_sales_metrics_worst_month(self):
+        """Test sales metrics handler for worst month query."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.mock_db.get_best_worst_months.return_value = {
+            'worst_month': {'month': 2, 'year': 2024, 'profit': 5000}
+        }
+        
+        answer, sources = self.processor._handle_sales_metrics("What was the worst month?")
+        assert "worst performing month" in answer.lower()
+        assert "2/2024" in answer
+
+    def test_handle_sales_metrics_recent(self):
+        """Test sales metrics handler for recent metrics."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 3, 'year': 2024, 'total_sales': 60000, 'total_costs': 35000, 'profit': 25000}
+        ]
+        
+        answer, sources = self.processor._handle_sales_metrics("Show me sales")
+        assert "Recent sales metrics" in answer
+        assert "3/2024" in answer
+        assert "$60,000" in answer
+
+    def test_handle_sales_metrics_exception(self):
+        """Test sales metrics handler exception handling."""
+        self.mock_db.get_sales_metrics.side_effect = Exception("DB error")
+        
+        answer, sources = self.processor._handle_sales_metrics("What are sales?")
+        assert "Error retrieving sales metrics" in answer
+        assert sources == []
+
+
+class TestHandleProductInfo:
+    """Tests for QueryProcessor._handle_product_info"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_handle_product_info_no_data(self):
+        """Test product info handler with no data."""
+        self.mock_db.get_products.return_value = []
+        
+        answer, sources = self.processor._handle_product_info("What products do we have?")
+        assert "No products found" in answer
+        assert sources == []
+
+    def test_handle_product_info_top_products(self):
+        """Test product info handler for top products query."""
+        self.mock_db.get_products.return_value = [
+            {'name': 'Product A', 'category': 'Electronics'}
+        ]
+        self.mock_db.get_top_products.return_value = [
+            {'name': 'Product A', 'total_revenue': 50000},
+            {'name': 'Product B', 'total_revenue': 40000}
+        ]
+        
+        answer, sources = self.processor._handle_product_info("What are the top products?")
+        assert "Top 5 products" in answer
+        assert "Product A" in answer
+        assert "$50,000" in answer
+
+    def test_handle_product_info_general(self):
+        """Test product info handler for general query."""
+        self.mock_db.get_products.return_value = [
+            {'name': 'Product A', 'category': 'Electronics'},
+            {'name': 'Product B', 'category': 'Furniture'},
+            {'name': 'Product C', 'category': 'Electronics'}
+        ]
+        
+        answer, sources = self.processor._handle_product_info("Tell me about products")
+        assert "3 products" in answer
+        assert "2 categories" in answer
+        assert "Electronics" in answer
+
+    def test_handle_product_info_exception(self):
+        """Test product info handler exception handling."""
+        self.mock_db.get_products.side_effect = Exception("DB error")
+        
+        answer, sources = self.processor._handle_product_info("What products?")
+        assert "Error retrieving product information" in answer
+        assert sources == []
+
+
+class TestHandleCustomerInfo:
+    """Tests for QueryProcessor._handle_customer_info"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_handle_customer_info_no_data(self):
+        """Test customer info handler with no data."""
+        self.mock_db.get_customers.return_value = []
+        
+        answer, sources = self.processor._handle_customer_info("Who are our customers?")
+        assert "No customers found" in answer
+        assert sources == []
+
+    def test_handle_customer_info_with_data(self):
+        """Test customer info handler with customer data."""
+        self.mock_db.get_customers.return_value = [
+            {'name': 'Customer A', 'segment': 'Enterprise', 'country': 'USA'},
+            {'name': 'Customer B', 'segment': 'SMB', 'country': 'Canada'},
+            {'name': 'Customer C', 'segment': 'Enterprise', 'country': 'USA'}
+        ]
+        
+        answer, sources = self.processor._handle_customer_info("Who are our customers?")
+        assert "3 customers" in answer
+        assert "Enterprise" in answer
+        assert "USA" in answer
+
+    def test_handle_customer_info_segments_and_countries(self):
+        """Test customer info handler aggregates segments and countries."""
+        self.mock_db.get_customers.return_value = [
+            {'segment': 'Enterprise', 'country': 'USA'},
+            {'segment': 'SMB', 'country': 'Canada'},
+            {'segment': 'Enterprise', 'country': 'Germany'}
+        ]
+        
+        answer, sources = self.processor._handle_customer_info("Customer info")
+        assert "Segments:" in answer
+        assert "Top countries:" in answer
+
+    def test_handle_customer_info_exception(self):
+        """Test customer info handler exception handling."""
+        self.mock_db.get_customers.side_effect = Exception("DB error")
+        
+        answer, sources = self.processor._handle_customer_info("Who are customers?")
+        assert "Error retrieving customer information" in answer
+        assert sources == []
+
+
+class TestHandleDocumentSearch:
+    """Tests for QueryProcessor._handle_document_search"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_handle_document_search_no_keywords(self):
+        """Test document search handler with no keywords."""
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=[])
+        
+        answer, sources = self.processor._handle_document_search("Find documents")
+        assert "more specific search terms" in answer
+        assert sources == []
+
+    def test_handle_document_search_no_results(self):
+        """Test document search handler with no results."""
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['contract'])
+        self.mock_db.search_documents.return_value = []
+        
+        answer, sources = self.processor._handle_document_search("Find contract documents")
+        assert "No documents found" in answer
+        assert "contract" in answer
+
+    def test_handle_document_search_with_results(self):
+        """Test document search handler with results."""
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['contract'])
+        self.mock_db.search_documents.return_value = [
+            {'filename': 'contract1.pdf', 'extracted_text': 'This is a contract document with important terms.'}
+        ]
+        
+        answer, sources = self.processor._handle_document_search("Find contract documents")
+        assert "Found 1 document" in answer
+        assert "contract1.pdf" in answer
+        assert "document:contract1.pdf" in sources
+
+    def test_handle_document_search_exception(self):
+        """Test document search handler exception handling."""
+        self.processor.intent_classifier.extract_keywords = Mock(side_effect=Exception("Error"))
+        
+        answer, sources = self.processor._handle_document_search("Find documents")
+        assert "Error searching documents" in answer
+        assert sources == []
+
+
+class TestHandleMixedQuery:
+    """Tests for QueryProcessor._handle_mixed_query"""
+
+    def setup_method(self):
+        """Create a QueryProcessor instance with a mock db connection."""
+        self.mock_db = Mock()
+        self.processor = QueryProcessor(self.mock_db)
+
+    def test_handle_mixed_query_with_documents(self):
+        """Test mixed query handler with documents."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['sales'])
+        self.mock_db.search_documents.return_value = [
+            {'filename': 'report.pdf', 'extracted_text': 'Sales report for January'}
+        ]
+        
+        answer, sources = self.processor._handle_mixed_query("Sales and documents")
+        assert "Recent sales metrics" in answer
+        assert "Relevant documents" in answer
+        assert "report.pdf" in answer
+
+    def test_handle_mixed_query_no_documents(self):
+        """Test mixed query handler without documents."""
+        self.mock_db.get_sales_metrics.return_value = [
+            {'month': 1, 'year': 2024, 'total_sales': 50000, 'total_costs': 30000, 'profit': 20000}
+        ]
+        self.processor.intent_classifier.extract_keywords = Mock(return_value=['sales'])
+        self.mock_db.search_documents.return_value = []
+        
+        answer, sources = self.processor._handle_mixed_query("Sales info")
+        assert "Recent sales metrics" in answer
+        assert "Relevant documents" not in answer
+
+    def test_handle_mixed_query_exception(self):
+        """Test mixed query handler exception handling."""
+        self.mock_db.get_sales_metrics.side_effect = Exception("DB error")
+        
+        answer, sources = self.processor._handle_mixed_query("Mixed query")
+        assert "Error processing" in answer
+        assert sources == []
 
 
 class TestExtractExcerpt:

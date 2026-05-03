@@ -141,7 +141,7 @@ public class DocumentExtractionIntegrationTest {
         assertEquals("DOCX", doc.getFileType());
         assertEquals(ExtractionStatus.SUCCESS, doc.getExtractionStatus());
         assertNotNull(doc.getExtractedText());
-        assertTrue(doc.getExtractedText().length() > 0);
+        assertTrue(!doc.getExtractedText().isEmpty());
     }
     
     // ==================== PDF File Extraction Tests ====================
@@ -171,7 +171,7 @@ public class DocumentExtractionIntegrationTest {
         assertEquals("PDF", doc.getFileType());
         assertEquals(ExtractionStatus.SUCCESS, doc.getExtractionStatus());
         assertNotNull(doc.getExtractedText());
-        assertTrue(doc.getExtractedText().length() > 0);
+        assertTrue(!doc.getExtractedText().isEmpty());
     }
     
     // ==================== XLSX File Extraction Tests ====================
@@ -201,7 +201,7 @@ public class DocumentExtractionIntegrationTest {
         assertEquals("XLSX", doc.getFileType());
         assertEquals(ExtractionStatus.SUCCESS, doc.getExtractionStatus());
         assertNotNull(doc.getExtractedText());
-        assertTrue(doc.getExtractedText().length() > 0);
+        assertTrue(!doc.getExtractedText().isEmpty());
     }
     
     // ==================== Metadata Preservation Tests ====================

@@ -33,11 +33,11 @@ const SONAR_TOKEN = process.env.SONAR_TOKEN ?? '';
 
 // Mock SonarQube client for testing without actual server
 interface MockQualityGateResult {
-  securityHotspots: number;
-  duplicatedLinesPercent: number;
-  securityRating: 'A' | 'B' | 'C' | 'D' | 'E';
-  reliabilityRating: 'A' | 'B' | 'C' | 'D' | 'E';
-  qualityGateStatus: 'PASSED' | 'FAILED' | 'ERROR';
+  readonly securityHotspots: number;
+  readonly duplicatedLinesPercent: number;
+  readonly securityRating: 'A' | 'B' | 'C' | 'D' | 'E';
+  readonly reliabilityRating: 'A' | 'B' | 'C' | 'D' | 'E';
+  readonly qualityGateStatus: 'PASSED' | 'FAILED' | 'ERROR';
 }
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────────

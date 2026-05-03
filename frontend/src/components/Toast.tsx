@@ -7,10 +7,10 @@ const DEFAULT_TOAST_DURATION_MS = 3000 // 3 seconds
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
 export interface ToastMessage {
-  id: string
-  message: string
-  type: ToastType
-  duration?: number
+  readonly id: string
+  readonly message: string
+  readonly type: ToastType
+  readonly duration?: number
 }
 
 interface ToastProps {

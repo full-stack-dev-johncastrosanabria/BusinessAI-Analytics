@@ -3,8 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
+  readonly theme: Theme;
+  readonly toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -18,7 +18,7 @@ export const useTheme = () => {
 };
 
 interface ThemeProviderProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {

@@ -4,19 +4,19 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
 export interface ChatMessage {
-  id: string
-  question: string
-  answer: string
-  sources: string[]
-  timestamp: number
-  processingTime?: number
+  readonly id: string
+  readonly question: string
+  readonly answer: string
+  readonly sources: string[]
+  readonly timestamp: number
+  readonly processingTime?: number
 }
 
 export interface ChatbotResponse {
-  question: string
-  answer: string
-  sources: string[]
-  processing_time: number
+  readonly question: string
+  readonly answer: string
+  readonly sources: string[]
+  readonly processing_time: number
 }
 
 // Query keys

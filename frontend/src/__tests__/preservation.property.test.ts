@@ -35,7 +35,7 @@ const FRONTEND_URL = 'http://localhost:5173';
 const AI_SERVICE_URL = 'http://localhost:8000';
 
 // Mock fetch for API testing
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────────
 
@@ -420,7 +420,7 @@ describe('Property 2: Preservation - Functional Behavior Preservation (Validates
             })
           };
 
-          (global.fetch as any).mockResolvedValueOnce(mockResponse);
+          (globalThis.fetch as any).mockResolvedValueOnce(mockResponse);
           
           // Preserve API structure expectations
           expect(endpoint.method).toMatch(/^(GET|POST|PUT|DELETE)$/);

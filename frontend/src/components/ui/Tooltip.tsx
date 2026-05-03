@@ -2,9 +2,9 @@ import React, { useState, useRef, useId } from 'react'
 import './Tooltip.css'
 
 export interface TooltipProps {
-  content: string
-  children: React.ReactElement
-  position?: 'top' | 'bottom' | 'left' | 'right'
+  readonly content: string
+  readonly children: React.ReactElement
+  readonly position?: 'top' | 'bottom' | 'left' | 'right'
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 'top' }) => {

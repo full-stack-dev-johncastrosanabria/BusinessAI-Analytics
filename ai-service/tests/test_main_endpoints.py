@@ -636,7 +636,7 @@ class TestStartupShutdown:
 
         from main import startup_event  # noqa: PLC0415
 
-        asyncio.run(startup_event())
+        startup_event()
 
         mock_db.assert_called_once()
 
@@ -647,6 +647,6 @@ class TestStartupShutdown:
 
         from main import shutdown_event  # noqa: PLC0415
 
-        asyncio.run(shutdown_event())
+        shutdown_event()
 
         mock_db_instance.close.assert_called_once()

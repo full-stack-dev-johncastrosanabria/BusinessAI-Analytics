@@ -18,27 +18,27 @@ import './InteractiveChart.css'
 export type ChartType = 'line' | 'bar'
 
 export interface ChartSeries {
-  dataKey: string
-  color: string
-  name?: string
+  readonly dataKey: string
+  readonly color: string
+  readonly name?: string
 }
 
 export interface InteractiveChartProps {
-  data: Record<string, unknown>[]
-  series: ChartSeries[]
-  xDataKey: string
-  chartType?: ChartType
-  height?: number
-  title?: string
-  onDataPointClick?: (dataKey: string, value: unknown, entry: Record<string, unknown>) => void
-  onExportCSV?: () => void
-  onExportJSON?: () => void
+  readonly data: Record<string, unknown>[]
+  readonly series: ChartSeries[]
+  readonly xDataKey: string
+  readonly chartType?: ChartType
+  readonly height?: number
+  readonly title?: string
+  readonly onDataPointClick?: (dataKey: string, value: unknown, entry: Record<string, unknown>) => void
+  readonly onExportCSV?: () => void
+  readonly onExportJSON?: () => void
 }
 
 interface CustomTooltipProps extends TooltipProps<number, string> {
-  active?: boolean
-  payload?: Array<{ name: string; value: number; color: string }>
-  label?: string
+  readonly active?: boolean
+  readonly payload?: Array<{ name: string; value: number; color: string }>
+  readonly label?: string
 }
 
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {

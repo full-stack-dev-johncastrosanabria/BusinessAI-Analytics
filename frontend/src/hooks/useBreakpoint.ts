@@ -13,17 +13,17 @@ export type Breakpoint = 'mobile' | 'tablet' | 'desktop'
 
 export interface BreakpointState {
   /** Current active breakpoint */
-  breakpoint: Breakpoint
+  readonly breakpoint: Breakpoint
   /** True when viewport width < 768px */
-  isMobile: boolean
+  readonly isMobile: boolean
   /** True when 768px ≤ viewport width < 1280px */
-  isTablet: boolean
+  readonly isTablet: boolean
   /** True when viewport width ≥ 1280px */
-  isDesktop: boolean
+  readonly isDesktop: boolean
   /** True when viewport width < 1280px (mobile OR tablet) */
-  isMobileOrTablet: boolean
+  readonly isMobileOrTablet: boolean
   /** Current viewport width in pixels */
-  width: number
+  readonly width: number
 }
 
 const BREAKPOINTS = {
@@ -56,22 +56,22 @@ function buildState(width: number): BreakpointState {
  */
 export function useBreakpoint(): BreakpointState {
   const [state, setState] = useState<BreakpointState>(() =>
-    buildState(typeof window !== 'undefined' ? window.innerWidth : BREAKPOINTS.desktop),
+    buildState(typeof globalThis.window !== 'undefined' ? globalThis.innerWidth : BREAKPOINTS.desktop),
   )
 
   const handleResize = useCallback(() => {
-    setState(buildState(window.innerWidth))
+    setState(buildState(globalThis.innerWidth))
   }, [])
 
   useEffect(() => {
     // Use ResizeObserver on the document element for accuracy
-    if (typeof window === 'undefined') return
+    if (typeof globalThis.window === 'undefined') return
 
     // Initial sync in case the window size changed between render and effect
-    setState(buildState(window.innerWidth))
+    setState(buildState(globalThis.innerWidth))
 
-    window.addEventListener('resize', handleResize, { passive: true })
-    return () => window.removeEventListener('resize', handleResize)
+    globalThis.addEventListener('resize', handleResize, { passive: true })
+    return () => globalThis.removeEventListener('resize', handleResize)
   }, [handleResize])
 
   return state
@@ -86,13 +86,13 @@ export function useBreakpoint(): BreakpointState {
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia(query).matches
+    if (typeof globalThis.window === 'undefined') return false
+    return globalThis.matchMedia(query).matches
   })
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mql = window.matchMedia(query)
+    if (typeof globalThis.window === 'undefined') return
+    const mql = globalThis.matchMedia(query)
     const handler = (e: MediaQueryListEvent) => setMatches(e.matches)
     setMatches(mql.matches)
     mql.addEventListener('change', handler)

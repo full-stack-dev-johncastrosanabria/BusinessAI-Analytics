@@ -2,14 +2,14 @@ import React, { useEffect, useRef } from 'react'
 import './ConfirmDialog.css'
 
 export interface ConfirmDialogProps {
-  open: boolean
-  title: string
-  message: string
-  confirmLabel?: string
-  cancelLabel?: string
-  onConfirm: () => void
-  onCancel: () => void
-  danger?: boolean
+  readonly open: boolean
+  readonly title: string
+  readonly message: string
+  readonly confirmLabel?: string
+  readonly cancelLabel?: string
+  readonly onConfirm: () => void
+  readonly onCancel: () => void
+  readonly danger?: boolean
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({

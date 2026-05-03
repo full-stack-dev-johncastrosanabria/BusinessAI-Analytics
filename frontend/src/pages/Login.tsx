@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, SubmitEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
   const from = location.state?.from?.pathname || '/';
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     

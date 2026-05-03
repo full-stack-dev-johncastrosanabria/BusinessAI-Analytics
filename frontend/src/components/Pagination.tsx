@@ -25,7 +25,7 @@ export function Pagination({
   const getPageNumbers = () => {
     const delta = 2 // Number of pages to show on each side of current page
     const range: (number | string)[] = []
-    const rangeWithDots: (number | string)[] = []
+    const rangeWithDots: Array<{ value: number | string; key: string }> = []
 
     for (
       let i = Math.max(2, page - delta);
@@ -36,17 +36,21 @@ export function Pagination({
     }
 
     if (page - delta > 2) {
-      rangeWithDots.push(1, '...')
+      rangeWithDots.push({ value: 1, key: 'page-1' })
+      rangeWithDots.push({ value: '...', key: 'dots-start' })
     } else {
-      rangeWithDots.push(1)
+      rangeWithDots.push({ value: 1, key: 'page-1' })
     }
 
-    rangeWithDots.push(...range)
+    range.forEach((pageNum) => {
+      rangeWithDots.push({ value: pageNum, key: `page-${pageNum}` })
+    })
 
     if (page + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages)
+      rangeWithDots.push({ value: '...', key: 'dots-end' })
+      rangeWithDots.push({ value: totalPages, key: `page-${totalPages}` })
     } else if (totalPages > 1) {
-      rangeWithDots.push(totalPages)
+      rangeWithDots.push({ value: totalPages, key: `page-${totalPages}` })
     }
 
     return rangeWithDots
@@ -76,22 +80,22 @@ export function Pagination({
 
         {/* Page numbers */}
         <div className="pagination-pages">
-          {getPageNumbers().map((pageNum, index) =>
-            pageNum === '...' ? (
-              <span key={`dots-${pageNum}-${index}`} className="pagination-dots">
+          {getPageNumbers().map((item) =>
+            item.value === '...' ? (
+              <span key={item.key} className="pagination-dots">
                 ...
               </span>
             ) : (
               <button
-                key={pageNum}
-                onClick={() => onPageChange(pageNum as number)}
+                key={item.key}
+                onClick={() => onPageChange(item.value as number)}
                 className={`pagination-page ${
-                  pageNum === page ? 'active' : ''
+                  item.value === page ? 'active' : ''
                 }`}
-                aria-label={`Page ${pageNum}`}
-                aria-current={pageNum === page ? 'page' : undefined}
+                aria-label={`Page ${item.value}`}
+                aria-current={item.value === page ? 'page' : undefined}
               >
-                {pageNum}
+                {item.value}
               </button>
             )
           )}

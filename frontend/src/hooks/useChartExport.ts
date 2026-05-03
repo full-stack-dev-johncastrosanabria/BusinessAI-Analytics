@@ -31,9 +31,9 @@ export function toCSV(data: Record<string, unknown>[]): string {
 
 export interface UseChartExportOptions {
   /** Data rows to export */
-  data: Record<string, unknown>[]
+  readonly data: Record<string, unknown>[]
   /** Base filename without extension */
-  filename?: string
+  readonly filename?: string
 }
 
 export function useChartExport({ data, filename = 'chart-data' }: UseChartExportOptions) {

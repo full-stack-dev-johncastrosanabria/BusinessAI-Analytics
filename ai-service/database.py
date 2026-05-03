@@ -277,11 +277,11 @@ class DatabaseConnection:
             )
             like_params = [f"%{kw}%" for kw in keywords]
             query = (
-                f"SELECT id, filename, extracted_text "
-                f"FROM documents "
+                "SELECT id, filename, extracted_text "
+                "FROM documents "
                 f"WHERE ({placeholders}) "
-                f"AND extraction_status = 'SUCCESS' "
-                f"LIMIT %s"
+                "AND extraction_status = 'SUCCESS' "
+                "LIMIT %s"
             )
             results = self.execute_query(
                 query, tuple(like_params + [limit])

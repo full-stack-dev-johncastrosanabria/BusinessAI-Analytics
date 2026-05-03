@@ -6,18 +6,18 @@ import { api } from '../lib/api'
  * Cursor-based pagination types for infinite scroll
  */
 export interface CursorPaginationParams {
-  pageSize: number
-  cursor?: string | null
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-  search?: string
+  readonly pageSize: number
+  readonly cursor?: string | null
+  readonly sortBy?: string
+  readonly sortOrder?: 'asc' | 'desc'
+  readonly search?: string
 }
 
 export interface CursorPaginatedResponse<T> {
-  data: T[]
-  nextCursor: string | null
-  hasMore: boolean
-  totalItems?: number
+  readonly data: T[]
+  readonly nextCursor: string | null
+  readonly hasMore: boolean
+  readonly totalItems?: number
 }
 
 /**

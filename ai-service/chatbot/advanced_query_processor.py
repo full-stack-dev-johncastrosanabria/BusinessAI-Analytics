@@ -5,7 +5,7 @@ Handles complex business queries in English and Spanish with real database data.
 
 import re
 import logging
-from typing import Tuple, List, Optional, Dict
+from typing import List, Tuple, Optional, Dict
 from chatbot.intent_classifier import AdvancedIntentClassifier, Intent, Language
 
 logger = logging.getLogger(__name__)
@@ -179,6 +179,20 @@ class AdvancedQueryProcessor:
         """Keyword-based routing that fires regardless of classifier output."""
         
         # Check high-priority patterns first
+        high_priority_intent = self._check_high_priority_patterns(q)
+        if high_priority_intent:
+            return high_priority_intent
+        
+        # Check break-even and specialized patterns
+        specialized_intent = self._check_specialized_patterns(q)
+        if specialized_intent:
+            return specialized_intent
+        
+        # Route by signal type
+        return self._route_by_signal_type(q, intent)
+    
+    def _check_high_priority_patterns(self, q: str) -> Optional[Intent]:
+        """Check high-priority query patterns and return appropriate intent."""
         if self._is_customer_segment_query(q):
             return Intent.CUSTOMER_INFO
         
@@ -200,20 +214,20 @@ class AdvancedQueryProcessor:
         if self._is_trend_analysis_query(q):
             return Intent.TREND_ANALYSIS
         
-        # Check break-even signals
+        return None
+    
+    def _check_specialized_patterns(self, q: str) -> Optional[Intent]:
+        """Check specialized query patterns like break-even and customer segments."""
         if self._is_breakeven_query(q):
             return self._route_breakeven_query(q)
         
-        # Check for customer segment questions
         if self._is_specific_customer_segment_query(q):
             return Intent.CUSTOMER_INFO
         
-        # Check for high sales low profit
         if self._is_high_sales_low_profit_query(q):
             return Intent.PROFIT_ANALYSIS
         
-        # Route by signal type
-        return self._route_by_signal_type(q, intent)
+        return None
 
     def _is_customer_segment_query(self, q: str) -> bool:
         """Check for customer segment questions - HIGHEST PRIORITY."""
@@ -429,47 +443,19 @@ class AdvancedQueryProcessor:
             q = question.lower()
 
             # Route to specific handlers
-            if self._is_highest_transaction_query(q):
-                return self._handle_highest_transaction(language)
+            specific_handler_result = await self._route_to_specific_sales_handler(q, question, language)
+            if specific_handler_result:
+                return specific_handler_result
             
-            if self._is_sales_by_day_query(q):
-                return self._handle_sales_by_day(language)
+            # Handle time-based queries
+            time_based_result = self._handle_time_based_sales_queries(question, language)
+            if time_based_result:
+                return time_based_result
             
-            if self._is_small_transactions_query(q):
-                return self._handle_small_transactions(language)
-            
-            if self._is_monthly_sales_count_query(q):
-                return self._handle_monthly_sales_count(language)
-            
-            if self._is_current_month_billing_query(q):
-                return await self._handle_current_month_billing(language)
-
-            if self._is_best_worst_month_query(q):
-                return self._handle_best_worst_month_query(q, language)
-
-            if self._is_quarter_query(question):
-                quarter_data = self._extract_quarter(question)
-                if quarter_data:
-                    year, months = quarter_data
-                    return self._handle_quarter(year, months, language)
-
-            if self._is_year_only_query(question):
-                year_only = self._extract_year_only(question)
-                if year_only:
-                    return self._handle_year_total(year_only, language)
-
-            if self._is_specific_month_query(question):
-                return self._handle_specific_month_query(question, language)
-
-            if self._is_average_margin_query(q):
-                return self._handle_avg_margin(language)
-
-            if self._is_transaction_count_query(q):
-                return self._handle_transaction_count(question, language)
-
-            if self._is_trend_query(q):
-                metrics = self.db.get_sales_metrics()
-                return self._analyze_sales_trends(metrics, language)
+            # Handle analysis queries
+            analysis_result = self._handle_sales_analysis_queries(q, question, language)
+            if analysis_result:
+                return analysis_result
 
             # Default: recent month
             return self._handle_recent_month_metrics(language)
@@ -477,6 +463,60 @@ class AdvancedQueryProcessor:
         except Exception as e:
             logger.error("Error in sales handler: %s", e, exc_info=True)
             return self._err(language), []
+    
+    async def _route_to_specific_sales_handler(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Route to specific sales handlers based on query type."""
+        if self._is_highest_transaction_query(q):
+            return self._handle_highest_transaction(language)
+        
+        if self._is_sales_by_day_query(q):
+            return self._handle_sales_by_day(language)
+        
+        if self._is_small_transactions_query(q):
+            return self._handle_small_transactions(language)
+        
+        if self._is_monthly_sales_count_query(q):
+            return self._handle_monthly_sales_count(language)
+        
+        if self._is_current_month_billing_query(q):
+            return await self._handle_current_month_billing(language)
+
+        if self._is_best_worst_month_query(q):
+            return self._handle_best_worst_month_query(q, language)
+        
+        return None
+    
+    def _handle_time_based_sales_queries(self, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Handle time-based sales queries (quarters, years, specific months)."""
+        if self._is_quarter_query(question):
+            quarter_data = self._extract_quarter(question)
+            if quarter_data:
+                year, months = quarter_data
+                return self._handle_quarter(year, months, language)
+
+        if self._is_year_only_query(question):
+            year_only = self._extract_year_only(question)
+            if year_only:
+                return self._handle_year_total(year_only, language)
+
+        if self._is_specific_month_query(question):
+            return self._handle_specific_month_query(question, language)
+        
+        return None
+    
+    def _handle_sales_analysis_queries(self, q: str, question: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Handle sales analysis queries (margins, transactions, trends)."""
+        if self._is_average_margin_query(q):
+            return self._handle_avg_margin(language)
+
+        if self._is_transaction_count_query(q):
+            return self._handle_transaction_count(question, language)
+
+        if self._is_trend_query(q):
+            metrics = self.db.get_sales_metrics()
+            return self._analyze_sales_trends(metrics, language)
+        
+        return None
 
     def _is_highest_transaction_query(self, q: str) -> bool:
         """Check for highest transaction queries."""
@@ -657,244 +697,6 @@ class AdvancedQueryProcessor:
             [DB_BUSINESS_METRICS]
         )
 
-        # ── Quarter query (Q1/Q2/Q3/Q4 YYYY) ──
-        quarter_data = self._extract_quarter(question)
-        if quarter_data:
-            year, months = quarter_data
-            return self._handle_quarter(year, months, language)
-
-        # ── Year-only query (e.g. "total 2024") ──
-        year_only = self._extract_year_only(question)
-        if year_only:
-            return self._handle_year_total(year_only, language)
-
-        # ── Specific month query ──
-        try:
-            date_info = self._extract_date_from_question(question)
-            if date_info:
-                year, month = date_info
-                rec = self.db.get_sales_for_period(year, month)
-                if rec:
-                    mn = MONTH_NAMES_EN[month]
-                    mn_es = MONTH_NAMES_ES[month]
-                    total_sales = float(rec['total_sales'])
-                    total_costs = float(rec['total_costs'])
-                    profit = float(rec['profit'])
-                    margin = (profit / total_sales * 100) if total_sales else 0
-                    if language == Language.SPANISH:
-                        return (
-                            f"📅 Ventas de {mn_es} {year}:\n"
-                            f"• Ventas Totales: ${total_sales:,.2f}\n"
-                            f"• Costos Totales: ${total_costs:,.2f}\n"
-                            f"• Ganancia: ${profit:,.2f}\n"
-                            f"• Margen: {margin:.1f}%",
-                            [DB_BUSINESS_METRICS]
-                        )
-                    return (
-                        f"📅 Sales for {mn} {year}:\n"
-                        f"• Total Sales: ${total_sales:,.2f}\n"
-                        f"• Total Costs: ${total_costs:,.2f}\n"
-                        f"• Profit: ${profit:,.2f}\n"
-                        f"• Margin: {margin:.1f}%",
-                        [DB_BUSINESS_METRICS]
-                    )
-                mn = MONTH_NAMES_EN[month]
-                mn_es = MONTH_NAMES_ES[month]
-                if language == Language.SPANISH:
-                    return f"No hay datos para {mn_es} {year}.", []
-                return f"No data found for {mn} {year}.", []
-
-            # ── Average margin query ──
-            if any(w in q for w in ['average', 'promedio', 'avg', 'mean', 'margin',
-                                    'margen', 'average profit', 'margen promedio']):
-                return self._handle_avg_margin(language)
-
-            # ── Transaction count query ──
-            if any(w in q for w in ['transaction', 'transaccion', 'transacciones',
-                                    'how many', 'cuántas', 'count', 'número de']):
-                return self._handle_transaction_count(question, language)
-
-            # ── Trend query ──
-            if any(w in q for w in ['trend', 'tendencia', 'growth', 'crecimiento',
-                                    'change', 'cambio', 'compare', 'comparar',
-                                    'últimos', 'last', 'recent', 'reciente']):
-                metrics = self.db.get_sales_metrics()
-                return self._analyze_sales_trends(metrics, language)
-
-            # ── Default: recent month ──
-            metrics = self.db.get_sales_metrics()
-            if not metrics:
-                return self._no_data("sales", language), []
-            r = metrics[0]
-            total_sales = float(r['total_sales'])
-            total_costs = float(r['total_costs'])
-            profit = float(r['profit'])
-            margin = (profit / total_sales * 100) if total_sales else 0
-            mn = MONTH_NAMES_EN[r['month']]
-            mn_es = MONTH_NAMES_ES[r['month']]
-            if language == Language.SPANISH:
-                return (
-                    f"📊 Métricas más recientes — {mn_es} {r['year']}:\n"
-                    f"• Ventas Totales: ${total_sales:,.2f}\n"
-                    f"• Costos Totales: ${total_costs:,.2f}\n"
-                    f"• Ganancia: ${profit:,.2f}\n"
-                    f"• Margen: {margin:.1f}%",
-                    [DB_BUSINESS_METRICS]
-                )
-            return (
-                f"📊 Most recent metrics — {mn} {r['year']}:\n"
-                f"• Total Sales: ${total_sales:,.2f}\n"
-                f"• Total Costs: ${total_costs:,.2f}\n"
-                f"• Profit: ${profit:,.2f}\n"
-                f"• Margin: {margin:.1f}%",
-                [DB_BUSINESS_METRICS]
-            )
-        except Exception as e:
-            logger.error("Error in sales handler: %s", e, exc_info=True)
-            return self._err(language), []
-
-    async def _handle_profit_analysis(self, question: str, language: Language) -> Tuple[str, List[str]]:
-        """Enhanced profit analysis with break-even calculations."""
-        try:
-            q = question.lower()
-            
-            # Route to specific analysis handlers
-            if self._is_worst_month_analysis_query(q):
-                return self._handle_worst_month_analysis(language)
-            
-            if self._is_closest_to_loss_query(q):
-                return self._handle_closest_to_loss(language)
-            
-            if self._is_accounting_analysis_detailed_query(q):
-                return self._handle_accounting_analysis(question, language)
-            
-            if self._is_high_sales_low_profit_detailed_query(q):
-                return self._handle_high_sales_low_profit(language)
-            
-            if self._is_surprising_performance_query(q):
-                return self._handle_surprising_performance(language)
-            
-            if self._is_suspicious_months_query(q):
-                return self._handle_suspicious_months(language)
-            
-            if self._is_business_failure_query(q):
-                return self._handle_failure_scenarios(language)
-            
-            if self._is_near_failure_query(q):
-                return self._handle_near_failure_month(language)
-            
-            if self._is_breakeven_point_query(q):
-                return self._handle_breakeven_point(language)
-            
-            if self._is_breakeven_closest_query(q):
-                return self._handle_breakeven_closest(language)
-            
-            if self._is_first_profitable_query(q):
-                return self._handle_first_profitable_month(language)
-            
-            if self._is_loss_months_query(q):
-                return self._handle_loss_months(language)
-            
-            if self._is_risk_analysis_query(q):
-                return self._handle_risk_analysis(language)
-            
-            if self._is_cost_increase_scenario_query(q):
-                return self._handle_cost_increase_scenario(question, language)
-            
-            # Default: delegate to sales metrics
-            return await self._handle_sales_metrics(question, language)
-            
-        except Exception as e:
-            logger.error(f"Error in profit analysis: {e}", exc_info=True)
-            return self._err(language), []
-
-    def _is_worst_month_analysis_query(self, q: str) -> bool:
-        """Check for worst month analysis queries."""
-        return any(w in q for w in [WORST_MONTH_EN, WORST_MONTH_ES, WORST_PERFORMING_EN, 'peor rendimiento',
-                                    'mes con peor', 'peor utilidad', 'worst profit'])
-
-    def _is_closest_to_loss_query(self, q: str) -> bool:
-        """Check for closest to losing money queries."""
-        return any(w in q for w in ['closest to losing', 'más cerca de perder', 'losing money', 
-                                    'perder dinero', 'closest to loss', 'near bankruptcy', 'estuvimos cerca',
-                                    'cerca de pérdida', 'más cerca de pérdida'])
-
-    def _is_accounting_analysis_detailed_query(self, q: str) -> bool:
-        """Check for detailed accounting analysis queries."""
-        return any(w in q for w in ['gastamos más', COST_COVERAGE_ES, ACTUAL_PROFIT_ES,
-                                    NEGATIVE_PROFIT_ES, RISING_COSTS_ES, MOST_PROFITABLE_YEAR_ES,
-                                    REDUCE_EXPENSES_ES, MONEY_DRAIN_ES, PROFIT_VS_SALES_ES])
-
-    def _is_high_sales_low_profit_detailed_query(self, q: str) -> bool:
-        """Check for high sales low profit queries."""
-        return any(w in q for w in ['high sales low profit', 'ventas altas ganancia baja', 
-                                    'vendimos mucho ganamos poco', 'vendimos mucho pero ganamos poco',
-                                    'sales were high but profit was low', 'high but profit was low',
-                                    'where sales were high', 'donde vendimos mucho', 'mes donde vendimos mucho',
-                                    'any month where', 'algún mes donde'])
-
-    def _is_surprising_performance_query(self, q: str) -> bool:
-        """Check for surprising performance queries."""
-        return any(w in q for w in ['surprisingly well', 'sorprendentemente bien', 'performed well',
-                                    'surprisingly good', 'unexpectedly well', 'nos fue bien'])
-
-    def _is_suspicious_months_query(self, q: str) -> bool:
-        """Check for suspicious months queries."""
-        return any(w in q for w in ['suspicious', 'sospechoso', 'too high', 'muy altas', 'muy alta',
-                                    'too low', 'muy bajas', 'muy baja', 'looks suspicious', 'parece sospechoso'])
-
-    def _is_business_failure_query(self, q: str) -> bool:
-        """Check for business failure scenario queries."""
-        return any(w in q for w in ['stop being profitable', 'deje de ser rentable', 'dejar de ser rentable',
-                                    'business to fail', 'negocio fracasar', 'what would need to happen'])
-
-    def _is_near_failure_query(self, q: str) -> bool:
-        """Check for near failure queries."""
-        return any(w in q for w in ['almost broke', 'casi se rompe', 'nearly failed', 'casi fracasa',
-                                    'where almost', 'donde casi', 'casi se rompe el negocio'])
-
-    def _is_breakeven_point_query(self, q: str) -> bool:
-        """Check for break-even point calculation queries."""
-        return (any(w in q for w in ['break-even point', BREAKEVEN_POINT_ES,
-                                     'cover costs', 'cubrir costos', 'cover expenses',
-                                     'cubrir gastos', 'how much revenue', 'cuánto vender',
-                                     'cuánto tendríamos que vender']) and 
-                not any(w in q for w in ['closest', 'cerca']))
-
-    def _is_breakeven_closest_query(self, q: str) -> bool:
-        """Check for closest to break-even queries."""
-        return (any(w in q for w in ['closest to zero', 'cerca de cero', 'más cerca de cero',
-                                     'closest to break-even', 'break-even', 'break even',
-                                     'breakeven']) and 
-                any(w in q for w in ['closest', 'cerca', 'month', 'mes']))
-
-    def _is_first_profitable_query(self, q: str) -> bool:
-        """Check for first profitable month queries."""
-        return any(w in q for w in ['first month', 'primer mes', 'loss to profit',
-                                    'pérdida a ganancia', 'perdida a ganancia',
-                                    'first profitable', 'primer mes rentable',
-                                    'moved from loss', 'pasó de pérdida'])
-
-    def _is_loss_months_query(self, q: str) -> bool:
-        """Check for loss months queries."""
-        return any(w in q for w in ['sales lower than', 'ventas menores que',
-                                    'sales less than', 'ventas menor que',
-                                    'costs plus expenses', 'costos y gastos',
-                                    'suma de costos', 'total costs'])
-
-    def _is_risk_analysis_query(self, q: str) -> bool:
-        """Check for risk analysis queries."""
-        return any(w in q for w in ['risk of operating', 'riesgo de operar',
-                                    'operating below', 'operar por debajo',
-                                    'highest risk', 'mayor riesgo', 'most risk'])
-
-    def _is_cost_increase_scenario_query(self, q: str) -> bool:
-        """Check for cost increase scenario queries."""
-        return any(w in q for w in ['costs increase', 'costos suben', 'costos aumentan',
-                                    'costs go up', 'increase by', 'suben un',
-                                    'maintain profit', 'mantener utilidad',
-                                    'mantener ganancia', 'keep profit positive'])
-
     # ── Business Metrics Analysis ────────────────────────────────────────────
 
     def _handle_avg_margin(self, language: Language) -> Tuple[str, List[str]]:
@@ -1053,26 +855,9 @@ class AdvancedQueryProcessor:
             q = question.lower()
 
             # Route to specific handlers
-            if self._is_top_product_revenue_query(q):
-                return self._handle_top_product_by_revenue(language)
-
-            if self._is_underpriced_products_query(q):
-                return self._handle_underpriced_products(language)
-
-            if self._is_high_volume_low_margin_query(q):
-                return self._handle_high_volume_low_margin_products(language)
-
-            if self._is_product_margin_query(q):
-                return self._handle_product_margins(language)
-
-            if self._is_product_breakeven_query(q):
-                return self._handle_product_breakeven_contribution(language)
-
-            if self._is_category_revenue_query(q):
-                return self._handle_category_revenue(language)
-
-            if self._is_top_products_query(q):
-                return self._handle_top_products_list(language)
+            specific_result = self._route_to_product_handler(q, language)
+            if specific_result:
+                return specific_result
 
             # Try specific product search
             product_result = self._handle_product_search(question, language)
@@ -1085,6 +870,31 @@ class AdvancedQueryProcessor:
         except Exception as e:
             logger.error("Error in product handler: %s", e)
             return self._err(language), []
+    
+    def _route_to_product_handler(self, q: str, language: Language) -> Optional[Tuple[str, List[str]]]:
+        """Route to specific product handlers based on query type."""
+        if self._is_top_product_revenue_query(q):
+            return self._handle_top_product_by_revenue(language)
+
+        if self._is_underpriced_products_query(q):
+            return self._handle_underpriced_products(language)
+
+        if self._is_high_volume_low_margin_query(q):
+            return self._handle_high_volume_low_margin_products(language)
+
+        if self._is_product_margin_query(q):
+            return self._handle_product_margins(language)
+
+        if self._is_product_breakeven_query(q):
+            return self._handle_product_breakeven_contribution(language)
+
+        if self._is_category_revenue_query(q):
+            return self._handle_category_revenue(language)
+
+        if self._is_top_products_query(q):
+            return self._handle_top_products_list(language)
+        
+        return None
 
     def _is_top_product_revenue_query(self, q: str) -> bool:
         """Check for top product by revenue queries."""
@@ -1151,6 +961,17 @@ class AdvancedQueryProcessor:
             return ans, [DB_PRODUCTS, DB_SALES_TRANSACTIONS]
         return self._no_data("products", language), []
 
+    def _format_single_product_match(self, p: Dict, language: Language) -> str:
+        """Format a single product match result."""
+        price = float(p['price'])
+        if language == Language.SPANISH:
+            return (f"📦 {p['name']}\n"
+                    f"• Categoría: {p['category']}\n"
+                    f"• Precio: ${price:,.2f}")
+        return (f"📦 {p['name']}\n"
+                f"• Category: {p['category']}\n"
+                f"• Price: ${price:,.2f}")
+
     def _handle_product_search(self, question: str, language: Language) -> Tuple[str, List[str]]:
         """Handle specific product search."""
         keywords = self._extract_product_keywords(question)
@@ -1158,22 +979,14 @@ class AdvancedQueryProcessor:
             matches = self.db.get_product_by_name(kw)
             if matches:
                 if len(matches) == 1:
-                    p = matches[0]
-                    price = float(p['price'])
-                    if language == Language.SPANISH:
-                        ans = (f"📦 {p['name']}\n"
-                               f"• Categoría: {p['category']}\n"
-                               f"• Precio: ${price:,.2f}")
-                    else:
-                        ans = (f"📦 {p['name']}\n"
-                               f"• Category: {p['category']}\n"
-                               f"• Price: ${price:,.2f}")
+                    ans = self._format_single_product_match(matches[0], language)
                 else:
                     names = ', '.join(p['name'] for p in matches[:5])
                     ans = f"Productos encontrados: {names}" if language == Language.SPANISH \
-                          else f"Products found: {names}"
+                        else f"Products found: {names}"
                 return ans, [DB_PRODUCTS]
         return "", []
+
 
     def _handle_product_catalog_overview(self, language: Language) -> Tuple[str, List[str]]:
         """Handle product catalog overview."""
@@ -1370,19 +1183,21 @@ class AdvancedQueryProcessor:
         for c in customers:
             segs[c.get('segment', 'Unknown')] = segs.get(c.get('segment', 'Unknown'), 0) + 1
         seg_str = ', '.join(f"{v} {k}" for k, v in sorted(segs.items(), key=lambda x: -x[1]))
+        
         if language == Language.SPANISH:
-            return (
+            message = (
                 f"👥 Base de clientes: {len(customers)} clientes\n"
                 f"Segmentos: {seg_str}\n\n"
-                "💡 Puedes preguntar por el mejor cliente, clientes por país o segmento.",
-                [DB_CUSTOMERS]
+                "💡 Puedes preguntar por el mejor cliente, clientes por país o segmento."
             )
-        return (
-            f"👥 Customer base: {len(customers)} customers\n"
-            f"Segments: {seg_str}\n\n"
-            "💡 You can ask for top customers, customers by country or segment.",
-            [DB_CUSTOMERS]
-        )
+        else:
+            message = (
+                f"👥 Customer base: {len(customers)} customers\n"
+                f"Segments: {seg_str}\n\n"
+                "💡 You can ask for top customers, customers by country or segment."
+            )
+        
+        return message, [DB_CUSTOMERS]
 
     def _handle_customers_by_country(self, country: str,
                                             language: Language) -> Tuple[str, List[str]]:
@@ -2343,77 +2158,112 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in product margins: {e}")
             return self._err(language), []
 
+    def _calculate_product_breakeven_metrics(
+        self, product: Dict, all_metrics: List[Dict], avg_monthly_costs: float
+    ) -> tuple:
+        """Calculate monthly contribution and breakeven coverage for a product."""
+        monthly_contribution = product['total_revenue'] / len(all_metrics) if all_metrics else 0
+        breakeven_coverage = (monthly_contribution / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
+        return monthly_contribution, breakeven_coverage
+
+    def _format_breakeven_product_list_spanish(
+        self, top_products: List[Dict], all_metrics: List[Dict], avg_monthly_costs: float
+    ) -> str:
+        """Format product breakeven contribution list in Spanish."""
+        answer = f"🎯 Contribución al {BREAKEVEN_POINT_ES} (${avg_monthly_costs:,.2f}/mes):\n\n"
+        for i, product in enumerate(top_products, 1):
+            monthly_contribution, breakeven_coverage = self._calculate_product_breakeven_metrics(
+                product, all_metrics, avg_monthly_costs
+            )
+            answer += (f"{i}. {product['name']}\n"
+                      f"   • Ingresos totales: ${product['total_revenue']:,.2f}\n"
+                      f"   • Contribución mensual est.: ${monthly_contribution:,.2f}\n"
+                      f"   • Cobertura de costos: {breakeven_coverage:.1f}%\n"
+                      f"   • Categoría: {product['category']}\n\n")
+        top_product = top_products[0]
+        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+            top_product, all_metrics, avg_monthly_costs
+        )
+        answer += (f"🏆 **{top_product['name']}** contribuye más al {BREAKEVEN_POINT_ES}\n"
+                  f"Cubre aproximadamente {coverage_top:.1f}% de los costos mensuales promedio.")
+        return answer
+
+    def _format_breakeven_product_list_english(
+        self, top_products: List[Dict], all_metrics: List[Dict], avg_monthly_costs: float
+    ) -> str:
+        """Format product breakeven contribution list in English."""
+        answer = f"🎯 Break-even contribution (${avg_monthly_costs:,.2f}/month):\n\n"
+        for i, product in enumerate(top_products, 1):
+            monthly_contribution, breakeven_coverage = self._calculate_product_breakeven_metrics(
+                product, all_metrics, avg_monthly_costs
+            )
+            answer += (f"{i}. {product['name']}\n"
+                      f"   • Total revenue: ${product['total_revenue']:,.2f}\n"
+                      f"   • Est. monthly contribution: ${monthly_contribution:,.2f}\n"
+                      f"   • Cost coverage: {breakeven_coverage:.1f}%\n"
+                      f"   • Category: {product['category']}\n\n")
+        top_product = top_products[0]
+        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+            top_product, all_metrics, avg_monthly_costs
+        )
+        answer += (f"🏆 **{top_product['name']}** contributes most to break-even\n"
+                  f"Covers approximately {coverage_top:.1f}% of average monthly costs.")
+        return answer
+
     def _handle_product_breakeven_contribution(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze which products contribute most to reaching break-even."""
         try:
-            # Get top products by revenue (these contribute most to covering costs)
             top_products = self.db.get_top_products(limit=10)
             if not top_products:
                 return self._no_data("products", language), []
-            
-            # Get average monthly costs for break-even calculation
             all_metrics = self.db.get_all_sales_metrics()
             if not all_metrics:
                 return self._no_data("sales", language), []
-            
             avg_monthly_costs = sum(m['total_costs'] for m in all_metrics) / len(all_metrics)
-            
             if language == Language.SPANISH:
-                answer = f"🎯 Contribución al {BREAKEVEN_POINT_ES} (${avg_monthly_costs:,.2f}/mes):\n\n"
-                
-                for i, product in enumerate(top_products, 1):
-                    # Estimate monthly contribution (assuming revenue is spread over time)
-                    monthly_contribution = product['total_revenue'] / len(all_metrics) if all_metrics else 0
-                    breakeven_coverage = (monthly_contribution / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
-                    
-                    answer += (f"{i}. {product['name']}\n"
-                              f"   • Ingresos totales: ${product['total_revenue']:,.2f}\n"
-                              f"   • Contribución mensual est.: ${monthly_contribution:,.2f}\n"
-                              f"   • Cobertura de costos: {breakeven_coverage:.1f}%\n"
-                              f"   • Categoría: {product['category']}\n\n")
-                
-                top_product = top_products[0]
-                monthly_top = top_product['total_revenue'] / len(all_metrics) if all_metrics else 0
-                coverage_top = (monthly_top / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
-                
-                answer += (f"🏆 **{top_product['name']}** contribuye más al {BREAKEVEN_POINT_ES}\n"
-                          f"Cubre aproximadamente {coverage_top:.1f}% de los costos mensuales promedio.")
+                answer = self._format_breakeven_product_list_spanish(top_products, all_metrics, avg_monthly_costs)
             else:
-                answer = f"🎯 Break-even contribution (${avg_monthly_costs:,.2f}/month):\n\n"
-                
-                for i, product in enumerate(top_products, 1):
-                    # Estimate monthly contribution (assuming revenue is spread over time)
-                    monthly_contribution = product['total_revenue'] / len(all_metrics) if all_metrics else 0
-                    breakeven_coverage = (monthly_contribution / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
-                    
-                    answer += (f"{i}. {product['name']}\n"
-                              f"   • Total revenue: ${product['total_revenue']:,.2f}\n"
-                              f"   • Est. monthly contribution: ${monthly_contribution:,.2f}\n"
-                              f"   • Cost coverage: {breakeven_coverage:.1f}%\n"
-                              f"   • Category: {product['category']}\n\n")
-                
-                top_product = top_products[0]
-                monthly_top = top_product['total_revenue'] / len(all_metrics) if all_metrics else 0
-                coverage_top = (monthly_top / avg_monthly_costs * 100) if avg_monthly_costs > 0 else 0
-                
-                answer += (f"🏆 **{top_product['name']}** contributes most to break-even\n"
-                          f"Covers approximately {coverage_top:.1f}% of average monthly costs.")
-            
+                answer = self._format_breakeven_product_list_english(top_products, all_metrics, avg_monthly_costs)
             return answer, [DB_PRODUCTS, DB_SALES_TRANSACTIONS, DB_BUSINESS_METRICS]
         except Exception as e:
             logger.error(f"Error in product breakeven contribution: {e}")
             return self._err(language), []
 
+    def _format_customer_profitability_spanish(self, sorted_segments: List) -> str:
+        """Format customer profitability analysis in Spanish."""
+        answer = "👥 Rentabilidad por segmento de clientes:\n\n"
+        for i, (segment, stats) in enumerate(sorted_segments, 1):
+            answer += (f"{i}. **{segment}**\n"
+                      f"   • Clientes: {stats['customers']}\n"
+                      f"   • Compras totales: ${stats['total_purchases']:,.2f}\n"
+                      f"   • Promedio por cliente: ${stats['avg_purchase_per_customer']:,.2f}\n"
+                      f"   • Transacciones promedio: {stats['avg_transactions_per_customer']:.1f}\n"
+                      f"   • Valor promedio por transacción: ${stats['avg_transaction_value']:,.2f}\n\n")
+        top_segment = sorted_segments[0]
+        answer += f"🏆 Segmento más rentable: **{top_segment[0]}** con ${top_segment[1]['total_purchases']:,.2f} en compras totales"
+        return answer
+
+    def _format_customer_profitability_english(self, sorted_segments: List) -> str:
+        """Format customer profitability analysis in English."""
+        answer = "👥 Customer segment profitability:\n\n"
+        for i, (segment, stats) in enumerate(sorted_segments, 1):
+            answer += (f"{i}. **{segment}**\n"
+                      f"   • Customers: {stats['customers']}\n"
+                      f"   • Total purchases: ${stats['total_purchases']:,.2f}\n"
+                      f"   • Average per customer: ${stats['avg_purchase_per_customer']:,.2f}\n"
+                      f"   • Avg transactions: {stats['avg_transactions_per_customer']:.1f}\n"
+                      f"   • Avg transaction value: ${stats['avg_transaction_value']:,.2f}\n\n")
+        top_segment = sorted_segments[0]
+        answer += f"🏆 Most profitable segment: **{top_segment[0]}** with ${top_segment[1]['total_purchases']:,.2f} in total purchases"
+        return answer
+
     def _handle_customer_profitability(self, language: Language) -> Tuple[str, List[str]]:
         """Analyze customer segment profitability."""
         try:
-            # Get customer segments and their spending
             customers = self.db.get_customers(limit=1000)
             if not customers:
                 return self._no_data("customers", language), []
-            
-            # Group by segment and calculate totals
-            segment_stats = {}
+            segment_stats: Dict[str, Dict] = {}
             for customer in customers:
                 segment = customer.get('segment', 'Unknown')
                 if segment not in segment_stats:
@@ -2422,45 +2272,18 @@ class AdvancedQueryProcessor:
                         'total_purchases': 0,
                         'total_transactions': 0
                     }
-                
                 segment_stats[segment]['customers'] += 1
                 segment_stats[segment]['total_purchases'] += customer.get('total_purchases', 0)
                 segment_stats[segment]['total_transactions'] += customer.get('transaction_count', 0)
-            
-            # Calculate profitability metrics
             for segment, stats in segment_stats.items():
                 stats['avg_purchase_per_customer'] = stats['total_purchases'] / stats['customers'] if stats['customers'] > 0 else 0
                 stats['avg_transactions_per_customer'] = stats['total_transactions'] / stats['customers'] if stats['customers'] > 0 else 0
                 stats['avg_transaction_value'] = stats['total_purchases'] / stats['total_transactions'] if stats['total_transactions'] > 0 else 0
-            
-            # Sort by total purchases (profitability)
             sorted_segments = sorted(segment_stats.items(), key=lambda x: x[1]['total_purchases'], reverse=True)
-            
             if language == Language.SPANISH:
-                answer = "👥 Rentabilidad por segmento de clientes:\n\n"
-                for i, (segment, stats) in enumerate(sorted_segments, 1):
-                    answer += (f"{i}. **{segment}**\n"
-                              f"   • Clientes: {stats['customers']}\n"
-                              f"   • Compras totales: ${stats['total_purchases']:,.2f}\n"
-                              f"   • Promedio por cliente: ${stats['avg_purchase_per_customer']:,.2f}\n"
-                              f"   • Transacciones promedio: {stats['avg_transactions_per_customer']:.1f}\n"
-                              f"   • Valor promedio por transacción: ${stats['avg_transaction_value']:,.2f}\n\n")
-                
-                top_segment = sorted_segments[0]
-                answer += f"🏆 Segmento más rentable: **{top_segment[0]}** con ${top_segment[1]['total_purchases']:,.2f} en compras totales"
+                answer = self._format_customer_profitability_spanish(sorted_segments)
             else:
-                answer = "👥 Customer segment profitability:\n\n"
-                for i, (segment, stats) in enumerate(sorted_segments, 1):
-                    answer += (f"{i}. **{segment}**\n"
-                              f"   • Customers: {stats['customers']}\n"
-                              f"   • Total purchases: ${stats['total_purchases']:,.2f}\n"
-                              f"   • Average per customer: ${stats['avg_purchase_per_customer']:,.2f}\n"
-                              f"   • Avg transactions: {stats['avg_transactions_per_customer']:.1f}\n"
-                              f"   • Avg transaction value: ${stats['avg_transaction_value']:,.2f}\n\n")
-                
-                top_segment = sorted_segments[0]
-                answer += f"🏆 Most profitable segment: **{top_segment[0]}** with ${top_segment[1]['total_purchases']:,.2f} in total purchases"
-            
+                answer = self._format_customer_profitability_english(sorted_segments)
             return answer, [DB_CUSTOMERS, DB_SALES_TRANSACTIONS]
         except Exception as e:
             logger.error(f"Error in customer profitability: {e}")
@@ -3041,41 +2864,57 @@ class AdvancedQueryProcessor:
             return self._err(language), []
     # ── Enhanced Product Analysis Methods ────────────────────────────────────
 
+    def _find_underpriced_candidates(self, top_products: List[Dict]) -> List[Dict]:
+        """Find products that may be underpriced based on volume and price."""
+        underpriced_candidates = []
+        for product in top_products:
+            revenue = float(product['total_revenue'])
+            product_details = self.db.get_product_by_name(product['name'])
+            if product_details:
+                price = float(product_details[0]['price'])
+                estimated_volume = revenue / price if price > 0 else 0
+                if estimated_volume > 50 and price < 1000:
+                    underpriced_candidates.append({
+                        'name': product['name'],
+                        'category': product['category'],
+                        'price': price,
+                        'revenue': revenue,
+                        'estimated_volume': estimated_volume,
+                    })
+        underpriced_candidates.sort(key=lambda x: x['estimated_volume'], reverse=True)
+        return underpriced_candidates
+
+    def _format_underpriced_products(self, candidates: List[Dict], language: Language) -> str:
+        """Format underpriced products list."""
+        if language == Language.SPANISH:
+            answer = f"💰 Productos potencialmente subvalorados ({len(candidates)}):\n\n"
+            for i, product in enumerate(candidates[:5], 1):
+                answer += (f"{i}. {product['name']}\n"
+                          f"   • Precio actual: ${product['price']:,.2f}\n"
+                          f"   • Volumen estimado: {product['estimated_volume']:.0f} unidades\n"
+                          f"   • Ingresos totales: ${product['revenue']:,.2f}\n"
+                          f"   • Categoría: {product['category']}\n\n")
+            answer += ("🔍 **Recomendación:** Considera aumentar precios gradualmente\n"
+                      "para productos con alta demanda y bajo precio.")
+        else:
+            answer = f"💰 Potentially underpriced products ({len(candidates)}):\n\n"
+            for i, product in enumerate(candidates[:5], 1):
+                answer += (f"{i}. {product['name']}\n"
+                          f"   • Current price: ${product['price']:,.2f}\n"
+                          f"   • Estimated volume: {product['estimated_volume']:.0f} units\n"
+                          f"   • Total revenue: ${product['revenue']:,.2f}\n"
+                          f"   • Category: {product['category']}\n\n")
+            answer += ("🔍 **Recommendation:** Consider gradual price increases\n"
+                      "for high-demand, low-price products.")
+        return answer
+
     def _handle_underpriced_products(self, language: Language) -> Tuple[str, List[str]]:
         """Identify products that may be underpriced based on sales volume vs profit contribution."""
         try:
-            # Get top products by volume (transaction count) and revenue
             top_products = self.db.get_top_products(limit=20)
             if not top_products:
                 return self._no_data("products", language), []
-            
-            # Analyze products for potential underpricing
-            # High sales volume but relatively low revenue per unit suggests underpricing
-            underpriced_candidates = []
-            
-            for product in top_products:
-                revenue = float(product['total_revenue'])
-                # Get product details to estimate volume and pricing
-                product_details = self.db.get_product_by_name(product['name'])
-                if product_details:
-                    price = float(product_details[0]['price'])
-                    estimated_volume = revenue / price if price > 0 else 0
-                    
-                    # Calculate revenue per transaction (proxy for pricing efficiency)
-                    # Products with high volume but low price might be underpriced
-                    if estimated_volume > 50 and price < 1000:  # High volume, relatively low price
-                        underpriced_candidates.append({
-                            'name': product['name'],
-                            'category': product['category'],
-                            'price': price,
-                            'revenue': revenue,
-                            'estimated_volume': estimated_volume,
-                            'revenue_per_unit': price
-                        })
-            
-            # Sort by estimated volume (highest volume products that might be underpriced)
-            underpriced_candidates.sort(key=lambda x: x['estimated_volume'], reverse=True)
-            
+            underpriced_candidates = self._find_underpriced_candidates(top_products)
             if not underpriced_candidates:
                 if language == Language.SPANISH:
                     return (
@@ -3088,30 +2927,7 @@ class AdvancedQueryProcessor:
                     "Pricing appears aligned with sales volume.",
                     [DB_PRODUCTS, DB_SALES_TRANSACTIONS]
                 )
-            
-            if language == Language.SPANISH:
-                answer = f"💰 Productos potencialmente subvalorados ({len(underpriced_candidates)}):\n\n"
-                for i, product in enumerate(underpriced_candidates[:5], 1):
-                    answer += (f"{i}. {product['name']}\n"
-                              f"   • Precio actual: ${product['price']:,.2f}\n"
-                              f"   • Volumen estimado: {product['estimated_volume']:.0f} unidades\n"
-                              f"   • Ingresos totales: ${product['revenue']:,.2f}\n"
-                              f"   • Categoría: {product['category']}\n\n")
-                
-                answer += ("🔍 **Recomendación:** Considera aumentar precios gradualmente\n"
-                          "para productos con alta demanda y bajo precio.")
-            else:
-                answer = f"💰 Potentially underpriced products ({len(underpriced_candidates)}):\n\n"
-                for i, product in enumerate(underpriced_candidates[:5], 1):
-                    answer += (f"{i}. {product['name']}\n"
-                              f"   • Current price: ${product['price']:,.2f}\n"
-                              f"   • Estimated volume: {product['estimated_volume']:.0f} units\n"
-                              f"   • Total revenue: ${product['revenue']:,.2f}\n"
-                              f"   • Category: {product['category']}\n\n")
-                
-                answer += ("🔍 **Recommendation:** Consider gradual price increases\n"
-                          "for high-demand, low-price products.")
-            
+            answer = self._format_underpriced_products(underpriced_candidates, language)
             return answer, [DB_PRODUCTS, DB_SALES_TRANSACTIONS]
         except Exception as e:
             logger.error(f"Error in underpriced products analysis: {e}")

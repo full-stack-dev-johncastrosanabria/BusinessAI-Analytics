@@ -5,6 +5,7 @@ import './InfiniteScroll.css'
 interface InfiniteScrollProps<T> {
   readonly query: UseInfiniteQueryResult<InfiniteData<{ data: T[]; hasMore: boolean }>, Error>
   readonly renderItem: (item: T, index: number) => React.ReactNode
+  readonly getItemKey: (item: T, index: number) => string | number
   readonly loadingComponent?: React.ReactNode
   readonly emptyComponent?: React.ReactNode
   readonly errorComponent?: (error: Error) => React.ReactNode
@@ -15,6 +16,7 @@ interface InfiniteScrollProps<T> {
 export function InfiniteScroll<T>({
   query,
   renderItem,
+  getItemKey,
   loadingComponent,
   emptyComponent,
   errorComponent,
@@ -94,7 +96,7 @@ export function InfiniteScroll<T>({
     <div className={`infinite-scroll-container ${className}`}>
       <div className="infinite-scroll-list">
         {allItems.map((item: T, index: number) => (
-          <div key={`item-${index}`} className="infinite-scroll-item">
+          <div key={getItemKey(item, index)} className="infinite-scroll-item">
             {renderItem(item, index)}
           </div>
         ))}

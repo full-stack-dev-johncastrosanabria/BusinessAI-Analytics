@@ -12,7 +12,7 @@ export const mockFetchSuccess = (customData?: Record<string, unknown>) => {
   const mockSummary = createMockSummary();
   const mockMetrics = createMockMetrics();
   
-  vi.mocked(global.fetch).mockImplementation((url: RequestInfo | URL) => {
+  vi.mocked(globalThis.fetch).mockImplementation((url: RequestInfo | URL) => {
     const urlStr = url.toString();
     let data: unknown = {};
     
@@ -34,9 +34,9 @@ export const mockFetchSuccess = (customData?: Record<string, unknown>) => {
 };
 
 export const mockFetchError = (errorMessage = 'Failed to load data') => {
-  vi.mocked(global.fetch).mockRejectedValue(new Error(errorMessage));
+  vi.mocked(globalThis.fetch).mockRejectedValue(new Error(errorMessage));
 };
 
 export const mockFetchPending = () => {
-  vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}));
+  vi.mocked(globalThis.fetch).mockReturnValue(new Promise(() => {}));
 };

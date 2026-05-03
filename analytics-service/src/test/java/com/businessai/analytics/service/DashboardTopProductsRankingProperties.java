@@ -31,13 +31,37 @@ public class DashboardTopProductsRankingProperties {
      * Simulates a product with revenue
      */
     static class ProductRevenue {
-        public Long productId;
-        public String productName;
-        public BigDecimal revenue;
+        private Long productId;
+        private String productName;
+        private BigDecimal revenue;
 
         public ProductRevenue(Long productId, String productName, BigDecimal revenue) {
             this.productId = productId;
             this.productName = productName;
+            this.revenue = revenue;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
+        }
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        public BigDecimal getRevenue() {
+            return revenue;
+        }
+
+        public void setRevenue(BigDecimal revenue) {
             this.revenue = revenue;
         }
     }
@@ -46,11 +70,27 @@ public class DashboardTopProductsRankingProperties {
      * Simulates a sales transaction
      */
     static class SalesTransaction {
-        public Long productId;
-        public BigDecimal amount;
+        private Long productId;
+        private BigDecimal amount;
 
         public SalesTransaction(Long productId, BigDecimal amount) {
             this.productId = productId;
+            this.amount = amount;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
+        }
+
+        public BigDecimal getAmount() {
+            return amount;
+        }
+
+        public void setAmount(BigDecimal amount) {
             this.amount = amount;
         }
     }
@@ -75,9 +115,9 @@ public class DashboardTopProductsRankingProperties {
             ProductRevenue prev = topProducts.get(i - 1);
             ProductRevenue curr = topProducts.get(i);
 
-            assert prev.revenue.compareTo(curr.revenue) >= 0 :
+            assert prev.getRevenue().compareTo(curr.getRevenue()) >= 0 :
                 String.format("Products not sorted by revenue: %s (%.2f) comes before %s (%.2f)",
-                        prev.productName, prev.revenue, curr.productName, curr.revenue);
+                        prev.getProductName(), prev.getRevenue(), curr.getProductName(), curr.getRevenue());
         }
     }
 
@@ -126,9 +166,9 @@ public class DashboardTopProductsRankingProperties {
                 .orElse(BigDecimal.ZERO);
 
         // Verify top product has the highest revenue
-        assert topProducts.get(0).revenue.compareTo(maxRevenue) == 0 :
+        assert topProducts.get(0).getRevenue().compareTo(maxRevenue) == 0 :
             String.format("Top product revenue %s does not match maximum revenue %s",
-                    topProducts.get(0).revenue, maxRevenue);
+                    topProducts.get(0).getRevenue(), maxRevenue);
     }
 
     @Property
@@ -149,8 +189,8 @@ public class DashboardTopProductsRankingProperties {
 
         // Verify all returned products have the same revenue
         for (ProductRevenue product : topProducts) {
-            assert product.revenue.compareTo(equalRevenue) == 0 :
-                String.format("Expected revenue %s but got %s", equalRevenue, product.revenue);
+            assert product.getRevenue().compareTo(equalRevenue) == 0 :
+                String.format("Expected revenue %s but got %s", equalRevenue, product.getRevenue());
         }
 
         // Verify at most 5 products returned
@@ -228,8 +268,8 @@ public class DashboardTopProductsRankingProperties {
     private Map<Long, BigDecimal> aggregateProductRevenue(List<SalesTransaction> transactions) {
         return transactions.stream()
                 .collect(Collectors.groupingBy(
-                        t -> t.productId,
-                        Collectors.reducing(BigDecimal.ZERO, t -> t.amount, BigDecimal::add)
+                        t -> t.getProductId(),
+                        Collectors.reducing(BigDecimal.ZERO, t -> t.getAmount(), BigDecimal::add)
                 ));
     }
 
@@ -239,7 +279,7 @@ public class DashboardTopProductsRankingProperties {
     private List<ProductRevenue> getTopProducts(Map<Long, BigDecimal> productRevenue, int limit) {
         return productRevenue.entrySet().stream()
                 .map(e -> new ProductRevenue(e.getKey(), "Product " + e.getKey(), e.getValue()))
-                .sorted((a, b) -> b.revenue.compareTo(a.revenue))
+                .sorted((a, b) -> b.getRevenue().compareTo(a.getRevenue()))
                 .limit(limit)
                 .collect(Collectors.toList());
     }

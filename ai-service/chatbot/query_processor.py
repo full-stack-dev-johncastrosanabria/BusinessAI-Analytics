@@ -25,7 +25,7 @@ class QueryProcessor:
         self.db = db_connection
         self.intent_classifier = IntentClassifier()
 
-    async def process_query(
+    def process_query(
         self, question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -38,21 +38,21 @@ class QueryProcessor:
             Tuple of (answer, sources)
         """
         try:
-            intent, _confidence, _language = self.intent_classifier.classify(
+            intent, _, _ = self.intent_classifier.classify(
                 question
             )
             logger.info("Processing query with intent: %s", intent.value)
 
             if intent == Intent.SALES_METRICS:
-                return await self._handle_sales_metrics(question)
+                return self._handle_sales_metrics(question)
             if intent == Intent.PRODUCT_INFO:
-                return await self._handle_product_info(question)
+                return self._handle_product_info(question)
             if intent == Intent.CUSTOMER_INFO:
-                return await self._handle_customer_info(question)
+                return self._handle_customer_info(question)
             if intent == Intent.DOCUMENT_SEARCH:
-                return await self._handle_document_search(question)
+                return self._handle_document_search(question)
             if intent == Intent.MIXED:
-                return await self._handle_mixed_query(question)
+                return self._handle_mixed_query(question)
 
             return (
                 "I'm not sure how to answer that question. "
@@ -68,7 +68,7 @@ class QueryProcessor:
                 [],
             )
 
-    async def _handle_sales_metrics(
+    def _handle_sales_metrics(
         self, question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -123,7 +123,7 @@ class QueryProcessor:
             logger.error("Error handling sales metrics query: %s", e)
             return "Error retrieving sales metrics.", []
 
-    async def _handle_product_info(
+    def _handle_product_info(
         self, question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -164,7 +164,7 @@ class QueryProcessor:
             logger.error("Error handling product info query: %s", e)
             return "Error retrieving product information.", []
 
-    async def _handle_customer_info(
+    def _handle_customer_info(
         self, _question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -212,7 +212,7 @@ class QueryProcessor:
             logger.error("Error handling customer info query: %s", e)
             return "Error retrieving customer information.", []
 
-    async def _handle_document_search(
+    def _handle_document_search(
         self, question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -259,7 +259,7 @@ class QueryProcessor:
             logger.error("Error handling document search query: %s", e)
             return "Error searching documents.", []
 
-    async def _handle_mixed_query(
+    def _handle_mixed_query(
         self, question: str
     ) -> Tuple[str, List[str]]:
         """
@@ -272,7 +272,7 @@ class QueryProcessor:
             Tuple of (answer, sources)
         """
         try:
-            db_answer, db_sources = await self._handle_sales_metrics(
+            db_answer, db_sources = self._handle_sales_metrics(
                 question
             )
             keywords = self.intent_classifier.extract_keywords(question)

@@ -100,7 +100,7 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(3, 'Dashboard loading and rendering');
     
     DemoLogger.action('📊 Scrolling to see all metrics');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(3, 'Viewing dashboard content - viewers can see all metrics');
 
     // ====================================================================
@@ -116,20 +116,20 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(2, 'Page rendering');
     
     // Scroll to top first
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => globalThis.scrollTo(0, 0));
     await DemoTiming.wait(1, 'Positioned at top');
     
     // Scroll down to see forecasts - multiple scrolls for visibility
     DemoLogger.action('📈 Scrolling to reveal forecast charts');
-    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.evaluate(() => globalThis.scrollBy(0, 500));
     await DemoTiming.wait(3, 'Forecasts visible - viewers can see predictions');
     
     DemoLogger.action('📈 Scrolling more to see all forecast details');
-    await page.evaluate(() => window.scrollBy(0, 600));
+    await page.evaluate(() => globalThis.scrollBy(0, 600));
     await DemoTiming.wait(3, 'Viewing detailed forecasts - viewers can see all data');
     
     DemoLogger.action('📈 Scrolling to see bottom of forecasts');
-    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.evaluate(() => globalThis.scrollBy(0, 500));
     await DemoTiming.wait(2, 'All forecast data visible');
 
     // ====================================================================
@@ -174,14 +174,14 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(3, '✓ Product creation complete - viewers can see the new product');
     
     DemoLogger.action('📦 Scrolling through product list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(3, 'Viewing product details - viewers can see products');
 
     // Try to interact with product actions
     await tryEntityActions(page, 'product');
 
     DemoLogger.action('📦 Scrolling to see more products');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(2, 'Viewing more products');
 
     // ====================================================================
@@ -201,14 +201,14 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(3, '✓ Customer creation complete - viewers can see the new customer');
     
     DemoLogger.action('👥 Scrolling through customer list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(3, 'Viewing customer details - viewers can see customers');
 
     // Try to interact with customer actions
     await tryEntityActions(page, 'customer');
 
     DemoLogger.action('👥 Scrolling to see more customers');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(2, 'Viewing more customers');
 
     // ====================================================================
@@ -224,14 +224,14 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(2, 'Observing sales data');
     
     DemoLogger.action('💰 Scrolling through transactions');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(3, 'Viewing transaction details - viewers can see the sales');
 
     // Try to interact with sales actions
     await tryEntityActions(page, 'sale');
 
     DemoLogger.action('💰 Scrolling to see more transactions');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(2, 'Viewing more transactions');
 
     // ====================================================================
@@ -247,7 +247,7 @@ async function runDemo(): Promise<void> {
     await DemoTiming.wait(2, 'Observing documents');
     
     DemoLogger.action('📄 Scrolling through document list');
-    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.evaluate(() => globalThis.scrollBy(0, 400));
     await DemoTiming.wait(2, 'Viewing document details - viewers can see the documents');
 
     // ====================================================================

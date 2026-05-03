@@ -176,7 +176,7 @@ class TestWorkflow2_SalesTransactionCreation:
             if product:
                 expected_total = transaction["quantity"] * product["price"]
                 assert transaction["total_amount"] == expected_total, \
-                    f"Transaction total should be quantity * price"
+                    "Transaction total should be quantity * price"
     
     def test_sales_transaction_retrieval_with_details(self, mock_database_with_sales):
         """Test retrieving transaction with customer and product details"""
@@ -438,7 +438,7 @@ class TestWorkflow5_ForecastGeneration:
         # Verify profit is less than sales
         for i in range(12):
             assert profit_forecast[i] < sales_forecast[i], \
-                f"Profit should be less than sales"
+                "Profit should be less than sales"
     
     def test_forecast_response_structure(self):
         """Test that forecast response has correct structure"""

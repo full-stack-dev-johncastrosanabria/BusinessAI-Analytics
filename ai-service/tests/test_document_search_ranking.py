@@ -51,7 +51,7 @@ class TestDocumentSearchResultRanking:
         # Verify results are in non-increasing order
         for i in range(len(results) - 1):
             assert results[i].relevance_score >= results[i + 1].relevance_score, \
-                f"Results should be in non-increasing order by relevance"
+                "Results should be in non-increasing order by relevance"
     
     def test_search_results_with_single_result(self):
         """Test search results with only one document"""

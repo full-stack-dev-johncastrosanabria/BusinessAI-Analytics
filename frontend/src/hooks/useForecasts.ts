@@ -2,13 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
 export interface ForecastPrediction {
-  month: string
-  value: number
+  readonly month: string
+  readonly value: number
 }
 
 export interface ForecastResponse {
-  predictions: ForecastPrediction[]
-  mape: number | null
+  readonly predictions: ForecastPrediction[]
+  readonly mape: number | null
 }
 
 // Query keys for cache management

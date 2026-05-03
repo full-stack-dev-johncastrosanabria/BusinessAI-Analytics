@@ -11,36 +11,36 @@ import type { QualityMetrics, Rating } from './types';
 export type TrendDirection = 'improving' | 'degrading' | 'stable';
 
 export interface MetricTrendPoint {
-  timestamp: Date;
-  value: number;
-  label: string;
+  readonly timestamp: Date;
+  readonly value: number;
+  readonly label: string;
 }
 
 export interface RatingTrendPoint {
-  timestamp: Date;
-  rating: Rating;
-  numericValue: number;
-  label: string;
+  readonly timestamp: Date;
+  readonly rating: Rating;
+  readonly numericValue: number;
+  readonly label: string;
 }
 
 export interface QualityTrend {
-  direction: TrendDirection;
-  changePercent: number;
-  dataPoints: MetricTrendPoint[];
+  readonly direction: TrendDirection;
+  readonly changePercent: number;
+  readonly dataPoints: MetricTrendPoint[];
 }
 
 export interface RatingTrend {
-  direction: TrendDirection;
-  dataPoints: RatingTrendPoint[];
+  readonly direction: TrendDirection;
+  readonly dataPoints: RatingTrendPoint[];
 }
 
 export interface HistoricalTrendData {
-  coverage: QualityTrend;
-  technicalDebt: QualityTrend;
-  maintainability: RatingTrend;
-  reliability: RatingTrend;
-  security: RatingTrend;
-  totalIssues: QualityTrend;
+  readonly coverage: QualityTrend;
+  readonly technicalDebt: QualityTrend;
+  readonly maintainability: RatingTrend;
+  readonly reliability: RatingTrend;
+  readonly security: RatingTrend;
+  readonly totalIssues: QualityTrend;
 }
 
 /** Maps a letter rating to a numeric score (A=1 best, E=5 worst). */
@@ -72,7 +72,7 @@ function parseTimeUnit(iso: string, unit: string): number {
   start++; // Move to the first digit
   
   const numberStr = iso.substring(start, index);
-  return numberStr ? parseInt(numberStr, 10) : 0;
+  return numberStr ? Number.parseInt(numberStr, 10) : 0;
 }
 
 /**

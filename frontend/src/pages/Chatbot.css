@@ -2,6 +2,19 @@
    Chatbot Page — Modern Conversational UI
    ============================================================ */
 
+/* Accessibility: Visually hidden but available to screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .chatbot {
   padding: var(--spacing-6, 24px);
   display: flex;
@@ -256,7 +269,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-neutral-400, #9ca3af);
+  background-color: var(--color-neutral-400, #6b7280);
   animation: typing-bounce 1.4s infinite ease-in-out;
 }
 
@@ -277,14 +290,14 @@
 /* ---- Timestamp ---- */
 .message__time {
   font-size: 11px;
-  color: var(--color-text-tertiary, #9ca3af);
+  color: var(--color-text-tertiary, #6b7280);
   padding: 0 var(--spacing-1, 4px);
 }
 
 /* ---- Message Meta (processing time) ---- */
 .message__meta {
   font-size: 11px;
-  color: var(--color-text-tertiary, #9ca3af);
+  color: var(--color-text-tertiary, #6b7280);
   margin-top: var(--spacing-1, 4px);
 }
 

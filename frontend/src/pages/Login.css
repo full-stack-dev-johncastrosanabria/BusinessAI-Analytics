@@ -262,7 +262,7 @@
 .demo-text p {
   margin: 0;
   font-size: 0.9rem;
-  color: #a16207;
+  color: #92400e;
 }
 
 :root[data-theme="dark"] .demo-text p {

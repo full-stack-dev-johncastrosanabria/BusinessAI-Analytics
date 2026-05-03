@@ -1,17 +1,17 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 
 interface User {
-  name: string;
-  email: string;
-  role: string;
+  readonly name: string;
+  readonly email: string;
+  readonly role: string;
 }
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  loading: boolean;
+  readonly isAuthenticated: boolean;
+  readonly user: User | null;
+  readonly login: (email: string, password: string) => Promise<boolean>;
+  readonly logout: () => void;
+  readonly loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,7 +25,7 @@ export const useAuth = () => {
 };
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email: string, _password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, _password: string): Promise<boolean> => {
     // For demo purposes, accept any credentials
     // In a real app, this would make an API call
     try {
@@ -73,23 +73,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Login failed:', error instanceof Error ? error.message : String(error));
       return false;
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
-  };
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    isAuthenticated,
+    user,
+    login,
+    logout,
+    loading
+  }), [isAuthenticated, user, login, logout, loading]);
 
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated,
-      user,
-      login,
-      logout,
-      loading
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
