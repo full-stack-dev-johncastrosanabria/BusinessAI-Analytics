@@ -1,9 +1,12 @@
 #!/bin/bash
 # Verification script for SonarCloud fixes
 
-echo "=========================================="
+# Constants
+SEPARATOR="=========================================="
+
+echo "$SEPARATOR"
 echo "  SonarCloud Fixes Verification"
-echo "=========================================="
+echo "$SEPARATOR"
 echo ""
 
 # Color codes
@@ -102,7 +105,7 @@ fi
 echo ""
 
 # Final summary
-echo "=========================================="
+echo "$SEPARATOR"
 if [[ "$ALL_PASSED" == "true" ]]; then
     echo -e "${GREEN}✅ ALL CHECKS PASSED${NC}"
     echo ""
@@ -115,4 +118,4 @@ else
     echo ""
     echo "Please review the errors above."
 fi
-echo "=========================================="
+echo "$SEPARATOR"
