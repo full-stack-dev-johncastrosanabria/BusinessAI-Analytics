@@ -130,12 +130,30 @@
                                             <value>COVEREDRATIO</value>
                                             <minimum>0.80</minimum>
                                         </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.70</minimum>
+                                        </limit>
                                     </limits>
                                 </rule>
                             </rules>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <!-- Exclude Spring Boot generated classes -->
+                        <exclude>**/*Application.class</exclude>
+                        <!-- Exclude configuration classes -->
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/*Config.class</exclude>
+                        <!-- Exclude DTOs and entities (data classes) -->
+                        <exclude>**/dto/**</exclude>
+                        <exclude>**/entity/**</exclude>
+                        <exclude>**/model/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

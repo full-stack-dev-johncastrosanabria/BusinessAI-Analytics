@@ -1,4 +1,4 @@
-/**
+check/**
  * Shared Demo Orchestration Utilities
  * 
  * This module provides common functionality for demo scripts to eliminate duplication:

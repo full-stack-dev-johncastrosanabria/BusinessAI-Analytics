@@ -8,10 +8,15 @@ omit =
     train_models.py
     train_10x_models.sh
     conftest.py
+    */.hypothesis/*
 
 [report]
 fail_under = 80
 show_missing = true
+precision = 2
 
 [xml]
 output = coverage.xml
+
+[html]
+directory = htmlcov

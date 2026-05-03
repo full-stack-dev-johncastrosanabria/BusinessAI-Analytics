@@ -28,6 +28,12 @@ export default defineConfig({
         '**/*.spec.ts',
         '**/*.spec.tsx',
       ],
+      thresholds: {
+        lines: 80,
+        branches: 70,
+        functions: 80,
+        statements: 80,
+      },
     },
   },
 })

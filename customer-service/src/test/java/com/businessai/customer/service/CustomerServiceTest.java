@@ -258,6 +258,23 @@ class CustomerServiceTest {
         verify(customerRepository, times(1)).save(customer);
     }
 
+    @Test
+    void createCustomer_WithNonEmailDataIntegrityViolation_ShouldThrowValidationException() {
+        // Arrange - DataIntegrityViolationException with a message NOT containing "email"
+        Customer customer = new Customer("John Doe", "john@example.com", "Enterprise", "USA");
+        DataIntegrityViolationException cause = new DataIntegrityViolationException("Unique constraint violation on 'name'");
+        when(customerRepository.save(any(Customer.class))).thenThrow(cause);
+
+        // Act & Assert
+        CustomerValidationException exception = assertThrows(
+            CustomerValidationException.class,
+            () -> customerService.createCustomer(customer)
+        );
+        assertTrue(exception.getMessage().startsWith("Failed to create customer:"));
+        assertEquals(cause, exception.getCause());
+        verify(customerRepository, times(1)).save(customer);
+    }
+
     // Get Customer Tests
 
     @Test
