@@ -21,7 +21,11 @@ export class ReactErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: { componentStack: string }): void {
     // Log error details without exposing sensitive information
-    console.error('ReactErrorBoundary caught an error:', error.message, info.componentStack)
+    // Only log in development mode to avoid console output in production
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('ReactErrorBoundary caught an error:', error.message, info.componentStack)
+    }
   }
 
   render() {

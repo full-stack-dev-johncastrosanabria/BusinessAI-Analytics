@@ -32,11 +32,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        continue-on-error: true
 
       - name: Run tests with coverage
-        run: npx vitest run --coverage || echo "Tests completed"
-        continue-on-error: true
+        run: npx vitest run --coverage
 
       - name: Check SonarQube Configuration
         id: sonar-check
@@ -56,7 +54,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        continue-on-error: true
 
   # ─── AI Service Analysis ──────────────────────────────────────────────────
   sonar-ai-service:
@@ -80,11 +77,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-cov
-        continue-on-error: true
 
       - name: Run tests with coverage
-        run: pytest --cov=. --cov-report=xml --cov-config=.coveragerc || echo "Tests completed"
-        continue-on-error: true
+        run: pytest --cov=. --cov-report=xml --cov-config=.coveragerc
 
       - name: Check SonarQube Configuration
         id: sonar-check
@@ -104,7 +99,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        continue-on-error: true
 
   # ─── Java Microservices Analysis ─────────────────────────────────────────
   sonar-java-services:
@@ -135,8 +129,7 @@ jobs:
           cache: 'maven'
 
       - name: Build and test with JaCoCo coverage
-        run: mvn -B verify -Pcoverage --no-transfer-progress || echo "Build completed"
-        continue-on-error: true
+        run: mvn -B verify -Pcoverage --no-transfer-progress
 
       - name: Check SonarQube Configuration
         id: sonar-check
@@ -156,7 +149,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        continue-on-error: true
 
   # ─── Quality Gate Check ───────────────────────────────────────────────────
   quality-gate:
@@ -187,7 +179,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        continue-on-error: true
       
       - name: Quality Gate Summary
         run: |

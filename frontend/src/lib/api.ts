@@ -91,10 +91,17 @@ async function request<T>(
     })
   }
 
-  // Default headers
+  // Default headers with security best practices
   const headers = new Headers(fetchConfig.headers)
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
+  // Add security headers
+  if (!headers.has('X-Content-Type-Options')) {
+    headers.set('X-Content-Type-Options', 'nosniff')
+  }
+  if (!headers.has('X-Frame-Options')) {
+    headers.set('X-Frame-Options', 'DENY')
   }
 
   return retryRequest(async () => {

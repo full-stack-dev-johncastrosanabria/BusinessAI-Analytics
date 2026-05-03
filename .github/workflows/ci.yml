@@ -40,23 +40,18 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        continue-on-error: false
 
       - name: Lint code
-        run: npm run lint || true
-        continue-on-error: true
+        run: npm run lint
 
       - name: Type check
-        run: npx tsc --noEmit || true
-        continue-on-error: true
+        run: npx tsc --noEmit
 
       - name: Run unit tests
-        run: npx vitest run --coverage || true
-        continue-on-error: true
+        run: npx vitest run --coverage
 
       - name: Build application
-        run: npm run build || true
-        continue-on-error: true
+        run: npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -100,12 +95,11 @@ jobs:
           pip install pytest pytest-cov pylint flake8
 
       - name: Lint with flake8
-        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         continue-on-error: true
 
       - name: Run tests with coverage
-        run: pytest --cov=. --cov-report=xml --cov-report=html --cov-config=.coveragerc || true
-        continue-on-error: true
+        run: pytest --cov=. --cov-report=xml --cov-report=html --cov-config=.coveragerc
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -145,16 +139,13 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -B clean compile --no-transfer-progress || true
-        continue-on-error: true
+        run: mvn -B clean compile --no-transfer-progress
 
       - name: Run tests with coverage
-        run: mvn -B test -Pcoverage --no-transfer-progress || true
-        continue-on-error: true
+        run: mvn -B test -Pcoverage --no-transfer-progress
 
       - name: Package application
-        run: mvn -B package -DskipTests --no-transfer-progress || true
-        continue-on-error: true
+        run: mvn -B package -DskipTests --no-transfer-progress
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

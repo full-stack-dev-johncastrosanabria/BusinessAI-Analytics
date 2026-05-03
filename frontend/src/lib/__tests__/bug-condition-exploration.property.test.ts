@@ -93,8 +93,8 @@ function simulateSonarQubeAnalysis(): MockQualityGateResult {
       if (content.includes('random.random()') || content.includes('random.choices()')) {
         hotspotCount += 15; // Multiple random calls in data generator
       }
-      if (content.includes('Math.random().toString(36).slice(2, 9)')) {
-        hotspotCount += 1; // Random ID generation
+      if (content.includes('crypto.randomUUID()')) {
+        hotspotCount += 0; // Secure random ID generation - no hotspot
       }
     }
   }
@@ -284,7 +284,7 @@ describe('Property 1: Bug Condition - SonarQube Quality Gate Failures (Validates
  *    - S5852: ISO duration regex in demo scripts (iso.match patterns)
  *    - S5852: Percentage regex in ai-service/chatbot/advanced_query_processor.py
  *    - S2245: random.random() and random.choices() in ai-service/data_generator.py
- *    - S2245: Math.random() in frontend/src/components/ui/Input.tsx
+ *    - FIXED: crypto.randomUUID() now used in frontend/src/components/ui/Input.tsx
  * 
  * 2. Code Duplication (4.2% > 3%):
  *    - frontend/src/components/__tests__/DarkModeProperties.test.tsx (56.2%)

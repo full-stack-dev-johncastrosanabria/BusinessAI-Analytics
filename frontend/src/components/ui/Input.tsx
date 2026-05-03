@@ -24,7 +24,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const inputId = id ?? `input-${Math.random().toString(36).slice(2, 9)}`; // NOSONAR S2245 - SAFE: UI component ID generation, no security implications
+    // Use crypto.randomUUID() for secure random ID generation
+    const inputId = id ?? `input-${crypto.randomUUID().slice(0, 9)}`;
     const errorId = error ? `${inputId}-error` : undefined;
     const helperId = helperText ? `${inputId}-helper` : undefined;
 

@@ -82,6 +82,8 @@ async function sonarFetch<T>(
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
       },
       signal: controller.signal,
     });
