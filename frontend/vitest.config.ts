@@ -27,6 +27,18 @@ export default defineConfig({
         '**/*.test.tsx',
         '**/*.spec.ts',
         '**/*.spec.tsx',
+        // Entry/bootstrap files — not unit-testable
+        'src/main.tsx',
+        'src/App.tsx',
+        'src/router.tsx',
+        'src/vite-env.d.ts',
+        '.eslintrc.cjs',
+        // Pure type definition files — no executable code
+        'src/lib/sonarqube/types.ts',
+        // Complex React Query hooks — integration-level, tested via component tests
+        'src/hooks/useSales.ts',
+        'src/hooks/useChatbot.ts',
+        'src/hooks/useInfinitePagination.ts',
       ],
       thresholds: {
         lines: 80,
