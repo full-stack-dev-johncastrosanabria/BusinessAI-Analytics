@@ -7,22 +7,22 @@ echo "=========================================="
 echo ""
 
 # Verificar que estamos en el directorio correcto
-if [ ! -f "train_models.py" ]; then
-    echo "❌ Error: Ejecuta este script desde el directorio ai-service"
+if [[ ! -f "train_models.py" ]]; then
+    echo "❌ Error: Ejecuta este script desde el directorio ai-service" >&2
     exit 1
 fi
 
 # Verificar que PyTorch esté instalado
 echo "Verificando PyTorch..."
 python3 -c "import torch; print(f'✓ PyTorch {torch.__version__} instalado')" 2>/dev/null
-if [ $? -ne 0 ]; then
-    echo "❌ PyTorch no está instalado"
+if [[ $? -ne 0 ]]; then
+    echo "❌ PyTorch no está instalado" >&2
     echo "   Instalando PyTorch..."
     pip3 install torch --break-system-packages
 fi
 
 # Verificar contraseña de MySQL
-if [ -z "$MYSQL_PASSWORD" ]; then
+if [[ -z "$MYSQL_PASSWORD" ]]; then
     echo ""
     echo "⚠️  La variable MYSQL_PASSWORD no está configurada"
     echo ""
@@ -35,20 +35,20 @@ fi
 echo ""
 echo "Verificando conexión a MySQL..."
 mysql -u root -p"$MYSQL_PASSWORD" -e "SELECT COUNT(*) FROM businessai.business_metrics" > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "❌ No se puede conectar a MySQL"
-    echo "   Verifica que MySQL esté corriendo y la contraseña sea correcta"
+if [[ $? -ne 0 ]]; then
+    echo "❌ No se puede conectar a MySQL" >&2
+    echo "   Verifica que MySQL esté corriendo y la contraseña sea correcta" >&2
     exit 1
 fi
 
 METRICS_COUNT=$(mysql -u root -p"$MYSQL_PASSWORD" -N -e "SELECT COUNT(*) FROM businessai.business_metrics" 2>/dev/null)
 echo "✓ Conexión exitosa - $METRICS_COUNT meses de datos disponibles"
 
-if [ "$METRICS_COUNT" -lt 24 ]; then
+if [[ "$METRICS_COUNT" -lt 24 ]]; then
     echo "⚠️  Advertencia: Se necesitan al menos 24 meses de datos"
     echo "   Tienes $METRICS_COUNT meses. ¿Continuar de todos modos? (y/n)"
     read -r response
-    if [ "$response" != "y" ]; then
+    if [[ "$response" != "y" ]]; then
         exit 1
     fi
 fi
@@ -73,7 +73,7 @@ echo ""
 python3 train_models.py
 
 # Verificar resultado
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo ""
     echo "=========================================="
     echo "  ✓ Entrenamiento Completado"
@@ -86,7 +86,7 @@ if [ $? -eq 0 ]; then
     echo "  MYSQL_PASSWORD=$MYSQL_PASSWORD python3 -m uvicorn main:app --port 8000"
 else
     echo ""
-    echo "❌ Error durante el entrenamiento"
-    echo "   Revisa los logs arriba para más detalles"
+    echo "❌ Error durante el entrenamiento" >&2
+    echo "   Revisa los logs arriba para más detalles" >&2
     exit 1
 fi

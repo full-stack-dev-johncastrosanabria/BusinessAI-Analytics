@@ -98,6 +98,24 @@ COUNTRY_OR_SEGMENT_ES = 'país o segmento'
 COUNTRY_SEGMENT_BUYS_ES = 'país o segmento compra'
 COUNTRY_SEGMENT_BUYS_EN = 'country or segment buys'
 
+# Sales and billing query patterns
+TOP_PRODUCT_REVENUE_ES = 'se facturó más'
+PRODUCT_INVOICED_ES = 'producto se facturó'
+PRODUCT_INVOICED_EN = 'product was invoiced'
+TOP_PRODUCT_REVENUE_EN = 'top product by revenue'
+HIGHEST_SALES_DAY_ES = 'día tuvimos más ventas'
+HIGHEST_SALES_DAY_EN = 'highest sales day'
+BEST_DAY_EN = 'best day'
+DAY_MOST_SALES_EN = 'day with most sales'
+TINY_SALES_EN = 'tiny sales'
+LOW_VALUE_SALES_EN = 'low value sales'
+SMALL_TRANSACTIONS_EN = 'small transactions'
+TINY_SALES_ES = 'ventas muy pequeñas'
+SALES_PER_MONTH_ES = 'ventas por mes'
+HOW_MANY_SALES_ES = 'cuántas ventas hicimos'
+SALES_PER_MONTH_EN = 'sales per month'
+HOW_MANY_SALES_EN = 'how many sales'
+
 # ── Stop words to strip from document keyword searches ──────────────────────
 _DOC_STOP_WORDS = {
     'que', 'qué', 'cuál', 'cual', 'tenemos', 'sobre', 'acerca', 'de', 'del',
@@ -264,10 +282,10 @@ class AdvancedQueryProcessor:
         """Check for sales and billing questions."""
         sales_billing_patterns = [
             HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN,
-            'se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue',
-            'día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day',
-            'ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales',
-            'cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes',
+            TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN,
+            HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN,
+            TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN,
+            HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES,
             'se facturó', 'generó más ingresos', 'ventas hicimos', 'compraron más cantidad',
             'vende más por volumen', 'no han comprado recientemente'
         ]
@@ -277,13 +295,13 @@ class AdvancedQueryProcessor:
         """Route sales and billing queries to appropriate intent."""
         if any(w in q for w in [HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue']):
+        if any(w in q for w in [TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN]):
             return Intent.PRODUCT_INFO
-        if any(w in q for w in ['día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day']):
+        if any(w in q for w in [HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales']):
+        if any(w in q for w in [TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes']):
+        if any(w in q for w in [HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES]):
             return Intent.SALES_METRICS
         if any(w in q for w in ['se facturó', 'generó más ingresos', 'ventas hicimos', 'compraron más cantidad',
                                 'vende más por volumen', 'no han comprado recientemente']):
@@ -524,15 +542,15 @@ class AdvancedQueryProcessor:
 
     def _is_sales_by_day_query(self, q: str) -> bool:
         """Check for sales by day queries."""
-        return any(w in q for w in ['día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day'])
+        return any(w in q for w in [HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN])
 
     def _is_small_transactions_query(self, q: str) -> bool:
         """Check for small transactions queries."""
-        return any(w in q for w in ['ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales'])
+        return any(w in q for w in [TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN])
 
     def _is_monthly_sales_count_query(self, q: str) -> bool:
         """Check for monthly sales count queries."""
-        return any(w in q for w in ['cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes'])
+        return any(w in q for w in [HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES])
 
     def _is_current_month_billing_query(self, q: str) -> bool:
         """Check for current month billing queries."""
@@ -898,7 +916,7 @@ class AdvancedQueryProcessor:
 
     def _is_top_product_revenue_query(self, q: str) -> bool:
         """Check for top product by revenue queries."""
-        return any(w in q for w in ['se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue'])
+        return any(w in q for w in [TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN])
 
     def _is_underpriced_products_query(self, q: str) -> bool:
         """Check for underpriced products queries."""
