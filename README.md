@@ -977,6 +977,7 @@ Configure per environment:
 
 ## 📚 Additional Documentation
 
+- **[GitHub Actions SHA Pinning](./GITHUB-ACTIONS-SHA-PINNING.md)** - Security fix for supply chain protection (32 actions pinned)
 - **[Security Fixes Summary](./SECURITY-FIXES-SUMMARY.md)** - Complete overview of all security issues fixed (30+ hotspots resolved)
 - **[SonarCloud Fix Details](./docs/SONARCLOUD-FIX-SUMMARY.md)** - Detailed SonarCloud configuration and test exclusions
 - **[CI/CD & Security Fixes](./CI-CD-SECURITY-FIXES.md)** - Comprehensive guide to CI/CD pipeline configuration, security enhancements, and quality improvements
