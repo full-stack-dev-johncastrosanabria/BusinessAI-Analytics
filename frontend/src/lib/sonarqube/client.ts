@@ -281,12 +281,11 @@ export class SonarQubeClient {
 
 /**
  * Factory function — creates a SonarQubeClient from environment variables.
- * Expects VITE_SONAR_URL and VITE_SONAR_TOKEN (browser) or
- * SONAR_HOST_URL and SONAR_TOKEN (Node.js / CI).
+ * Expects VITE_SONAR_URL and VITE_SONAR_TOKEN from Vite environment.
+ * Falls back to localhost:9000 if not configured.
  */
 export function createSonarQubeClient(overrides?: Partial<SonarQubeClientConfig>): SonarQubeClient {
-  // Support both browser (Vite) and Node.js environments
-  const env = typeof process !== 'undefined' ? process.env : {};
+  // Support Vite environment variables (browser)
   const importMetaEnv =
     typeof import.meta !== 'undefined' && 'env' in import.meta
       ? (import.meta as { env: Record<string, string> }).env
@@ -295,13 +294,11 @@ export function createSonarQubeClient(overrides?: Partial<SonarQubeClientConfig>
   const baseUrl =
     overrides?.baseUrl ??
     importMetaEnv['VITE_SONAR_URL'] ??
-    env['SONAR_HOST_URL'] ??
     'http://localhost:9000';
 
   const token =
     overrides?.token ??
     importMetaEnv['VITE_SONAR_TOKEN'] ??
-    env['SONAR_TOKEN'] ??
     '';
 
   return new SonarQubeClient({ baseUrl, token, ...overrides });
