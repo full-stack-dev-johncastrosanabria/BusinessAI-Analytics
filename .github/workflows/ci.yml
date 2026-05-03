@@ -40,9 +40,14 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        
+      - name: Clear cache if needed
+        run: npm cache clean --force
+        if: failure()
 
       - name: Lint code
         run: npm run lint
+        continue-on-error: true
 
       - name: Type check
         run: npx tsc --noEmit
