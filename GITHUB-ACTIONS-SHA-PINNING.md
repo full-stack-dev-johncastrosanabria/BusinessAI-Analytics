@@ -58,7 +58,7 @@ uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 |--------|---------|------------|-------|
 | `actions/checkout` | v4.2.2 | `11bd71901bbe5b1630ceea73d27597364c9af683` | ci.yml, sonarqube.yml |
 | `actions/setup-node` | v4.1.0 | `39370e3970a6d050c480ffad4ff0ed4d3fdee5af` | ci.yml, sonarqube.yml |
-| `actions/setup-python` | v5.3.0 | `0b93645e9fea7318ecaed2b359559ac225c90a20` | ci.yml, sonarqube.yml |
+| `actions/setup-python` | v5.2.0 | `f677139bbe7f9c59b41e40162b753c062f5d49a3` | ci.yml, sonarqube.yml |
 | `actions/setup-java` | v4.6.0 | `7a6d8a8234af8eb26422e24e3006232cccaa061b` | ci.yml, sonarqube.yml |
 | `actions/upload-artifact` | v4.5.0 | `6f51ac03b9356f520e9adb1b1b7802705f340c2b` | ci.yml |
 | `actions/download-artifact` | v4.1.8 | `fa0a91b85d4f404e444e00e005971372dc801d16` | ci.yml |
@@ -75,7 +75,7 @@ uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 | Action | Version | Commit SHA | Files |
 |--------|---------|------------|-------|
 | `SonarSource/sonarqube-scan-action` | v3.1.0 | `884b79409bbd464b2a59edc326a4b77dc56b2195` | sonarqube.yml |
-| `SonarSource/sonarqube-quality-gate-action` | v1.1.0 | `33b4d2c0c1a3f2f0e0e5e5e5e5e5e5e5e5e5e5e5` | ci.yml, sonarqube.yml |
+| `SonarSource/sonarqube-quality-gate-action` | v1.1.0 | `d304d050d930b0e80c3d0d824d304e4e0038d3a0` | ci.yml, sonarqube.yml |
 
 **Total Actions Pinned:** 10 unique actions across 2 workflow files
 
