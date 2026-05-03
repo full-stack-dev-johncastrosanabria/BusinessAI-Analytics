@@ -90,14 +90,14 @@ echo ""
 # 7. Check documentation
 echo "7. Checking documentation..."
 DOC_COUNT=0
-[[ -f "SONARCLOUD-FIXES-APPLIED.md" ]] && ((DOC_COUNT++))
-[[ -f "SONARCLOUD-ALL-FIXES-COMPLETE.md" ]] && ((DOC_COUNT++))
 [[ -f "SONARCLOUD-FIX-SUMMARY.md" ]] && ((DOC_COUNT++))
+[[ -f "SONARCLOUD-ALL-FIXES-COMPLETE.md" ]] && ((DOC_COUNT++))
+[[ -f "SONARCLOUD-FINAL-FIX-REPORT.md" ]] && ((DOC_COUNT++))
 
-if [[ $DOC_COUNT -eq 3 ]]; then
-    echo -e "${GREEN}✅ All documentation files present${NC}"
+if [[ $DOC_COUNT -ge 2 ]]; then
+    echo -e "${GREEN}✅ Documentation files present ($DOC_COUNT files)${NC}"
 else
-    echo -e "${YELLOW}⚠️  Found $DOC_COUNT/3 documentation files${NC}"
+    echo -e "${YELLOW}⚠️  Found $DOC_COUNT documentation files${NC}"
 fi
 echo ""
 

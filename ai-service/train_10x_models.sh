@@ -1,9 +1,12 @@
 #!/bin/bash
 # Script para entrenar modelos 10X con alta confiabilidad
 
-echo "=========================================="
+# Constants
+SEPARATOR="=========================================="
+
+echo "$SEPARATOR"
 echo "  Entrenamiento de Modelos 10X"
-echo "=========================================="
+echo "$SEPARATOR"
 echo ""
 
 # Verificar que estamos en el directorio correcto
@@ -55,9 +58,9 @@ fi
 
 # Entrenar modelos
 echo ""
-echo "=========================================="
+echo "$SEPARATOR"
 echo "  Iniciando Entrenamiento 10X"
-echo "=========================================="
+echo "$SEPARATOR"
 echo ""
 echo "Configuración:"
 echo "  • 3 capas LSTM (128 unidades cada una)"
@@ -75,9 +78,9 @@ python3 train_models.py
 # Verificar resultado
 if [[ $? -eq 0 ]]; then
     echo ""
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo "  ✓ Entrenamiento Completado"
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo ""
     echo "Modelos guardados en:"
     ls -lh trained_models/*.pt 2>/dev/null

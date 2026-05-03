@@ -222,7 +222,7 @@ def generate_sales_transactions(cursor, num_products, num_customers, count=10000
         year_progress = (transaction_date - start_date).days / 365.0
         
         # Growth trend: 8% annual growth with some year-to-year variability
-        year_num = int(year_progress)
+        _ = int(year_progress)  # year_num not used
         year_variability = random.uniform(0.95, 1.05)  # ±5% per year
         growth_factor = (1.0 + (0.08 * year_progress)) * year_variability
         

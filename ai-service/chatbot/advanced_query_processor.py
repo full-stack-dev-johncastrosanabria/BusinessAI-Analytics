@@ -75,7 +75,6 @@ MOST_VALUABLE_ES = 'más valioso'
 MOST_VALUABLE_EN = 'most valuable'
 LAST_YEAR_ES = 'año pasado'
 LAST_YEAR_EN = 'last year'
-YEAR_REGEX = r'\b(20\d{2})\b'
 
 # Additional constants for remaining duplications
 SEGMENT_BOUGHT_ES = 'segmento compró'
@@ -115,6 +114,13 @@ SALES_PER_MONTH_ES = 'ventas por mes'
 HOW_MANY_SALES_ES = 'cuántas ventas hicimos'
 SALES_PER_MONTH_EN = 'sales per month'
 HOW_MANY_SALES_EN = 'how many sales'
+
+# Product query patterns
+MOST_SOLD_EN = 'most sold'
+MOST_SOLD_ES = 'más vendido'
+
+# Year regex pattern
+YEAR_REGEX_PATTERN = r'\b(20\d{2})\b'
 
 # ── Stop words to strip from document keyword searches ──────────────────────
 _DOC_STOP_WORDS = {
@@ -356,10 +362,10 @@ class AdvancedQueryProcessor:
         """Route break-even queries to appropriate intent."""
         product_signals = [
             'product', 'products', 'producto', 'productos', 'item', 'items',
-            'most sold', 'best selling', 'bestseller', 'top selling',
-            'más vendido', 'más vendidos', 'más popular', 'más populares',
+            MOST_SOLD_EN, 'best selling', 'bestseller', 'top selling',
+            MOST_SOLD_ES, 'más vendidos', 'más popular', 'más populares',
             'selling', 'vendido', 'vendidos', 'sku', 'catalog', 'catálogo',
-            'categoría', 'categoria', 'category', 'categories',
+            CATEGORY_ES, 'categoria', CATEGORY_EN, 'categories',
             'which product', 'what product', 'qué producto', 'cuál producto'
         ]
         if any(s in q for s in product_signals):
@@ -385,10 +391,10 @@ class AdvancedQueryProcessor:
         """Get list of product-related signal words."""
         return [
             'product', 'products', 'producto', 'productos', 'item', 'items',
-            'most sold', 'best selling', 'bestseller', 'top selling',
-            'más vendido', 'más vendidos', 'más popular', 'más populares',
+            MOST_SOLD_EN, 'best selling', 'bestseller', 'top selling',
+            MOST_SOLD_ES, 'más vendidos', 'más popular', 'más populares',
             'selling', 'vendido', 'vendidos', 'sku', 'catalog', 'catálogo',
-            'categoría', 'categoria', 'category', 'categories',
+            CATEGORY_ES, 'categoria', CATEGORY_EN, 'categories',
             'which product', 'what product', 'qué producto', 'cuál producto'
         ]
     
@@ -945,14 +951,14 @@ class AdvancedQueryProcessor:
 
     def _is_category_revenue_query(self, q: str) -> bool:
         """Check for category revenue queries."""
-        return any(w in q for w in ['category', 'categoría', 'categoria', 'categories',
+        return any(w in q for w in [CATEGORY_EN, CATEGORY_ES, 'categoria', 'categories',
                                     'categorías', 'which category', 'qué categoría',
                                     'highest margin', 'most revenue', 'más ingresos'])
 
     def _is_top_products_query(self, q: str) -> bool:
         """Check for top products queries."""
-        return any(w in q for w in ['top', 'best', 'most sold', 'bestseller',
-                                    'mejor', 'más vendido', 'principal',
+        return any(w in q for w in ['top', 'best', MOST_SOLD_EN, 'bestseller',
+                                    'mejor', MOST_SOLD_ES, 'principal',
                                     'which', 'cuál', 'what', 'qué', 'show',
                                     'list', 'lista', 'ranking'])
 
@@ -1140,7 +1146,7 @@ class AdvancedQueryProcessor:
 
     def _is_customer_count_query(self, q: str) -> bool:
         """Check for customer count queries."""
-        return any(w in q for w in ['how many', 'cuántos', 'count', 'total',
+        return any(w in q for w in [HOW_MANY_EN, 'cuántos', 'count', 'total',
                                     'number', 'número', 'cantidad'])
 
     def _handle_top_customers_list(self, language: Language) -> Tuple[str, List[str]]:
@@ -1631,7 +1637,7 @@ class AdvancedQueryProcessor:
                         'this year', 'este año']
         if not any(s in q for s in year_signals):
             return None
-        m = re.search(YEAR_REGEX, q)
+        m = re.search(YEAR_REGEX_PATTERN, q)
         if m:
             return int(m.group(1))
         # "last year" / "año pasado" → current year - 1
@@ -1997,7 +2003,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in risk analysis: {e}")
             return self._err(language), []
 
-    def _handle_cost_increase_scenario(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_increase_scenario(self, _question: str, language: Language) -> Tuple[str, List[str]]:
         """Analyze scenario where costs increase by X% and calculate required sales increase."""
         try:
             # Extract percentage from question
@@ -2005,9 +2011,9 @@ class AdvancedQueryProcessor:
             # SONAR_SAFE: Fixed regex to prevent polynomial runtime vulnerability
             # Original pattern r'(\d+)%' was vulnerable to backtracking
             # New pattern uses atomic grouping equivalent and is more specific
-            percentage_match = re.search(r'(\d{1,3})%', question)
+            percentage_match = re.search(r'(\d{1,3})%', _question)
             if not percentage_match:
-                percentage_match = re.search(r'(\d{1,3})', question)
+                percentage_match = re.search(r'(\d{1,3})', _question)
             
             cost_increase_pct = float(percentage_match.group(1)) if percentage_match else 10.0
             
@@ -2199,7 +2205,7 @@ class AdvancedQueryProcessor:
                       f"   • Cobertura de costos: {breakeven_coverage:.1f}%\n"
                       f"   • Categoría: {product['category']}\n\n")
         top_product = top_products[0]
-        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+        _, coverage_top = self._calculate_product_breakeven_metrics(
             top_product, all_metrics, avg_monthly_costs
         )
         answer += (f"🏆 **{top_product['name']}** contribuye más al {BREAKEVEN_POINT_ES}\n"
@@ -2221,7 +2227,7 @@ class AdvancedQueryProcessor:
                       f"   • Cost coverage: {breakeven_coverage:.1f}%\n"
                       f"   • Category: {product['category']}\n\n")
         top_product = top_products[0]
-        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+        _, coverage_top = self._calculate_product_breakeven_metrics(
             top_product, all_metrics, avg_monthly_costs
         )
         answer += (f"🏆 **{top_product['name']}** contributes most to break-even\n"
@@ -3153,7 +3159,7 @@ class AdvancedQueryProcessor:
                 segment_analysis[segment]['customers_list'].append(customer)
             
             # Calculate value metrics for each segment
-            for segment, data in segment_analysis.items():
+            for _segment, data in segment_analysis.items():
                 data['avg_spent_per_customer'] = data['total_spent'] / data['customers']
                 data['avg_transactions_per_customer'] = data['total_transactions'] / data['customers']
                 data['avg_spent_per_transaction'] = data['total_spent'] / data['total_transactions'] if data['total_transactions'] > 0 else 0
