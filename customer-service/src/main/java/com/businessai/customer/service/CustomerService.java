@@ -223,3 +223,4 @@ public class CustomerService {
         // Domain must be non-empty
         return !domain.isEmpty();
     }
+}

@@ -42,11 +42,7 @@ public class DocumentMetadataPreservationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         String filename = baseFilename.replaceAll("[^a-zA-Z0-9_-]", "") + "." + fileType.toLowerCase();
         if (filename.startsWith(".")) {
@@ -79,11 +75,7 @@ public class DocumentMetadataPreservationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         MultipartFile mockFile = createMockFile("test." + fileType.toLowerCase(), fileSize, "test content");
         
@@ -108,11 +100,7 @@ public class DocumentMetadataPreservationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         MultipartFile mockFile = createMockFile("test." + fileType.toLowerCase(), 1000, "test content");
         
@@ -141,11 +129,7 @@ public class DocumentMetadataPreservationProperties {
         DocumentRepository mockRepository = Mockito.mock(DocumentRepository.class);
         TextExtractor mockExtractor = Mockito.mock(TextExtractor.class);
         
-        DocumentService service = new DocumentService();
-        service.documentRepository = mockRepository;
-        service.textExtractor = mockExtractor;
-        service.maxFileSize = 52428800L;
-        service.allowedTypes = "TXT,DOCX,PDF,XLSX";
+        DocumentService service = new DocumentService(mockRepository, mockExtractor, 52428800L, "TXT,DOCX,PDF,XLSX");
         
         String filename = baseFilename.replaceAll("[^a-zA-Z0-9_-]", "") + "." + fileType.toLowerCase();
         if (filename.startsWith(".")) {
