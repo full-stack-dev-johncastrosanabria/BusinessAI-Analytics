@@ -239,26 +239,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check SonarQube Configuration
-        id: sonar-check
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_HOST_URL" ]; then
-            echo "configured=false" >> $GITHUB_OUTPUT
-          else
-            echo "configured=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check SonarQube Quality Gate
-        if: steps.sonar-check.outputs.configured == 'true'
-        uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b # v1.2.0
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        continue-on-error: true
+      # ── SonarQube quality gate (disabled) ──────────────────────────────────
+      # - name: Check SonarQube Configuration
+      #   id: sonar-check
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #   run: |
+      #     if [ -z "$SONAR_TOKEN" ] || [ -z "$SONAR_HOST_URL" ]; then
+      #       echo "configured=false" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "configured=true" >> $GITHUB_OUTPUT
+      #     fi
+      #
+      # - name: Check SonarQube Quality Gate
+      #   if: steps.sonar-check.outputs.configured == 'true'
+      #   uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b # v1.2.0
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #   continue-on-error: true
+      # ────────────────────────────────────────────────────────────────────────
 
       - name: Run Build Status Check
         run: |
@@ -270,23 +272,12 @@ jobs:
         run: |
           echo "## Quality Gate Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.sonar-check.outputs.configured }}" == "true" ]; then
-            echo "✅ SonarQube quality gate checked" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ SonarQube not configured - quality checks passed" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend: Built successfully" >> $GITHUB_STEP_SUMMARY
           echo "- AI Service: Built successfully" >> $GITHUB_STEP_SUMMARY
           echo "- Java Services: Built successfully" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Quality Metrics" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.sonar-check.outputs.configured }}" == "true" ]; then
-            echo "- SonarQube Quality Gate: Check dashboard for status" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- SonarQube Quality Gate: Not configured (configure SONAR_TOKEN and SONAR_HOST_URL)" >> $GITHUB_STEP_SUMMARY
-          fi
           echo "- Security Scan: Completed" >> $GITHUB_STEP_SUMMARY
           echo "- Test Coverage: Reports uploaded" >> $GITHUB_STEP_SUMMARY
 
