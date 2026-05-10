@@ -1,0 +1,1 @@
+import{a}from"./api-BrsGKDX9.js";const c={getProducts:async()=>await a.get("/api/products"),getProduct:async t=>await a.get(`/api/products/${t}`),createProduct:async t=>await a.post("/api/products",t),updateProduct:async(t,r)=>await a.put(`/api/products/${t}`,r),deleteProduct:async t=>{await a.delete(`/api/products/${t}`)}};export{c as p};
