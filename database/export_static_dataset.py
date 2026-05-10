@@ -61,6 +61,19 @@ DATASETS = {
         FROM business_metrics
         ORDER BY year, month
     """,
+    "documents": """
+        SELECT
+            id,
+            filename,
+            upload_date AS uploadDate,
+            file_size AS fileSize,
+            file_type AS fileType,
+            extracted_text AS extractedText,
+            extraction_status AS extractionStatus,
+            error_message AS errorMessage
+        FROM documents
+        ORDER BY upload_date DESC, id DESC
+    """,
 }
 
 
