@@ -1,0 +1,219 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop Pro 15",
+    "category": "Electronics",
+    "cost": 800.0,
+    "price": 1200.0
+  },
+  {
+    "id": 2,
+    "name": "Wireless Mouse",
+    "category": "Electronics",
+    "cost": 15.0,
+    "price": 35.0
+  },
+  {
+    "id": 3,
+    "name": "USB-C Hub",
+    "category": "Electronics",
+    "cost": 25.0,
+    "price": 55.0
+  },
+  {
+    "id": 4,
+    "name": "Mechanical Keyboard",
+    "category": "Electronics",
+    "cost": 60.0,
+    "price": 120.0
+  },
+  {
+    "id": 5,
+    "name": "27\" Monitor",
+    "category": "Electronics",
+    "cost": 200.0,
+    "price": 350.0
+  },
+  {
+    "id": 6,
+    "name": "Webcam HD",
+    "category": "Electronics",
+    "cost": 40.0,
+    "price": 80.0
+  },
+  {
+    "id": 7,
+    "name": "Office Chair Ergonomic",
+    "category": "Furniture",
+    "cost": 150.0,
+    "price": 300.0
+  },
+  {
+    "id": 8,
+    "name": "Standing Desk",
+    "category": "Furniture",
+    "cost": 250.0,
+    "price": 500.0
+  },
+  {
+    "id": 9,
+    "name": "Bookshelf Oak",
+    "category": "Furniture",
+    "cost": 80.0,
+    "price": 180.0
+  },
+  {
+    "id": 10,
+    "name": "Filing Cabinet",
+    "category": "Furniture",
+    "cost": 100.0,
+    "price": 220.0
+  },
+  {
+    "id": 11,
+    "name": "Conference Table",
+    "category": "Furniture",
+    "cost": 400.0,
+    "price": 800.0
+  },
+  {
+    "id": 12,
+    "name": "Desk Lamp LED",
+    "category": "Furniture",
+    "cost": 30.0,
+    "price": 65.0
+  },
+  {
+    "id": 13,
+    "name": "Business Shirt",
+    "category": "Clothing",
+    "cost": 20.0,
+    "price": 50.0
+  },
+  {
+    "id": 14,
+    "name": "Formal Pants",
+    "category": "Clothing",
+    "cost": 30.0,
+    "price": 70.0
+  },
+  {
+    "id": 15,
+    "name": "Blazer",
+    "category": "Clothing",
+    "cost": 80.0,
+    "price": 180.0
+  },
+  {
+    "id": 16,
+    "name": "Dress Shoes",
+    "category": "Clothing",
+    "cost": 50.0,
+    "price": 120.0
+  },
+  {
+    "id": 17,
+    "name": "Tie Silk",
+    "category": "Clothing",
+    "cost": 15.0,
+    "price": 40.0
+  },
+  {
+    "id": 18,
+    "name": "Belt Leather",
+    "category": "Clothing",
+    "cost": 20.0,
+    "price": 50.0
+  },
+  {
+    "id": 19,
+    "name": "Coffee Beans Premium",
+    "category": "Food",
+    "cost": 8.0,
+    "price": 20.0
+  },
+  {
+    "id": 20,
+    "name": "Tea Assortment",
+    "category": "Food",
+    "cost": 10.0,
+    "price": 25.0
+  },
+  {
+    "id": 21,
+    "name": "Snack Box",
+    "category": "Food",
+    "cost": 5.0,
+    "price": 15.0
+  },
+  {
+    "id": 22,
+    "name": "Energy Bars Pack",
+    "category": "Food",
+    "cost": 12.0,
+    "price": 28.0
+  },
+  {
+    "id": 23,
+    "name": "Bottled Water Case",
+    "category": "Food",
+    "cost": 6.0,
+    "price": 15.0
+  },
+  {
+    "id": 24,
+    "name": "Fruit Basket",
+    "category": "Food",
+    "cost": 15.0,
+    "price": 35.0
+  },
+  {
+    "id": 25,
+    "name": "Business Strategy Guide",
+    "category": "Books",
+    "cost": 12.0,
+    "price": 30.0
+  },
+  {
+    "id": 26,
+    "name": "Leadership Handbook",
+    "category": "Books",
+    "cost": 15.0,
+    "price": 35.0
+  },
+  {
+    "id": 27,
+    "name": "Marketing Essentials",
+    "category": "Books",
+    "cost": 18.0,
+    "price": 40.0
+  },
+  {
+    "id": 28,
+    "name": "Finance for Managers",
+    "category": "Books",
+    "cost": 20.0,
+    "price": 45.0
+  },
+  {
+    "id": 29,
+    "name": "Project Management",
+    "category": "Books",
+    "cost": 16.0,
+    "price": 38.0
+  },
+  {
+    "id": 30,
+    "name": "Data Analytics Primer",
+    "category": "Books",
+    "cost": 22.0,
+    "price": 50.0
+  },
+  {
+    "id": 31,
+    "name": "TEST",
+    "category": "Electronics",
+    "cost": 2.28,
+    "price": 3.08
+  }
+]

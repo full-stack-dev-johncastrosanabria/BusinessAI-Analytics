@@ -1,0 +1,47 @@
+{
+  "totalSales": 5185552.0,
+  "totalCosts": 2645124.82,
+  "totalProfit": 668552.55,
+  "bestMonth": {
+    "month": 10,
+    "year": 2023,
+    "profit": 17488.32
+  },
+  "worstMonth": {
+    "month": 6,
+    "year": 2018,
+    "profit": -5326.29
+  },
+  "topProducts": [
+    {
+      "id": 1,
+      "name": "Laptop Pro 15",
+      "category": "Electronics",
+      "totalRevenue": 1191600.0
+    },
+    {
+      "id": 11,
+      "name": "Conference Table",
+      "category": "Furniture",
+      "totalRevenue": 902400.0
+    },
+    {
+      "id": 8,
+      "name": "Standing Desk",
+      "category": "Furniture",
+      "totalRevenue": 569000.0
+    },
+    {
+      "id": 7,
+      "name": "Office Chair Ergonomic",
+      "category": "Furniture",
+      "totalRevenue": 339900.0
+    },
+    {
+      "id": 5,
+      "name": "27\" Monitor",
+      "category": "Electronics",
+      "totalRevenue": 309400.0
+    }
+  ]
+}

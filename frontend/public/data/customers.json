@@ -1,0 +1,702 @@
+[
+  {
+    "id": 1,
+    "name": "Emily Wright",
+    "email": "emily.wright@example.com",
+    "segment": "Enterprise",
+    "country": "Japan"
+  },
+  {
+    "id": 2,
+    "name": "Richard Harris",
+    "email": "richard.harris@example.com",
+    "segment": "Startup",
+    "country": "Japan"
+  },
+  {
+    "id": 3,
+    "name": "Linda Torres",
+    "email": "linda.torres@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 4,
+    "name": "Sarah Clark",
+    "email": "sarah.clark@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 5,
+    "name": "Joshua Young",
+    "email": "joshua.young@example.com",
+    "segment": "SMB",
+    "country": "UK"
+  },
+  {
+    "id": 6,
+    "name": "Emily Clark",
+    "email": "emily.clark@example.com",
+    "segment": "Startup",
+    "country": "India"
+  },
+  {
+    "id": 7,
+    "name": "Charles Wright",
+    "email": "charles.wright@example.com",
+    "segment": "SMB",
+    "country": "USA"
+  },
+  {
+    "id": 8,
+    "name": "John Gonzalez",
+    "email": "john.gonzalez@example.com",
+    "segment": "Startup",
+    "country": "Brazil"
+  },
+  {
+    "id": 9,
+    "name": "Patricia Torres",
+    "email": "patricia.torres@example.com",
+    "segment": "Enterprise",
+    "country": "Singapore"
+  },
+  {
+    "id": 10,
+    "name": "John Jackson",
+    "email": "john.jackson@example.com",
+    "segment": "Enterprise",
+    "country": "UK"
+  },
+  {
+    "id": 11,
+    "name": "William Gonzalez",
+    "email": "william.gonzalez@example.com",
+    "segment": "Startup",
+    "country": "Australia"
+  },
+  {
+    "id": 12,
+    "name": "Kimberly Harris",
+    "email": "kimberly.harris@example.com",
+    "segment": "SMB",
+    "country": "USA"
+  },
+  {
+    "id": 13,
+    "name": "Matthew Hill",
+    "email": "matthew.hill@example.com",
+    "segment": "Startup",
+    "country": "UK"
+  },
+  {
+    "id": 14,
+    "name": "Robert Garcia",
+    "email": "robert.garcia@example.com",
+    "segment": "SMB",
+    "country": "India"
+  },
+  {
+    "id": 15,
+    "name": "James Gonzalez",
+    "email": "james.gonzalez@example.com",
+    "segment": "Enterprise",
+    "country": "Brazil"
+  },
+  {
+    "id": 16,
+    "name": "Robert Smith",
+    "email": "robert.smith@example.com",
+    "segment": "SMB",
+    "country": "UK"
+  },
+  {
+    "id": 17,
+    "name": "Matthew Gonzalez",
+    "email": "matthew.gonzalez@example.com",
+    "segment": "Startup",
+    "country": "France"
+  },
+  {
+    "id": 18,
+    "name": "David Miller",
+    "email": "david.miller@example.com",
+    "segment": "Startup",
+    "country": "Canada"
+  },
+  {
+    "id": 19,
+    "name": "Ashley Allen",
+    "email": "ashley.allen@example.com",
+    "segment": "Enterprise",
+    "country": "Japan"
+  },
+  {
+    "id": 20,
+    "name": "Barbara Thomas",
+    "email": "barbara.thomas@example.com",
+    "segment": "SMB",
+    "country": "Brazil"
+  },
+  {
+    "id": 21,
+    "name": "Christopher Anderson",
+    "email": "christopher.anderson@example.com",
+    "segment": "SMB",
+    "country": "UK"
+  },
+  {
+    "id": 22,
+    "name": "Christopher Thomas",
+    "email": "christopher.thomas@example.com",
+    "segment": "Startup",
+    "country": "Germany"
+  },
+  {
+    "id": 23,
+    "name": "Nancy Flores",
+    "email": "nancy.flores@example.com",
+    "segment": "Enterprise",
+    "country": "Japan"
+  },
+  {
+    "id": 24,
+    "name": "Mark Smith",
+    "email": "mark.smith@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 25,
+    "name": "David Walker",
+    "email": "david.walker@example.com",
+    "segment": "Enterprise",
+    "country": "Germany"
+  },
+  {
+    "id": 26,
+    "name": "Anthony Martinez",
+    "email": "anthony.martinez@example.com",
+    "segment": "Startup",
+    "country": "Australia"
+  },
+  {
+    "id": 27,
+    "name": "Donna Garcia",
+    "email": "donna.garcia@example.com",
+    "segment": "SMB",
+    "country": "Australia"
+  },
+  {
+    "id": 28,
+    "name": "Mark Taylor",
+    "email": "mark.taylor@example.com",
+    "segment": "Enterprise",
+    "country": "France"
+  },
+  {
+    "id": 29,
+    "name": "Patricia Sanchez",
+    "email": "patricia.sanchez@example.com",
+    "segment": "Enterprise",
+    "country": "India"
+  },
+  {
+    "id": 30,
+    "name": "Joshua Allen",
+    "email": "joshua.allen@example.com",
+    "segment": "Startup",
+    "country": "Brazil"
+  },
+  {
+    "id": 31,
+    "name": "Anthony King",
+    "email": "anthony.king@example.com",
+    "segment": "Enterprise",
+    "country": "USA"
+  },
+  {
+    "id": 32,
+    "name": "Emily Thompson",
+    "email": "emily.thompson@example.com",
+    "segment": "Enterprise",
+    "country": "Germany"
+  },
+  {
+    "id": 33,
+    "name": "Joshua Taylor",
+    "email": "joshua.taylor@example.com",
+    "segment": "Startup",
+    "country": "France"
+  },
+  {
+    "id": 34,
+    "name": "Margaret Rodriguez",
+    "email": "margaret.rodriguez@example.com",
+    "segment": "Startup",
+    "country": "India"
+  },
+  {
+    "id": 35,
+    "name": "David Wright",
+    "email": "david.wright@example.com",
+    "segment": "Startup",
+    "country": "USA"
+  },
+  {
+    "id": 36,
+    "name": "Patricia Davis",
+    "email": "patricia.davis@example.com",
+    "segment": "Startup",
+    "country": "Canada"
+  },
+  {
+    "id": 37,
+    "name": "Linda Thomas",
+    "email": "linda.thomas@example.com",
+    "segment": "SMB",
+    "country": "USA"
+  },
+  {
+    "id": 38,
+    "name": "Richard Perez",
+    "email": "richard.perez@example.com",
+    "segment": "Enterprise",
+    "country": "India"
+  },
+  {
+    "id": 39,
+    "name": "Susan Ramirez",
+    "email": "susan.ramirez@example.com",
+    "segment": "SMB",
+    "country": "Australia"
+  },
+  {
+    "id": 40,
+    "name": "Donna Taylor",
+    "email": "donna.taylor@example.com",
+    "segment": "Startup",
+    "country": "UK"
+  },
+  {
+    "id": 41,
+    "name": "Matthew Brown",
+    "email": "matthew.brown@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 42,
+    "name": "Michael Garcia",
+    "email": "michael.garcia@example.com",
+    "segment": "Startup",
+    "country": "Singapore"
+  },
+  {
+    "id": 43,
+    "name": "Andrew Martinez",
+    "email": "andrew.martinez@example.com",
+    "segment": "SMB",
+    "country": "France"
+  },
+  {
+    "id": 44,
+    "name": "Daniel Garcia",
+    "email": "daniel.garcia@example.com",
+    "segment": "Enterprise",
+    "country": "Brazil"
+  },
+  {
+    "id": 45,
+    "name": "Patricia Moore",
+    "email": "patricia.moore@example.com",
+    "segment": "Enterprise",
+    "country": "Canada"
+  },
+  {
+    "id": 46,
+    "name": "Nancy Miller",
+    "email": "nancy.miller@example.com",
+    "segment": "Startup",
+    "country": "Canada"
+  },
+  {
+    "id": 47,
+    "name": "Christopher Miller",
+    "email": "christopher.miller@example.com",
+    "segment": "Startup",
+    "country": "India"
+  },
+  {
+    "id": 48,
+    "name": "Jessica Thomas",
+    "email": "jessica.thomas@example.com",
+    "segment": "SMB",
+    "country": "Canada"
+  },
+  {
+    "id": 49,
+    "name": "Sandra Lee",
+    "email": "sandra.lee@example.com",
+    "segment": "SMB",
+    "country": "UK"
+  },
+  {
+    "id": 50,
+    "name": "Patricia Johnson",
+    "email": "patricia.johnson@example.com",
+    "segment": "SMB",
+    "country": "France"
+  },
+  {
+    "id": 51,
+    "name": "Michael Torres",
+    "email": "michael.torres@example.com",
+    "segment": "SMB",
+    "country": "Brazil"
+  },
+  {
+    "id": 52,
+    "name": "Daniel Sanchez",
+    "email": "daniel.sanchez@example.com",
+    "segment": "Startup",
+    "country": "India"
+  },
+  {
+    "id": 53,
+    "name": "Christopher Allen",
+    "email": "christopher.allen@example.com",
+    "segment": "Enterprise",
+    "country": "France"
+  },
+  {
+    "id": 54,
+    "name": "David Scott",
+    "email": "david.scott@example.com",
+    "segment": "Enterprise",
+    "country": "India"
+  },
+  {
+    "id": 55,
+    "name": "Lisa Anderson",
+    "email": "lisa.anderson@example.com",
+    "segment": "SMB",
+    "country": "Canada"
+  },
+  {
+    "id": 56,
+    "name": "Emily Thompson",
+    "email": "emily.thompson1@example.com",
+    "segment": "SMB",
+    "country": "Brazil"
+  },
+  {
+    "id": 57,
+    "name": "Michael Walker",
+    "email": "michael.walker@example.com",
+    "segment": "Startup",
+    "country": "UK"
+  },
+  {
+    "id": 58,
+    "name": "Steven Perez",
+    "email": "steven.perez@example.com",
+    "segment": "SMB",
+    "country": "India"
+  },
+  {
+    "id": 59,
+    "name": "Mary Lee",
+    "email": "mary.lee@example.com",
+    "segment": "Startup",
+    "country": "Japan"
+  },
+  {
+    "id": 60,
+    "name": "Michelle Wilson",
+    "email": "michelle.wilson@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 61,
+    "name": "Joshua Lee",
+    "email": "joshua.lee@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 62,
+    "name": "Karen Torres",
+    "email": "karen.torres@example.com",
+    "segment": "Startup",
+    "country": "Brazil"
+  },
+  {
+    "id": 63,
+    "name": "Steven Young",
+    "email": "steven.young@example.com",
+    "segment": "Enterprise",
+    "country": "Japan"
+  },
+  {
+    "id": 64,
+    "name": "Ashley Thompson",
+    "email": "ashley.thompson@example.com",
+    "segment": "SMB",
+    "country": "Germany"
+  },
+  {
+    "id": 65,
+    "name": "John Perez",
+    "email": "john.perez@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 66,
+    "name": "Michael Jackson",
+    "email": "michael.jackson@example.com",
+    "segment": "Startup",
+    "country": "Germany"
+  },
+  {
+    "id": 67,
+    "name": "Karen Williams",
+    "email": "karen.williams@example.com",
+    "segment": "Startup",
+    "country": "Brazil"
+  },
+  {
+    "id": 68,
+    "name": "Linda Walker",
+    "email": "linda.walker@example.com",
+    "segment": "Enterprise",
+    "country": "Germany"
+  },
+  {
+    "id": 69,
+    "name": "Susan Torres",
+    "email": "susan.torres@example.com",
+    "segment": "Enterprise",
+    "country": "Singapore"
+  },
+  {
+    "id": 70,
+    "name": "Joshua Williams",
+    "email": "joshua.williams@example.com",
+    "segment": "Enterprise",
+    "country": "Germany"
+  },
+  {
+    "id": 71,
+    "name": "Robert Lewis",
+    "email": "robert.lewis@example.com",
+    "segment": "Startup",
+    "country": "Singapore"
+  },
+  {
+    "id": 72,
+    "name": "Michael Smith",
+    "email": "michael.smith@example.com",
+    "segment": "SMB",
+    "country": "USA"
+  },
+  {
+    "id": 73,
+    "name": "Ashley Jones",
+    "email": "ashley.jones@example.com",
+    "segment": "SMB",
+    "country": "Germany"
+  },
+  {
+    "id": 74,
+    "name": "Charles Miller",
+    "email": "charles.miller@example.com",
+    "segment": "Startup",
+    "country": "Canada"
+  },
+  {
+    "id": 75,
+    "name": "Sandra Scott",
+    "email": "sandra.scott@example.com",
+    "segment": "SMB",
+    "country": "Brazil"
+  },
+  {
+    "id": 76,
+    "name": "Joshua Perez",
+    "email": "joshua.perez@example.com",
+    "segment": "SMB",
+    "country": "Brazil"
+  },
+  {
+    "id": 77,
+    "name": "Betty Ramirez",
+    "email": "betty.ramirez@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 78,
+    "name": "Sandra Wilson",
+    "email": "sandra.wilson@example.com",
+    "segment": "Enterprise",
+    "country": "Canada"
+  },
+  {
+    "id": 79,
+    "name": "Daniel Lewis",
+    "email": "daniel.lewis@example.com",
+    "segment": "SMB",
+    "country": "India"
+  },
+  {
+    "id": 80,
+    "name": "Thomas Harris",
+    "email": "thomas.harris@example.com",
+    "segment": "Enterprise",
+    "country": "Singapore"
+  },
+  {
+    "id": 81,
+    "name": "Thomas Davis",
+    "email": "thomas.davis@example.com",
+    "segment": "Startup",
+    "country": "USA"
+  },
+  {
+    "id": 82,
+    "name": "Lisa Walker",
+    "email": "lisa.walker@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 83,
+    "name": "Paul Lopez",
+    "email": "paul.lopez@example.com",
+    "segment": "Enterprise",
+    "country": "Brazil"
+  },
+  {
+    "id": 84,
+    "name": "Patricia Johnson",
+    "email": "patricia.johnson1@example.com",
+    "segment": "SMB",
+    "country": "USA"
+  },
+  {
+    "id": 85,
+    "name": "Mary Wilson",
+    "email": "mary.wilson@example.com",
+    "segment": "Enterprise",
+    "country": "Singapore"
+  },
+  {
+    "id": 86,
+    "name": "Matthew Garcia",
+    "email": "matthew.garcia@example.com",
+    "segment": "Startup",
+    "country": "USA"
+  },
+  {
+    "id": 87,
+    "name": "Daniel Martinez",
+    "email": "daniel.martinez@example.com",
+    "segment": "Enterprise",
+    "country": "India"
+  },
+  {
+    "id": 88,
+    "name": "Jennifer Rodriguez",
+    "email": "jennifer.rodriguez@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 89,
+    "name": "Kimberly Young",
+    "email": "kimberly.young@example.com",
+    "segment": "Enterprise",
+    "country": "France"
+  },
+  {
+    "id": 90,
+    "name": "Mary Walker",
+    "email": "mary.walker@example.com",
+    "segment": "Enterprise",
+    "country": "Germany"
+  },
+  {
+    "id": 91,
+    "name": "Daniel King",
+    "email": "daniel.king@example.com",
+    "segment": "Enterprise",
+    "country": "UK"
+  },
+  {
+    "id": 92,
+    "name": "Mark Martin",
+    "email": "mark.martin@example.com",
+    "segment": "Startup",
+    "country": "France"
+  },
+  {
+    "id": 93,
+    "name": "Susan Brown",
+    "email": "susan.brown@example.com",
+    "segment": "Startup",
+    "country": "India"
+  },
+  {
+    "id": 94,
+    "name": "Michael Moore",
+    "email": "michael.moore@example.com",
+    "segment": "Startup",
+    "country": "Germany"
+  },
+  {
+    "id": 95,
+    "name": "Joseph Hill",
+    "email": "joseph.hill@example.com",
+    "segment": "SMB",
+    "country": "Singapore"
+  },
+  {
+    "id": 96,
+    "name": "Matthew Davis",
+    "email": "matthew.davis@example.com",
+    "segment": "Enterprise",
+    "country": "Japan"
+  },
+  {
+    "id": 97,
+    "name": "Donna Gonzalez",
+    "email": "donna.gonzalez@example.com",
+    "segment": "Enterprise",
+    "country": "Australia"
+  },
+  {
+    "id": 98,
+    "name": "Betty Flores",
+    "email": "betty.flores@example.com",
+    "segment": "Enterprise",
+    "country": "France"
+  },
+  {
+    "id": 99,
+    "name": "Susan Anderson",
+    "email": "susan.anderson@example.com",
+    "segment": "Startup",
+    "country": "Japan"
+  },
+  {
+    "id": 100,
+    "name": "Ashley Davis",
+    "email": "ashley.davis@example.com",
+    "segment": "SMB",
+    "country": "Canada"
+  }
+]
