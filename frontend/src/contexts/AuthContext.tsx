@@ -70,7 +70,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       return true;
     } catch (error: unknown) {
-      console.error('Login failed:', error instanceof Error ? error.message : String(error));
+      // Only log errors in development mode
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.error('Login failed:', error instanceof Error ? error.message : String(error));
+      }
       return false;
     }
   }, []);

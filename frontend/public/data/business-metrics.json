@@ -1,0 +1,875 @@
+[
+  {
+    "id": 1,
+    "month": 5,
+    "year": 2018,
+    "totalSales": 27801.0,
+    "totalCosts": 14995.0,
+    "totalExpenses": 8943.93,
+    "profit": 3862.07
+  },
+  {
+    "id": 2,
+    "month": 6,
+    "year": 2018,
+    "totalSales": 30662.0,
+    "totalCosts": 16049.31,
+    "totalExpenses": 19938.98,
+    "profit": -5326.29
+  },
+  {
+    "id": 3,
+    "month": 7,
+    "year": 2018,
+    "totalSales": 32833.0,
+    "totalCosts": 17115.72,
+    "totalExpenses": 11050.83,
+    "profit": 4666.45
+  },
+  {
+    "id": 4,
+    "month": 8,
+    "year": 2018,
+    "totalSales": 39818.0,
+    "totalCosts": 21605.96,
+    "totalExpenses": 12767.14,
+    "profit": 5444.9
+  },
+  {
+    "id": 5,
+    "month": 9,
+    "year": 2018,
+    "totalSales": 54541.0,
+    "totalCosts": 29201.25,
+    "totalExpenses": 17440.0,
+    "profit": 7899.75
+  },
+  {
+    "id": 6,
+    "month": 10,
+    "year": 2018,
+    "totalSales": 65589.0,
+    "totalCosts": 34688.58,
+    "totalExpenses": 17615.95,
+    "profit": 13284.47
+  },
+  {
+    "id": 7,
+    "month": 11,
+    "year": 2018,
+    "totalSales": 71156.0,
+    "totalCosts": 36978.32,
+    "totalExpenses": 23041.73,
+    "profit": 11135.95
+  },
+  {
+    "id": 8,
+    "month": 12,
+    "year": 2018,
+    "totalSales": 66817.0,
+    "totalCosts": 34682.55,
+    "totalExpenses": 27635.89,
+    "profit": 4498.56
+  },
+  {
+    "id": 9,
+    "month": 1,
+    "year": 2019,
+    "totalSales": 31843.0,
+    "totalCosts": 18154.28,
+    "totalExpenses": 12568.58,
+    "profit": 1120.14
+  },
+  {
+    "id": 10,
+    "month": 2,
+    "year": 2019,
+    "totalSales": 32041.0,
+    "totalCosts": 16566.64,
+    "totalExpenses": 8471.19,
+    "profit": 7003.17
+  },
+  {
+    "id": 11,
+    "month": 3,
+    "year": 2019,
+    "totalSales": 45375.0,
+    "totalCosts": 23865.15,
+    "totalExpenses": 13476.58,
+    "profit": 8033.27
+  },
+  {
+    "id": 12,
+    "month": 4,
+    "year": 2019,
+    "totalSales": 27326.0,
+    "totalCosts": 13378.4,
+    "totalExpenses": 8862.47,
+    "profit": 5085.13
+  },
+  {
+    "id": 13,
+    "month": 5,
+    "year": 2019,
+    "totalSales": 46552.0,
+    "totalCosts": 24532.72,
+    "totalExpenses": 13013.08,
+    "profit": 9006.2
+  },
+  {
+    "id": 14,
+    "month": 6,
+    "year": 2019,
+    "totalSales": 56854.0,
+    "totalCosts": 31975.85,
+    "totalExpenses": 16185.64,
+    "profit": 8692.51
+  },
+  {
+    "id": 15,
+    "month": 7,
+    "year": 2019,
+    "totalSales": 70961.0,
+    "totalCosts": 42302.79,
+    "totalExpenses": 20750.24,
+    "profit": 7907.97
+  },
+  {
+    "id": 16,
+    "month": 8,
+    "year": 2019,
+    "totalSales": 35339.0,
+    "totalCosts": 17921.29,
+    "totalExpenses": 12428.73,
+    "profit": 4988.98
+  },
+  {
+    "id": 17,
+    "month": 9,
+    "year": 2019,
+    "totalSales": 37423.0,
+    "totalCosts": 18883.27,
+    "totalExpenses": 10422.48,
+    "profit": 8117.25
+  },
+  {
+    "id": 18,
+    "month": 10,
+    "year": 2019,
+    "totalSales": 55601.0,
+    "totalCosts": 28427.2,
+    "totalExpenses": 15629.97,
+    "profit": 11543.83
+  },
+  {
+    "id": 19,
+    "month": 11,
+    "year": 2019,
+    "totalSales": 64309.0,
+    "totalCosts": 35682.36,
+    "totalExpenses": 19869.64,
+    "profit": 8757.0
+  },
+  {
+    "id": 20,
+    "month": 12,
+    "year": 2019,
+    "totalSales": 75088.0,
+    "totalCosts": 38332.12,
+    "totalExpenses": 34926.52,
+    "profit": 1829.36
+  },
+  {
+    "id": 21,
+    "month": 1,
+    "year": 2020,
+    "totalSales": 27195.0,
+    "totalCosts": 14131.25,
+    "totalExpenses": 8121.26,
+    "profit": 4942.49
+  },
+  {
+    "id": 22,
+    "month": 2,
+    "year": 2020,
+    "totalSales": 23623.0,
+    "totalCosts": 12248.88,
+    "totalExpenses": 5948.96,
+    "profit": 5425.16
+  },
+  {
+    "id": 23,
+    "month": 3,
+    "year": 2020,
+    "totalSales": 38877.0,
+    "totalCosts": 20983.87,
+    "totalExpenses": 11996.23,
+    "profit": 5896.9
+  },
+  {
+    "id": 24,
+    "month": 4,
+    "year": 2020,
+    "totalSales": 42884.0,
+    "totalCosts": 20513.51,
+    "totalExpenses": 14450.69,
+    "profit": 7919.8
+  },
+  {
+    "id": 25,
+    "month": 5,
+    "year": 2020,
+    "totalSales": 40605.0,
+    "totalCosts": 21128.58,
+    "totalExpenses": 15458.94,
+    "profit": 4017.48
+  },
+  {
+    "id": 26,
+    "month": 6,
+    "year": 2020,
+    "totalSales": 40630.0,
+    "totalCosts": 19627.4,
+    "totalExpenses": 20534.19,
+    "profit": 468.41
+  },
+  {
+    "id": 27,
+    "month": 7,
+    "year": 2020,
+    "totalSales": 46229.0,
+    "totalCosts": 24198.97,
+    "totalExpenses": 15675.45,
+    "profit": 6354.58
+  },
+  {
+    "id": 28,
+    "month": 8,
+    "year": 2020,
+    "totalSales": 21183.0,
+    "totalCosts": 10140.62,
+    "totalExpenses": 7774.75,
+    "profit": 3267.63
+  },
+  {
+    "id": 29,
+    "month": 9,
+    "year": 2020,
+    "totalSales": 45222.0,
+    "totalCosts": 22430.22,
+    "totalExpenses": 12082.8,
+    "profit": 10708.98
+  },
+  {
+    "id": 30,
+    "month": 10,
+    "year": 2020,
+    "totalSales": 43097.0,
+    "totalCosts": 20175.23,
+    "totalExpenses": 14118.19,
+    "profit": 8803.58
+  },
+  {
+    "id": 31,
+    "month": 11,
+    "year": 2020,
+    "totalSales": 45821.0,
+    "totalCosts": 21203.6,
+    "totalExpenses": 15224.49,
+    "profit": 9392.91
+  },
+  {
+    "id": 32,
+    "month": 12,
+    "year": 2020,
+    "totalSales": 80028.0,
+    "totalCosts": 42515.65,
+    "totalExpenses": 42665.98,
+    "profit": -5153.63
+  },
+  {
+    "id": 33,
+    "month": 1,
+    "year": 2021,
+    "totalSales": 27343.0,
+    "totalCosts": 14515.84,
+    "totalExpenses": 7268.01,
+    "profit": 5559.15
+  },
+  {
+    "id": 34,
+    "month": 2,
+    "year": 2021,
+    "totalSales": 23523.0,
+    "totalCosts": 12178.22,
+    "totalExpenses": 7091.12,
+    "profit": 4253.66
+  },
+  {
+    "id": 35,
+    "month": 3,
+    "year": 2021,
+    "totalSales": 46356.0,
+    "totalCosts": 25404.92,
+    "totalExpenses": 14013.84,
+    "profit": 6937.24
+  },
+  {
+    "id": 36,
+    "month": 4,
+    "year": 2021,
+    "totalSales": 52252.0,
+    "totalCosts": 26252.49,
+    "totalExpenses": 18077.3,
+    "profit": 7922.21
+  },
+  {
+    "id": 37,
+    "month": 5,
+    "year": 2021,
+    "totalSales": 24188.0,
+    "totalCosts": 11261.5,
+    "totalExpenses": 7673.36,
+    "profit": 5253.14
+  },
+  {
+    "id": 38,
+    "month": 6,
+    "year": 2021,
+    "totalSales": 48308.0,
+    "totalCosts": 24891.25,
+    "totalExpenses": 14806.43,
+    "profit": 8610.32
+  },
+  {
+    "id": 39,
+    "month": 7,
+    "year": 2021,
+    "totalSales": 41209.0,
+    "totalCosts": 20179.35,
+    "totalExpenses": 13421.72,
+    "profit": 7607.93
+  },
+  {
+    "id": 40,
+    "month": 8,
+    "year": 2021,
+    "totalSales": 39262.0,
+    "totalCosts": 20870.26,
+    "totalExpenses": 14659.86,
+    "profit": 3731.88
+  },
+  {
+    "id": 41,
+    "month": 9,
+    "year": 2021,
+    "totalSales": 70330.0,
+    "totalCosts": 36324.33,
+    "totalExpenses": 22028.1,
+    "profit": 11977.57
+  },
+  {
+    "id": 42,
+    "month": 10,
+    "year": 2021,
+    "totalSales": 53288.0,
+    "totalCosts": 25184.29,
+    "totalExpenses": 14676.47,
+    "profit": 13427.24
+  },
+  {
+    "id": 43,
+    "month": 11,
+    "year": 2021,
+    "totalSales": 94106.0,
+    "totalCosts": 47683.67,
+    "totalExpenses": 38762.02,
+    "profit": 7660.31
+  },
+  {
+    "id": 44,
+    "month": 12,
+    "year": 2021,
+    "totalSales": 82416.0,
+    "totalCosts": 41939.87,
+    "totalExpenses": 30473.21,
+    "profit": 10002.92
+  },
+  {
+    "id": 45,
+    "month": 1,
+    "year": 2022,
+    "totalSales": 50171.0,
+    "totalCosts": 25209.2,
+    "totalExpenses": 25626.76,
+    "profit": -664.96
+  },
+  {
+    "id": 46,
+    "month": 2,
+    "year": 2022,
+    "totalSales": 23080.0,
+    "totalCosts": 11720.05,
+    "totalExpenses": 6962.74,
+    "profit": 4397.21
+  },
+  {
+    "id": 47,
+    "month": 3,
+    "year": 2022,
+    "totalSales": 43757.0,
+    "totalCosts": 23012.31,
+    "totalExpenses": 12850.34,
+    "profit": 7894.35
+  },
+  {
+    "id": 48,
+    "month": 4,
+    "year": 2022,
+    "totalSales": 42896.0,
+    "totalCosts": 22099.57,
+    "totalExpenses": 12207.39,
+    "profit": 8589.04
+  },
+  {
+    "id": 49,
+    "month": 5,
+    "year": 2022,
+    "totalSales": 36823.0,
+    "totalCosts": 19287.38,
+    "totalExpenses": 10054.93,
+    "profit": 7480.69
+  },
+  {
+    "id": 50,
+    "month": 6,
+    "year": 2022,
+    "totalSales": 33140.0,
+    "totalCosts": 16681.32,
+    "totalExpenses": 9446.82,
+    "profit": 7011.86
+  },
+  {
+    "id": 51,
+    "month": 7,
+    "year": 2022,
+    "totalSales": 36783.0,
+    "totalCosts": 18692.29,
+    "totalExpenses": 13638.08,
+    "profit": 4452.63
+  },
+  {
+    "id": 52,
+    "month": 8,
+    "year": 2022,
+    "totalSales": 86807.0,
+    "totalCosts": 48719.24,
+    "totalExpenses": 31386.13,
+    "profit": 6701.63
+  },
+  {
+    "id": 53,
+    "month": 9,
+    "year": 2022,
+    "totalSales": 53570.0,
+    "totalCosts": 28461.67,
+    "totalExpenses": 14465.75,
+    "profit": 10642.58
+  },
+  {
+    "id": 54,
+    "month": 10,
+    "year": 2022,
+    "totalSales": 49477.0,
+    "totalCosts": 25358.36,
+    "totalExpenses": 16940.96,
+    "profit": 7177.68
+  },
+  {
+    "id": 55,
+    "month": 11,
+    "year": 2022,
+    "totalSales": 51249.0,
+    "totalCosts": 23587.08,
+    "totalExpenses": 17071.34,
+    "profit": 10590.58
+  },
+  {
+    "id": 56,
+    "month": 12,
+    "year": 2022,
+    "totalSales": 96243.0,
+    "totalCosts": 48283.55,
+    "totalExpenses": 45235.71,
+    "profit": 2723.74
+  },
+  {
+    "id": 57,
+    "month": 1,
+    "year": 2023,
+    "totalSales": 27920.0,
+    "totalCosts": 13440.89,
+    "totalExpenses": 7959.1,
+    "profit": 6520.01
+  },
+  {
+    "id": 58,
+    "month": 2,
+    "year": 2023,
+    "totalSales": 35509.0,
+    "totalCosts": 19102.28,
+    "totalExpenses": 9839.91,
+    "profit": 6566.81
+  },
+  {
+    "id": 59,
+    "month": 3,
+    "year": 2023,
+    "totalSales": 46185.0,
+    "totalCosts": 24923.76,
+    "totalExpenses": 13957.11,
+    "profit": 7304.13
+  },
+  {
+    "id": 60,
+    "month": 4,
+    "year": 2023,
+    "totalSales": 70454.0,
+    "totalCosts": 36016.29,
+    "totalExpenses": 25731.33,
+    "profit": 8706.38
+  },
+  {
+    "id": 61,
+    "month": 5,
+    "year": 2023,
+    "totalSales": 57990.0,
+    "totalCosts": 28842.45,
+    "totalExpenses": 21402.81,
+    "profit": 7744.74
+  },
+  {
+    "id": 62,
+    "month": 6,
+    "year": 2023,
+    "totalSales": 34183.0,
+    "totalCosts": 16401.26,
+    "totalExpenses": 12007.98,
+    "profit": 5773.76
+  },
+  {
+    "id": 63,
+    "month": 7,
+    "year": 2023,
+    "totalSales": 49981.0,
+    "totalCosts": 24100.88,
+    "totalExpenses": 18334.89,
+    "profit": 7545.23
+  },
+  {
+    "id": 64,
+    "month": 8,
+    "year": 2023,
+    "totalSales": 40426.0,
+    "totalCosts": 19233.51,
+    "totalExpenses": 21598.99,
+    "profit": -406.5
+  },
+  {
+    "id": 65,
+    "month": 9,
+    "year": 2023,
+    "totalSales": 67905.0,
+    "totalCosts": 34843.39,
+    "totalExpenses": 28180.44,
+    "profit": 4881.17
+  },
+  {
+    "id": 66,
+    "month": 10,
+    "year": 2023,
+    "totalSales": 69315.0,
+    "totalCosts": 32183.11,
+    "totalExpenses": 19643.57,
+    "profit": 17488.32
+  },
+  {
+    "id": 67,
+    "month": 11,
+    "year": 2023,
+    "totalSales": 84789.0,
+    "totalCosts": 41119.25,
+    "totalExpenses": 35371.68,
+    "profit": 8298.07
+  },
+  {
+    "id": 68,
+    "month": 12,
+    "year": 2023,
+    "totalSales": 131303.0,
+    "totalCosts": 69423.28,
+    "totalExpenses": 66681.6,
+    "profit": -4801.88
+  },
+  {
+    "id": 69,
+    "month": 1,
+    "year": 2024,
+    "totalSales": 35001.0,
+    "totalCosts": 17093.56,
+    "totalExpenses": 8983.86,
+    "profit": 8923.58
+  },
+  {
+    "id": 70,
+    "month": 2,
+    "year": 2024,
+    "totalSales": 37800.0,
+    "totalCosts": 19017.08,
+    "totalExpenses": 23657.46,
+    "profit": -4874.54
+  },
+  {
+    "id": 71,
+    "month": 3,
+    "year": 2024,
+    "totalSales": 51187.0,
+    "totalCosts": 25044.59,
+    "totalExpenses": 17329.94,
+    "profit": 8812.47
+  },
+  {
+    "id": 72,
+    "month": 4,
+    "year": 2024,
+    "totalSales": 50362.0,
+    "totalCosts": 24209.96,
+    "totalExpenses": 15200.7,
+    "profit": 10951.34
+  },
+  {
+    "id": 73,
+    "month": 5,
+    "year": 2024,
+    "totalSales": 39896.0,
+    "totalCosts": 19895.67,
+    "totalExpenses": 13329.82,
+    "profit": 6670.51
+  },
+  {
+    "id": 74,
+    "month": 6,
+    "year": 2024,
+    "totalSales": 34477.0,
+    "totalCosts": 16656.47,
+    "totalExpenses": 11786.8,
+    "profit": 6033.73
+  },
+  {
+    "id": 75,
+    "month": 7,
+    "year": 2024,
+    "totalSales": 61882.0,
+    "totalCosts": 30834.04,
+    "totalExpenses": 25487.99,
+    "profit": 5559.97
+  },
+  {
+    "id": 76,
+    "month": 8,
+    "year": 2024,
+    "totalSales": 43850.0,
+    "totalCosts": 20123.84,
+    "totalExpenses": 17447.89,
+    "profit": 6278.27
+  },
+  {
+    "id": 77,
+    "month": 9,
+    "year": 2024,
+    "totalSales": 43484.0,
+    "totalCosts": 19827.59,
+    "totalExpenses": 13060.63,
+    "profit": 10595.78
+  },
+  {
+    "id": 78,
+    "month": 10,
+    "year": 2024,
+    "totalSales": 111297.0,
+    "totalCosts": 60965.2,
+    "totalExpenses": 38178.93,
+    "profit": 12152.87
+  },
+  {
+    "id": 79,
+    "month": 11,
+    "year": 2024,
+    "totalSales": 61770.0,
+    "totalCosts": 28715.4,
+    "totalExpenses": 21895.24,
+    "profit": 11159.36
+  },
+  {
+    "id": 80,
+    "month": 12,
+    "year": 2024,
+    "totalSales": 134827.0,
+    "totalCosts": 64770.41,
+    "totalExpenses": 56262.21,
+    "profit": 13794.38
+  },
+  {
+    "id": 81,
+    "month": 1,
+    "year": 2025,
+    "totalSales": 51274.0,
+    "totalCosts": 27833.23,
+    "totalExpenses": 14310.27,
+    "profit": 9130.5
+  },
+  {
+    "id": 82,
+    "month": 2,
+    "year": 2025,
+    "totalSales": 31298.0,
+    "totalCosts": 16517.08,
+    "totalExpenses": 10594.03,
+    "profit": 4186.89
+  },
+  {
+    "id": 83,
+    "month": 3,
+    "year": 2025,
+    "totalSales": 72804.0,
+    "totalCosts": 39570.19,
+    "totalExpenses": 22584.55,
+    "profit": 10649.26
+  },
+  {
+    "id": 84,
+    "month": 4,
+    "year": 2025,
+    "totalSales": 82788.0,
+    "totalCosts": 44364.76,
+    "totalExpenses": 29882.07,
+    "profit": 8541.17
+  },
+  {
+    "id": 85,
+    "month": 5,
+    "year": 2025,
+    "totalSales": 77709.0,
+    "totalCosts": 42145.41,
+    "totalExpenses": 24941.27,
+    "profit": 10622.32
+  },
+  {
+    "id": 86,
+    "month": 6,
+    "year": 2025,
+    "totalSales": 64103.0,
+    "totalCosts": 30355.44,
+    "totalExpenses": 19426.95,
+    "profit": 14320.61
+  },
+  {
+    "id": 87,
+    "month": 7,
+    "year": 2025,
+    "totalSales": 58266.0,
+    "totalCosts": 28106.42,
+    "totalExpenses": 23723.36,
+    "profit": 6436.22
+  },
+  {
+    "id": 88,
+    "month": 8,
+    "year": 2025,
+    "totalSales": 55201.0,
+    "totalCosts": 28708.19,
+    "totalExpenses": 19614.27,
+    "profit": 6878.54
+  },
+  {
+    "id": 89,
+    "month": 9,
+    "year": 2025,
+    "totalSales": 78398.0,
+    "totalCosts": 38139.33,
+    "totalExpenses": 34529.49,
+    "profit": 5729.18
+  },
+  {
+    "id": 90,
+    "month": 10,
+    "year": 2025,
+    "totalSales": 105010.0,
+    "totalCosts": 55590.14,
+    "totalExpenses": 40615.01,
+    "profit": 8804.85
+  },
+  {
+    "id": 91,
+    "month": 11,
+    "year": 2025,
+    "totalSales": 83561.0,
+    "totalCosts": 38933.12,
+    "totalExpenses": 38266.91,
+    "profit": 6360.97
+  },
+  {
+    "id": 92,
+    "month": 12,
+    "year": 2025,
+    "totalSales": 123541.0,
+    "totalCosts": 62551.77,
+    "totalExpenses": 51893.58,
+    "profit": 9095.65
+  },
+  {
+    "id": 93,
+    "month": 1,
+    "year": 2026,
+    "totalSales": 40949.0,
+    "totalCosts": 19844.95,
+    "totalExpenses": 12148.8,
+    "profit": 8955.25
+  },
+  {
+    "id": 94,
+    "month": 2,
+    "year": 2026,
+    "totalSales": 32977.0,
+    "totalCosts": 15847.17,
+    "totalExpenses": 9465.34,
+    "profit": 7664.49
+  },
+  {
+    "id": 95,
+    "month": 3,
+    "year": 2026,
+    "totalSales": 70434.0,
+    "totalCosts": 35936.13,
+    "totalExpenses": 22573.94,
+    "profit": 11923.93
+  },
+  {
+    "id": 96,
+    "month": 4,
+    "year": 2026,
+    "totalSales": 63273.0,
+    "totalCosts": 30382.78,
+    "totalExpenses": 25176.07,
+    "profit": 7714.15
+  },
+  {
+    "id": 97,
+    "month": 5,
+    "year": 2026,
+    "totalSales": 2273.0,
+    "totalCosts": 1080.0,
+    "totalExpenses": 867.95,
+    "profit": 325.05
+  }
+]

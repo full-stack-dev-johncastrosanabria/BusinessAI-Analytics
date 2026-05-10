@@ -333,12 +333,11 @@ describe('Property 2: Preservation - Functional Behavior Preservation (Validates
       );
     });
 
-    it('should preserve UI component functionality with Math.random()', () => {
+    it('should preserve UI component functionality with crypto.randomUUID()', () => {
       const inputContent = readFileContent('frontend/src/components/ui/Input.tsx');
       if (inputContent) {
-        // Preserve ID generation functionality (even with insecure PRNG)
-        expect(inputContent).toContain('Math.random()');
-        expect(inputContent).toContain('toString(36)');
+        // Preserve ID generation functionality using secure crypto API
+        expect(inputContent).toContain('crypto.randomUUID()');
       }
     });
   });

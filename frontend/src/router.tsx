@@ -21,57 +21,62 @@ const withSuspense = (element: React.ReactNode) => (
   <Suspense fallback={<PageLoader />}>{element}</Suspense>
 )
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/login',
+      element: withSuspense(<Login />),
+      errorElement: <ErrorBoundary />,
+    },
+    {
+      path: '/',
+      element: (
+        <ProtectedRoute>
+          <App />
+        </ProtectedRoute>
+      ),
+      errorElement: <ErrorBoundary />,
+      children: [
+        {
+          index: true,
+          element: withSuspense(<Dashboard />),
+        },
+        {
+          path: 'forecasts',
+          element: withSuspense(<Forecasts />),
+        },
+        {
+          path: 'chatbot',
+          element: withSuspense(<Chatbot />),
+        },
+        {
+          path: 'documents',
+          element: withSuspense(<Documents />),
+        },
+        {
+          path: 'products',
+          element: withSuspense(<Products />),
+        },
+        {
+          path: 'customers',
+          element: withSuspense(<Customers />),
+        },
+        {
+          path: 'sales',
+          element: withSuspense(<Sales />),
+        },
+        {
+          path: 'sales-table',
+          element: withSuspense(<SalesTable />),
+        },
+        {
+          path: 'sales-infinite',
+          element: withSuspense(<SalesInfinite />),
+        },
+      ],
+    },
+  ],
   {
-    path: '/login',
-    element: withSuspense(<Login />),
-    errorElement: <ErrorBoundary />,
-  },
-  {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <App />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorBoundary />,
-    children: [
-      {
-        index: true,
-        element: withSuspense(<Dashboard />),
-      },
-      {
-        path: 'forecasts',
-        element: withSuspense(<Forecasts />),
-      },
-      {
-        path: 'chatbot',
-        element: withSuspense(<Chatbot />),
-      },
-      {
-        path: 'documents',
-        element: withSuspense(<Documents />),
-      },
-      {
-        path: 'products',
-        element: withSuspense(<Products />),
-      },
-      {
-        path: 'customers',
-        element: withSuspense(<Customers />),
-      },
-      {
-        path: 'sales',
-        element: withSuspense(<Sales />),
-      },
-      {
-        path: 'sales-table',
-        element: withSuspense(<SalesTable />),
-      },
-      {
-        path: 'sales-infinite',
-        element: withSuspense(<SalesInfinite />),
-      },
-    ],
-  },
-])
+    basename: import.meta.env.BASE_URL,
+  }
+)

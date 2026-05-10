@@ -75,7 +75,6 @@ MOST_VALUABLE_ES = 'más valioso'
 MOST_VALUABLE_EN = 'most valuable'
 LAST_YEAR_ES = 'año pasado'
 LAST_YEAR_EN = 'last year'
-YEAR_REGEX = r'\b(20\d{2})\b'
 
 # Additional constants for remaining duplications
 SEGMENT_BOUGHT_ES = 'segmento compró'
@@ -97,6 +96,31 @@ COUNTRY_OR_SEGMENT_EN = 'country or segment'
 COUNTRY_OR_SEGMENT_ES = 'país o segmento'
 COUNTRY_SEGMENT_BUYS_ES = 'país o segmento compra'
 COUNTRY_SEGMENT_BUYS_EN = 'country or segment buys'
+
+# Sales and billing query patterns
+TOP_PRODUCT_REVENUE_ES = 'se facturó más'
+PRODUCT_INVOICED_ES = 'producto se facturó'
+PRODUCT_INVOICED_EN = 'product was invoiced'
+TOP_PRODUCT_REVENUE_EN = 'top product by revenue'
+HIGHEST_SALES_DAY_ES = 'día tuvimos más ventas'
+HIGHEST_SALES_DAY_EN = 'highest sales day'
+BEST_DAY_EN = 'best day'
+DAY_MOST_SALES_EN = 'day with most sales'
+TINY_SALES_EN = 'tiny sales'
+LOW_VALUE_SALES_EN = 'low value sales'
+SMALL_TRANSACTIONS_EN = 'small transactions'
+TINY_SALES_ES = 'ventas muy pequeñas'
+SALES_PER_MONTH_ES = 'ventas por mes'
+HOW_MANY_SALES_ES = 'cuántas ventas hicimos'
+SALES_PER_MONTH_EN = 'sales per month'
+HOW_MANY_SALES_EN = 'how many sales'
+
+# Product query patterns
+MOST_SOLD_EN = 'most sold'
+MOST_SOLD_ES = 'más vendido'
+
+# Year regex pattern
+YEAR_REGEX_PATTERN = r'\b(20\d{2})\b'
 
 # ── Stop words to strip from document keyword searches ──────────────────────
 _DOC_STOP_WORDS = {
@@ -264,10 +288,10 @@ class AdvancedQueryProcessor:
         """Check for sales and billing questions."""
         sales_billing_patterns = [
             HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN,
-            'se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue',
-            'día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day',
-            'ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales',
-            'cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes',
+            TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN,
+            HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN,
+            TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN,
+            HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES,
             'se facturó', 'generó más ingresos', 'ventas hicimos', 'compraron más cantidad',
             'vende más por volumen', 'no han comprado recientemente'
         ]
@@ -277,13 +301,13 @@ class AdvancedQueryProcessor:
         """Route sales and billing queries to appropriate intent."""
         if any(w in q for w in [HIGHEST_INVOICE_ES, HIGHEST_SALE_ES, HIGHEST_TRANSACTION_EN, HIGHEST_SALE_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue']):
+        if any(w in q for w in [TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN]):
             return Intent.PRODUCT_INFO
-        if any(w in q for w in ['día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day']):
+        if any(w in q for w in [HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales']):
+        if any(w in q for w in [TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN]):
             return Intent.SALES_METRICS
-        if any(w in q for w in ['cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes']):
+        if any(w in q for w in [HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES]):
             return Intent.SALES_METRICS
         if any(w in q for w in ['se facturó', 'generó más ingresos', 'ventas hicimos', 'compraron más cantidad',
                                 'vende más por volumen', 'no han comprado recientemente']):
@@ -338,10 +362,10 @@ class AdvancedQueryProcessor:
         """Route break-even queries to appropriate intent."""
         product_signals = [
             'product', 'products', 'producto', 'productos', 'item', 'items',
-            'most sold', 'best selling', 'bestseller', 'top selling',
-            'más vendido', 'más vendidos', 'más popular', 'más populares',
+            MOST_SOLD_EN, 'best selling', 'bestseller', 'top selling',
+            MOST_SOLD_ES, 'más vendidos', 'más popular', 'más populares',
             'selling', 'vendido', 'vendidos', 'sku', 'catalog', 'catálogo',
-            'categoría', 'categoria', 'category', 'categories',
+            CATEGORY_ES, 'categoria', CATEGORY_EN, 'categories',
             'which product', 'what product', 'qué producto', 'cuál producto'
         ]
         if any(s in q for s in product_signals):
@@ -367,10 +391,10 @@ class AdvancedQueryProcessor:
         """Get list of product-related signal words."""
         return [
             'product', 'products', 'producto', 'productos', 'item', 'items',
-            'most sold', 'best selling', 'bestseller', 'top selling',
-            'más vendido', 'más vendidos', 'más popular', 'más populares',
+            MOST_SOLD_EN, 'best selling', 'bestseller', 'top selling',
+            MOST_SOLD_ES, 'más vendidos', 'más popular', 'más populares',
             'selling', 'vendido', 'vendidos', 'sku', 'catalog', 'catálogo',
-            'categoría', 'categoria', 'category', 'categories',
+            CATEGORY_ES, 'categoria', CATEGORY_EN, 'categories',
             'which product', 'what product', 'qué producto', 'cuál producto'
         ]
     
@@ -524,15 +548,15 @@ class AdvancedQueryProcessor:
 
     def _is_sales_by_day_query(self, q: str) -> bool:
         """Check for sales by day queries."""
-        return any(w in q for w in ['día tuvimos más ventas', 'day with most sales', 'highest sales day', 'best day'])
+        return any(w in q for w in [HIGHEST_SALES_DAY_ES, DAY_MOST_SALES_EN, HIGHEST_SALES_DAY_EN, BEST_DAY_EN])
 
     def _is_small_transactions_query(self, q: str) -> bool:
         """Check for small transactions queries."""
-        return any(w in q for w in ['ventas muy pequeñas', 'small transactions', 'low value sales', 'tiny sales'])
+        return any(w in q for w in [TINY_SALES_ES, SMALL_TRANSACTIONS_EN, LOW_VALUE_SALES_EN, TINY_SALES_EN])
 
     def _is_monthly_sales_count_query(self, q: str) -> bool:
         """Check for monthly sales count queries."""
-        return any(w in q for w in ['cuántas ventas hicimos', 'how many sales', 'sales per month', 'ventas por mes'])
+        return any(w in q for w in [HOW_MANY_SALES_ES, HOW_MANY_SALES_EN, SALES_PER_MONTH_EN, SALES_PER_MONTH_ES])
 
     def _is_current_month_billing_query(self, q: str) -> bool:
         """Check for current month billing queries."""
@@ -898,7 +922,7 @@ class AdvancedQueryProcessor:
 
     def _is_top_product_revenue_query(self, q: str) -> bool:
         """Check for top product by revenue queries."""
-        return any(w in q for w in ['se facturó más', 'producto se facturó', 'product was invoiced', 'top product by revenue'])
+        return any(w in q for w in [TOP_PRODUCT_REVENUE_ES, PRODUCT_INVOICED_ES, PRODUCT_INVOICED_EN, TOP_PRODUCT_REVENUE_EN])
 
     def _is_underpriced_products_query(self, q: str) -> bool:
         """Check for underpriced products queries."""
@@ -927,14 +951,14 @@ class AdvancedQueryProcessor:
 
     def _is_category_revenue_query(self, q: str) -> bool:
         """Check for category revenue queries."""
-        return any(w in q for w in ['category', 'categoría', 'categoria', 'categories',
+        return any(w in q for w in [CATEGORY_EN, CATEGORY_ES, 'categoria', 'categories',
                                     'categorías', 'which category', 'qué categoría',
                                     'highest margin', 'most revenue', 'más ingresos'])
 
     def _is_top_products_query(self, q: str) -> bool:
         """Check for top products queries."""
-        return any(w in q for w in ['top', 'best', 'most sold', 'bestseller',
-                                    'mejor', 'más vendido', 'principal',
+        return any(w in q for w in ['top', 'best', MOST_SOLD_EN, 'bestseller',
+                                    'mejor', MOST_SOLD_ES, 'principal',
                                     'which', 'cuál', 'what', 'qué', 'show',
                                     'list', 'lista', 'ranking'])
 
@@ -1122,7 +1146,7 @@ class AdvancedQueryProcessor:
 
     def _is_customer_count_query(self, q: str) -> bool:
         """Check for customer count queries."""
-        return any(w in q for w in ['how many', 'cuántos', 'count', 'total',
+        return any(w in q for w in [HOW_MANY_EN, 'cuántos', 'count', 'total',
                                     'number', 'número', 'cantidad'])
 
     def _handle_top_customers_list(self, language: Language) -> Tuple[str, List[str]]:
@@ -1613,7 +1637,7 @@ class AdvancedQueryProcessor:
                         'this year', 'este año']
         if not any(s in q for s in year_signals):
             return None
-        m = re.search(YEAR_REGEX, q)
+        m = re.search(YEAR_REGEX_PATTERN, q)
         if m:
             return int(m.group(1))
         # "last year" / "año pasado" → current year - 1
@@ -1979,7 +2003,7 @@ class AdvancedQueryProcessor:
             logger.error(f"Error in risk analysis: {e}")
             return self._err(language), []
 
-    def _handle_cost_increase_scenario(self, question: str, language: Language) -> Tuple[str, List[str]]:
+    def _handle_cost_increase_scenario(self, _question: str, language: Language) -> Tuple[str, List[str]]:
         """Analyze scenario where costs increase by X% and calculate required sales increase."""
         try:
             # Extract percentage from question
@@ -1987,9 +2011,9 @@ class AdvancedQueryProcessor:
             # SONAR_SAFE: Fixed regex to prevent polynomial runtime vulnerability
             # Original pattern r'(\d+)%' was vulnerable to backtracking
             # New pattern uses atomic grouping equivalent and is more specific
-            percentage_match = re.search(r'(\d{1,3})%', question)
+            percentage_match = re.search(r'(\d{1,3})%', _question)
             if not percentage_match:
-                percentage_match = re.search(r'(\d{1,3})', question)
+                percentage_match = re.search(r'(\d{1,3})', _question)
             
             cost_increase_pct = float(percentage_match.group(1)) if percentage_match else 10.0
             
@@ -2181,7 +2205,7 @@ class AdvancedQueryProcessor:
                       f"   • Cobertura de costos: {breakeven_coverage:.1f}%\n"
                       f"   • Categoría: {product['category']}\n\n")
         top_product = top_products[0]
-        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+        _, coverage_top = self._calculate_product_breakeven_metrics(
             top_product, all_metrics, avg_monthly_costs
         )
         answer += (f"🏆 **{top_product['name']}** contribuye más al {BREAKEVEN_POINT_ES}\n"
@@ -2203,7 +2227,7 @@ class AdvancedQueryProcessor:
                       f"   • Cost coverage: {breakeven_coverage:.1f}%\n"
                       f"   • Category: {product['category']}\n\n")
         top_product = top_products[0]
-        monthly_top, coverage_top = self._calculate_product_breakeven_metrics(
+        _, coverage_top = self._calculate_product_breakeven_metrics(
             top_product, all_metrics, avg_monthly_costs
         )
         answer += (f"🏆 **{top_product['name']}** contributes most to break-even\n"
@@ -3135,7 +3159,7 @@ class AdvancedQueryProcessor:
                 segment_analysis[segment]['customers_list'].append(customer)
             
             # Calculate value metrics for each segment
-            for segment, data in segment_analysis.items():
+            for _segment, data in segment_analysis.items():
                 data['avg_spent_per_customer'] = data['total_spent'] / data['customers']
                 data['avg_transactions_per_customer'] = data['total_transactions'] / data['customers']
                 data['avg_spent_per_transaction'] = data['total_spent'] / data['total_transactions'] if data['total_transactions'] > 0 else 0

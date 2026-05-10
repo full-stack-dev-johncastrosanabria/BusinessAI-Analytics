@@ -70,7 +70,20 @@
     "month": "Month",
     "predicted": "Predicted",
     "actual": "Actual",
-    "variance": "Variance"
+    "variance": "Variance",
+    "generateAll": "Generate All Forecasts",
+    "generating": "Generating...",
+    "salesForecast": "Sales Forecast",
+    "costForecast": "Cost Forecast",
+    "profitForecast": "Profit Forecast",
+    "generate": "Generate",
+    "loading": "Loading...",
+    "clickGenerate": "Click \"Generate\" to create forecast",
+    "combinedForecast": "Combined Forecast Comparison",
+    "sales": "Sales",
+    "cost": "Cost",
+    "profit": "Profit",
+    "mape": "MAPE"
   },
   "documents": {
     "title": "Document Management",

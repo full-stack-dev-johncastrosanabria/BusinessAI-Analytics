@@ -845,7 +845,7 @@ class AdvancedIntentClassifier:
     def _calculate_intent_scores(self, question_normalized: str, keywords: List[str], language: Language) -> Tuple[Dict[Intent, float], Dict[Intent, List[str]]]:
         """Calculate scores for all intents based on keyword matching."""
         intent_scores = {}
-        matched_keywords = {}
+        _ = {}  # matched_keywords not used in return
         
         for intent, lang_keywords in self.keywords.items():
             if language not in lang_keywords:
@@ -854,18 +854,16 @@ class AdvancedIntentClassifier:
             keywords_for_lang = lang_keywords[language]
             
             # Score different types of matches
-            direct_score, direct_matches = self._score_direct_keyword_matches(keywords_for_lang, question_normalized)
-            fuzzy_score, fuzzy_matches = self._score_fuzzy_matches(keywords_for_lang, keywords)
-            synonym_score, synonym_matches = self._score_synonym_matches(language, keywords, keywords_for_lang)
+            direct_score, _ = self._score_direct_keyword_matches(keywords_for_lang, question_normalized)
+            fuzzy_score, _ = self._score_fuzzy_matches(keywords_for_lang, keywords)
+            synonym_score, _ = self._score_synonym_matches(language, keywords, keywords_for_lang)
             
             total_score = direct_score + fuzzy_score + synonym_score
-            all_matches = direct_matches + fuzzy_matches + synonym_matches
             
             if total_score > 0:
                 intent_scores[intent] = total_score
-                matched_keywords[intent] = all_matches
         
-        return intent_scores, matched_keywords
+        return intent_scores, _
 
     def _check_mixed_intent(self, intent_scores: Dict[Intent, float]) -> bool:
         """Check if multiple intents have high scores (mixed intent)."""
@@ -897,8 +895,6 @@ class AdvancedIntentClassifier:
         Returns:
             Tuple of (intent, confidence_score, detected_language)
         """
-        start_time = datetime.now()
-        
         # Detect language first
         language, _ = self.detect_language(question)
         
@@ -909,11 +905,10 @@ class AdvancedIntentClassifier:
         keywords = self.extract_keywords(question_normalized, language)
         
         # Calculate intent scores
-        intent_scores, matched_keywords = self._calculate_intent_scores(question_normalized, keywords, language)
+        intent_scores, _ = self._calculate_intent_scores(question_normalized, keywords, language)
         
         # Handle no matches
         if not intent_scores:
-            processing_time = (datetime.now() - start_time).total_seconds()
             logger.info(f"No intent matched for question: {question}")
             return Intent.UNKNOWN, 0.0, language
         
@@ -929,10 +924,8 @@ class AdvancedIntentClassifier:
         # Calculate confidence
         confidence = self._calculate_confidence(best_intent, intent_scores, language)
         
-        processing_time = (datetime.now() - start_time).total_seconds()
-        
         logger.info(f"Intent classified: {best_intent.value} (confidence: {confidence:.2f}, "
-                   f"language: {language.value}, time: {processing_time:.3f}s)")
+                   f"language: {language.value})")
         
         return best_intent, confidence, language
     

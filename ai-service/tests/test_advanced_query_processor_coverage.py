@@ -515,12 +515,12 @@ class TestProfitHandlersDirect:
 
     @pytest.mark.asyncio
     async def test_handle_profit_analysis_en(self, rp):
-        ans, src = await rp._handle_net_profit_analysis("what was our profit", Language.ENGLISH)
+        ans, src = rp._handle_net_profit_analysis(Language.ENGLISH)
         assert isinstance(ans, str)
 
     @pytest.mark.asyncio
     async def test_handle_profit_analysis_es(self, rp):
-        ans, src = await rp._handle_net_profit_analysis("cuál fue la ganancia", Language.SPANISH)
+        ans, src = rp._handle_net_profit_analysis(Language.SPANISH)
         assert isinstance(ans, str)
 
     def test_handle_worst_month_analysis_en(self, rp):

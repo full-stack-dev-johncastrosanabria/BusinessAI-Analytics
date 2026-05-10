@@ -72,9 +72,10 @@ public class DocumentFormatValidationProperties {
         MultipartFile mockFile = createMockFile("test." + fileType.toLowerCase(), 1000, "test content");
         
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             service.uploadDocument(mockFile);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Example
@@ -91,9 +92,10 @@ public class DocumentFormatValidationProperties {
         MultipartFile mockFile = createMockFile("test.txt", oversizeFileSize, "test content");
         
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             service.uploadDocument(mockFile);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Example

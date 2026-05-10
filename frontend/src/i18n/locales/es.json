@@ -70,7 +70,20 @@
     "month": "Mes",
     "predicted": "Predicho",
     "actual": "Real",
-    "variance": "Varianza"
+    "variance": "Varianza",
+    "generateAll": "Generar Todos los Pronósticos",
+    "generating": "Generando...",
+    "salesForecast": "Pronóstico de Ventas",
+    "costForecast": "Pronóstico de Costos",
+    "profitForecast": "Pronóstico de Ganancias",
+    "generate": "Generar",
+    "loading": "Cargando...",
+    "clickGenerate": "Haz clic en \"Generar\" para crear el pronóstico",
+    "combinedForecast": "Comparación de Pronósticos Combinados",
+    "sales": "Ventas",
+    "cost": "Costo",
+    "profit": "Ganancia",
+    "mape": "MAPE"
   },
   "documents": {
     "title": "Gestión de Documentos",

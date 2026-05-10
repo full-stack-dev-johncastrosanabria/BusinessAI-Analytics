@@ -6,6 +6,8 @@
 
 // Configuration constants
 const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:8080'
+const STATIC_DATA_MODE = import.meta.env?.VITE_STATIC_DATA === 'true'
+const STATIC_DATA_BASE_URL = `${import.meta.env.BASE_URL || '/'}data/`
 const REQUEST_TIMEOUT_MS = 30_000 // 30 seconds
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 1_000 // 1 second
@@ -32,6 +34,69 @@ interface RequestConfig extends RequestInit {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
+}
+
+function getStaticDataFile(endpoint: string): string | null {
+  const endpointPath = endpoint.split('?')[0]
+  const staticEndpoints: Record<string, string> = {
+    '/api/products': 'products.json',
+    '/api/customers': 'customers.json',
+    '/api/sales': 'sales-transactions.json',
+    '/api/analytics/metrics': 'business-metrics.json',
+    '/api/analytics/dashboard': 'dashboard.json',
+  }
+
+  return staticEndpoints[endpointPath] || null
+}
+
+function applyStaticFilters<T>(endpoint: string, data: T, params?: Record<string, string | number | boolean>): T {
+  if (!params || !Array.isArray(data)) {
+    return data
+  }
+
+  if (endpoint === '/api/sales') {
+    return data.filter((row) => {
+      if (!isRecord(row)) return true
+      const transactionDate = String(row.transactionDate)
+      const customerId = Number(row.customerId)
+      const productId = Number(row.productId)
+
+      return (!params.dateFrom || transactionDate >= String(params.dateFrom)) &&
+        (!params.dateTo || transactionDate <= String(params.dateTo)) &&
+        (!params.customerId || customerId === Number(params.customerId)) &&
+        (!params.productId || productId === Number(params.productId))
+    }) as T
+  }
+
+  if (endpoint === '/api/analytics/metrics') {
+    return data.filter((row) => {
+      if (!isRecord(row)) return true
+      const metricDate = `${row.year}-${String(row.month).padStart(2, '0')}-01`
+
+      return (!params.dateFrom || metricDate >= String(params.dateFrom)) &&
+        (!params.dateTo || metricDate <= String(params.dateTo))
+    }) as T
+  }
+
+  return data
+}
+
+async function requestStaticData<T>(
+  endpoint: string,
+  params?: Record<string, string | number | boolean>
+): Promise<T> {
+  const staticFile = getStaticDataFile(endpoint)
+  if (!staticFile) {
+    throw new APIError('This action is unavailable in the static GitHub Pages build.', 405)
+  }
+
+  const response = await fetch(`${STATIC_DATA_BASE_URL}${staticFile}`)
+  if (!response.ok) {
+    throw new APIError(`Static data not found: ${staticFile}`, response.status, undefined, endpoint)
+  }
+
+  const data = await response.json() as T
+  return applyStaticFilters(endpoint, data, params)
 }
 
 /**
@@ -83,6 +148,14 @@ async function request<T>(
 ): Promise<T> {
   const { params, timeout = REQUEST_TIMEOUT_MS, retries = MAX_RETRIES, ...fetchConfig } = config
 
+  if (STATIC_DATA_MODE) {
+    if (fetchConfig.method && fetchConfig.method !== 'GET') {
+      throw new APIError('This action is unavailable in the static GitHub Pages build.', 405)
+    }
+
+    return requestStaticData<T>(endpoint, params)
+  }
+
   // Build URL with query params
   const url = new URL(`${API_BASE_URL}${endpoint}`)
   if (params) {
@@ -91,10 +164,17 @@ async function request<T>(
     })
   }
 
-  // Default headers
+  // Default headers with security best practices
   const headers = new Headers(fetchConfig.headers)
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
+  // Add security headers
+  if (!headers.has('X-Content-Type-Options')) {
+    headers.set('X-Content-Type-Options', 'nosniff')
+  }
+  if (!headers.has('X-Frame-Options')) {
+    headers.set('X-Frame-Options', 'DENY')
   }
 
   return retryRequest(async () => {

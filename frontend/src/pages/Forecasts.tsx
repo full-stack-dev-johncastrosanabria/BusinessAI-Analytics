@@ -1,4 +1,5 @@
 import { useTransition } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query'
 import {
   LineChart,
@@ -143,64 +144,8 @@ function useCombinedForecastData({
   }))
 }
 
-// Helper component to render individual forecast card
-interface ForecastCardProps {
-  readonly title: string
-  readonly query: UseQueryResult<ForecastResponse, Error>
-  readonly mutation: ForecastMutation
-  readonly onGenerate: () => void
-  readonly isLoading: boolean
-  readonly lineColor: string
-}
-
-function ForecastCard({
-  title,
-  query,
-  mutation,
-  onGenerate,
-  isLoading,
-  lineColor
-}: ForecastCardProps) {
-  return (
-    <div className="forecast-card">
-      <div className="forecast-header">
-        <h2>{title}</h2>
-        <button
-          onClick={onGenerate}
-          disabled={isLoading}
-          className="btn-secondary"
-        >
-          {mutation.isPending ? 'Loading...' : 'Generate'}
-        </button>
-      </div>
-      {query.data ? (
-        <>
-          {query.data.mape !== null && (
-            <div className="forecast-metric">
-              <span>MAPE:</span>
-              <strong>{query.data.mape.toFixed(2)}%</strong>
-            </div>
-          )}
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={query.data.predictions}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke={lineColor} />
-            </LineChart>
-          </ResponsiveContainer>
-        </>
-      ) : (
-        <div className="placeholder">
-          {query.isLoading ? 'Loading...' : 'Click "Generate" to create forecast'}
-        </div>
-      )}
-    </div>
-  )
-}
-
 function Forecasts() {
+  const { t } = useTranslation()
   const [isPending, startTransition] = useTransition()
 
   // Queries
@@ -248,11 +193,11 @@ function Forecasts() {
 
   return (
     <div className="forecasts">
-      <h1>Forecasts</h1>
+      <h1>{t('forecasts.title')}</h1>
 
       {error && (
         <div className="error-message">
-          {error instanceof Error ? error.message : 'An error occurred'}
+          {error instanceof Error ? error.message : t('common.error')}
         </div>
       )}
 
@@ -262,40 +207,126 @@ function Forecasts() {
           disabled={isLoading}
           className="btn-primary"
         >
-          {isLoading ? 'Generating...' : 'Generate All Forecasts'}
+          {isLoading ? t('forecasts.generating') : t('forecasts.generateAll')}
         </button>
       </div>
 
       <div className="forecasts-grid">
-        <ForecastCard
-          title="Sales Forecast"
-          query={salesQuery}
-          mutation={generateSales}
-          onGenerate={handleGenerateSales}
-          isLoading={isLoading}
-          lineColor="#8884d8"
-        />
-        <ForecastCard
-          title="Cost Forecast"
-          query={costQuery}
-          mutation={generateCost}
-          onGenerate={handleGenerateCost}
-          isLoading={isLoading}
-          lineColor="#82ca9d"
-        />
-        <ForecastCard
-          title="Profit Forecast"
-          query={profitQuery}
-          mutation={generateProfit}
-          onGenerate={handleGenerateProfit}
-          isLoading={isLoading}
-          lineColor="#ffc658"
-        />
+        {/* Sales Forecast */}
+        <div className="forecast-card">
+          <div className="forecast-header">
+            <h2>{t('forecasts.salesForecast')}</h2>
+            <button
+              onClick={handleGenerateSales}
+              disabled={isLoading}
+              className="btn-secondary"
+            >
+              {generateSales.isPending ? t('forecasts.loading') : t('forecasts.generate')}
+            </button>
+          </div>
+          {salesQuery.data ? (
+            <>
+              {salesQuery.data.mape !== null && (
+                <div className="forecast-metric">
+                  <span>{t('forecasts.mape')}:</span>
+                  <strong>{salesQuery.data.mape.toFixed(2)}%</strong>
+                </div>
+              )}
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={salesQuery.data.predictions}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </>
+          ) : (
+            <div className="placeholder">
+              {salesQuery.isLoading ? t('forecasts.loading') : t('forecasts.clickGenerate')}
+            </div>
+          )}
+        </div>
+
+        {/* Cost Forecast */}
+        <div className="forecast-card">
+          <div className="forecast-header">
+            <h2>{t('forecasts.costForecast')}</h2>
+            <button
+              onClick={handleGenerateCost}
+              disabled={isLoading}
+              className="btn-secondary"
+            >
+              {generateCost.isPending ? t('forecasts.loading') : t('forecasts.generate')}
+            </button>
+          </div>
+          {costQuery.data ? (
+            <>
+              {costQuery.data.mape !== null && (
+                <div className="forecast-metric">
+                  <span>{t('forecasts.mape')}:</span>
+                  <strong>{costQuery.data.mape.toFixed(2)}%</strong>
+                </div>
+              )}
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={costQuery.data.predictions}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#82ca9d" />
+                </LineChart>
+              </ResponsiveContainer>
+            </>
+          ) : (
+            <div className="placeholder">
+              {costQuery.isLoading ? t('forecasts.loading') : t('forecasts.clickGenerate')}
+            </div>
+          )}
+        </div>
+
+        {/* Profit Forecast */}
+        <div className="forecast-card">
+          <div className="forecast-header">
+            <h2>{t('forecasts.profitForecast')}</h2>
+            <button
+              onClick={handleGenerateProfit}
+              disabled={isLoading}
+              className="btn-secondary"
+            >
+              {generateProfit.isPending ? t('forecasts.loading') : t('forecasts.generate')}
+            </button>
+          </div>
+          {profitQuery.data ? (
+            <>
+              {profitQuery.data.mape !== null && (
+                <div className="forecast-metric">
+                  <span>{t('forecasts.mape')}:</span>
+                  <strong>{profitQuery.data.mape.toFixed(2)}%</strong>
+                </div>
+              )}
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={profitQuery.data.predictions}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#ffc658" />
+                </LineChart>
+              </ResponsiveContainer>
+            </>
+          ) : (
+            <div className="placeholder">
+              {profitQuery.isLoading ? t('forecasts.loading') : t('forecasts.clickGenerate')}
+            </div>
+          )}
+        </div>
       </div>
 
       {combinedData.length > 0 && (
         <div className="combined-forecast">
-          <h2>Combined Forecast Comparison</h2>
+          <h2>{t('forecasts.combinedForecast')}</h2>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={combinedData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -303,9 +334,9 @@ function Forecasts() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="sales" stroke="#8884d8" name="Sales" />
-              <Line type="monotone" dataKey="cost" stroke="#82ca9d" name="Cost" />
-              <Line type="monotone" dataKey="profit" stroke="#ffc658" name="Profit" />
+              <Line type="monotone" dataKey="sales" stroke="#8884d8" name={t('forecasts.sales')} />
+              <Line type="monotone" dataKey="cost" stroke="#82ca9d" name={t('forecasts.cost')} />
+              <Line type="monotone" dataKey="profit" stroke="#ffc658" name={t('forecasts.profit')} />
             </LineChart>
           </ResponsiveContainer>
         </div>
