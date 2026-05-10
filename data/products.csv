@@ -1,0 +1,32 @@
+id,name,category,cost,price
+1,Laptop Pro 15,Electronics,800.0,1200.0
+2,Wireless Mouse,Electronics,15.0,35.0
+3,USB-C Hub,Electronics,25.0,55.0
+4,Mechanical Keyboard,Electronics,60.0,120.0
+5,"27"" Monitor",Electronics,200.0,350.0
+6,Webcam HD,Electronics,40.0,80.0
+7,Office Chair Ergonomic,Furniture,150.0,300.0
+8,Standing Desk,Furniture,250.0,500.0
+9,Bookshelf Oak,Furniture,80.0,180.0
+10,Filing Cabinet,Furniture,100.0,220.0
+11,Conference Table,Furniture,400.0,800.0
+12,Desk Lamp LED,Furniture,30.0,65.0
+13,Business Shirt,Clothing,20.0,50.0
+14,Formal Pants,Clothing,30.0,70.0
+15,Blazer,Clothing,80.0,180.0
+16,Dress Shoes,Clothing,50.0,120.0
+17,Tie Silk,Clothing,15.0,40.0
+18,Belt Leather,Clothing,20.0,50.0
+19,Coffee Beans Premium,Food,8.0,20.0
+20,Tea Assortment,Food,10.0,25.0
+21,Snack Box,Food,5.0,15.0
+22,Energy Bars Pack,Food,12.0,28.0
+23,Bottled Water Case,Food,6.0,15.0
+24,Fruit Basket,Food,15.0,35.0
+25,Business Strategy Guide,Books,12.0,30.0
+26,Leadership Handbook,Books,15.0,35.0
+27,Marketing Essentials,Books,18.0,40.0
+28,Finance for Managers,Books,20.0,45.0
+29,Project Management,Books,16.0,38.0
+30,Data Analytics Primer,Books,22.0,50.0
+31,TEST,Electronics,2.28,3.08

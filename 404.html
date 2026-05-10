@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BusinessAI Analytics</title>
+    <!-- Prevent flash of wrong theme by applying saved preference before React renders -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var theme = (saved === 'light' || saved === 'dark') ? saved : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/BusinessAI-Analytics/assets/index-BzIz8D86.js"></script>
+    <link rel="modulepreload" crossorigin href="/BusinessAI-Analytics/assets/query-BKfunqW7.js">
+    <link rel="modulepreload" crossorigin href="/BusinessAI-Analytics/assets/react-DwB3Xgmk.js">
+    <link rel="modulepreload" crossorigin href="/BusinessAI-Analytics/assets/i18n-qYP94qgP.js">
+    <link rel="stylesheet" crossorigin href="/BusinessAI-Analytics/assets/index-DhpXiZj8.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

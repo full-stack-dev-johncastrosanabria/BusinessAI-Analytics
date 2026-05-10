@@ -1,0 +1,1 @@
+import{a as e}from"./api-Dp0gbbOj.js";const r={getCustomers:async()=>await e.get("/api/customers"),getCustomer:async t=>await e.get(`/api/customers/${t}`),createCustomer:async t=>await e.post("/api/customers",t),updateCustomer:async(t,a)=>await e.put(`/api/customers/${t}`,a),deleteCustomer:async t=>{await e.delete(`/api/customers/${t}`)}};export{r as c};
