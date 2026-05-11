@@ -321,7 +321,7 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
   const normalized = question.toLowerCase()
   const language = getActiveLanguage(question)
 
-  const [dashboard, products, customers, metrics, sales, documents] = await Promise.all([
+  const [dashboard, products, customers, metrics, sales, exportedDocuments] = await Promise.all([
     fetchStaticJson<Record<string, unknown>>('dashboard.json'),
     fetchStaticJson<Array<Record<string, unknown>>>('products.json', []),
     fetchStaticJson<Array<Record<string, unknown>>>('customers.json', []),
@@ -330,21 +330,84 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     fetchStaticJson<Array<Record<string, unknown>>>('documents.json', []),
   ])
 
+  // Merge static + localStorage documents so uploaded files are always searchable
+  const localDocuments = readStoredDocuments()
+  const allDocuments = [
+    ...(exportedDocuments as unknown as StaticDocument[]),
+    ...localDocuments,
+  ]
+
+  // Full-text document search — runs for every query, not just "document" queries
+  const queryTerms = normalized
+    .split(/\W+/)
+    .filter((term) => term.length > 3)
+  const documentHits = allDocuments
+    .filter((doc) => {
+      if (!doc.extractedText) return false
+      const haystack = `${doc.filename || ''} ${doc.extractedText}`.toLowerCase()
+      return queryTerms.some((term) => haystack.includes(term))
+    })
+    .slice(0, 3)
+
+  // Build a document context snippet to append to answers when relevant
+  function buildDocumentContext(): string {
+    if (documentHits.length === 0) return ''
+    const snippets = documentHits.map((doc) => {
+      const text = doc.extractedText || ''
+      // Find the first sentence/paragraph containing a matching term
+      const matchingTerm = queryTerms.find((term) => text.toLowerCase().includes(term))
+      if (!matchingTerm) return `📄 ${doc.filename}`
+      const idx = text.toLowerCase().indexOf(matchingTerm)
+      const start = Math.max(0, idx - 60)
+      const end = Math.min(text.length, idx + 200)
+      const excerpt = text.slice(start, end).replace(/\s+/g, ' ').trim()
+      return `📄 **${doc.filename}**: "…${excerpt}…"`
+    })
+    return language === 'es'
+      ? `\n\n📂 *Encontré información relevante en ${documentHits.length} documento(s):*\n${snippets.join('\n')}`
+      : `\n\n📂 *Found relevant content in ${documentHits.length} document(s):*\n${snippets.join('\n')}`
+  }
+
   let answer = ''
   let sources = ['dashboard.json']
 
-  if (includesAny(normalized, ['document', 'archivo', 'documento', 'file'])) {
-    const searchableTerms = normalized
-      .split(/\W+/)
-      .filter((term) => term.length > 3 && !['document', 'documents', 'documento', 'documentos', 'archivo', 'archivos', 'search', 'buscar'].includes(term))
-    const matches = documents.filter((document) => {
-      const haystack = `${document.filename || ''} ${document.extractedText || ''}`.toLowerCase()
+  if (includesAny(normalized, ['document', 'archivo', 'documento', 'file', 'fichero', 'adjunto'])) {
+    // Explicit document query — search by filename and content
+    const searchableTerms = queryTerms.filter(
+      (term) => !['document', 'documents', 'documento', 'documentos', 'archivo', 'archivos',
+        'search', 'buscar', 'file', 'fichero', 'adjunto'].includes(term)
+    )
+    const matches = allDocuments.filter((doc) => {
+      const haystack = `${doc.filename || ''} ${doc.extractedText || ''}`.toLowerCase()
       return searchableTerms.length === 0 || searchableTerms.some((term) => haystack.includes(term))
     })
-    answer = language === 'es'
-      ? `Hay ${documents.length} documentos exportados desde la base. ${matches.length > 0 ? `Coincidencias: ${matches.slice(0, 3).map((doc) => doc.filename).join(', ')}.` : 'No encontre coincidencias con esos terminos.'}`
-      : `There are ${documents.length} documents exported from the database. ${matches.length > 0 ? `Matches: ${matches.slice(0, 3).map((doc) => doc.filename).join(', ')}.` : 'I did not find matches for those terms.'}`
-    sources = ['documents.json']
+
+    if (matches.length > 0) {
+      const matchDetails = matches.slice(0, 5).map((doc) => {
+        const text = doc.extractedText || ''
+        if (!text) return `📄 ${doc.filename} (${doc.fileType})`
+        const firstTerm = searchableTerms.find((term) => text.toLowerCase().includes(term))
+        if (!firstTerm) return `📄 ${doc.filename} (${doc.fileType})`
+        const idx = text.toLowerCase().indexOf(firstTerm)
+        const start = Math.max(0, idx - 40)
+        const end = Math.min(text.length, idx + 180)
+        const excerpt = text.slice(start, end).replace(/\s+/g, ' ').trim()
+        return `📄 **${doc.filename}**: "…${excerpt}…"`
+      })
+      answer = language === 'es'
+        ? `Encontré ${matches.length} documento(s) relevante(s) de ${allDocuments.length} en total:\n\n${matchDetails.join('\n\n')}`
+        : `Found ${matches.length} relevant document(s) out of ${allDocuments.length} total:\n\n${matchDetails.join('\n\n')}`
+    } else if (allDocuments.length > 0) {
+      const docList = allDocuments.slice(0, 5).map((d) => `📄 ${d.filename}`).join('\n')
+      answer = language === 'es'
+        ? `No encontré coincidencias para esos términos. Hay ${allDocuments.length} documento(s) disponible(s):\n\n${docList}`
+        : `No matches found for those terms. There are ${allDocuments.length} document(s) available:\n\n${docList}`
+    } else {
+      answer = language === 'es'
+        ? 'No hay documentos cargados todavía. Puedes subir documentos TXT, DOCX, PDF o XLSX desde la sección Documentos.'
+        : 'No documents uploaded yet. You can upload TXT, DOCX, PDF or XLSX files from the Documents section.'
+    }
+    sources = ['documents.json', 'localStorage']
   } else if (includesAny(normalized, ['forecast', 'pronostico', 'pronóstico', 'predic', 'projection', 'proyeccion'])) {
     const recent = metrics.slice(-12)
     const avgSales = recent.reduce((sum, metric) => sum + Number(metric.totalSales || 0), 0) / Math.max(recent.length, 1)
@@ -352,6 +415,7 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     answer = language === 'es'
       ? `Pronostico estatico basado en el promedio de los ultimos 12 meses: ventas esperadas cercanas a ${formatCurrency(avgSales * 1.015, language)} y ganancia cercana a ${formatCurrency(avgProfit * 1.015, language)} para el proximo mes.`
       : `Static forecast based on the last 12-month average: expected sales near ${formatCurrency(avgSales * 1.015, language)} and profit near ${formatCurrency(avgProfit * 1.015, language)} for next month.`
+    answer += buildDocumentContext()
     sources = ['business-metrics.json']
   } else if (includesAny(normalized, ['producto', 'product', 'item', 'categoria', 'category', 'margin', 'margen'])) {
     const productPerformance = getProductPerformance(sales, products)
@@ -366,6 +430,7 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     answer = language === 'es'
       ? `Hay ${products.length} productos en ${categories.length} categorias (${categories.join(', ')}). Top productos: ${productList || 'sin ventas registradas'}.`
       : `There are ${products.length} products across ${categories.length} categories (${categories.join(', ')}). Top products: ${productList || 'no sales recorded'}.`
+    answer += buildDocumentContext()
     sources = ['products.json', 'sales-transactions.json']
   } else if (includesAny(normalized, ['cliente', 'customer', 'client', 'segment', 'pais', 'country'])) {
     const topCustomers = getTopCustomers(sales, customers).slice(0, 5)
@@ -380,21 +445,25 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     answer = language === 'es'
       ? `Hay ${customers.length} clientes. Segmentos: ${Object.entries(segments).map(([segment, count]) => `${segment}: ${count}`).join(', ')}. Top clientes por ingresos: ${customerList}.`
       : `There are ${customers.length} customers. Segments: ${Object.entries(segments).map(([segment, count]) => `${segment}: ${count}`).join(', ')}. Top customers by revenue: ${customerList}.`
+    answer += buildDocumentContext()
     sources = ['customers.json', 'sales-transactions.json']
   } else if (includesAny(normalized, ['tendencia', 'trend', 'crecimiento', 'growth'])) {
     answer = summarizeTrend(metrics, includesAny(normalized, ['profit', 'ganancia', 'utilidad']) ? 'profit' : 'totalSales', language)
+    answer += buildDocumentContext()
     sources = ['business-metrics.json']
   } else if (includesAny(normalized, ['mejor', 'best', 'highest', 'maximo', 'máximo', 'peak'])) {
     const best = isRecord(dashboard.bestMonth) ? dashboard.bestMonth : {}
     answer = language === 'es'
       ? `El mejor mes fue ${monthName(best.year, best.month, language)} con ganancia de ${formatCurrency(best.profit, language)}.`
       : `The best month was ${monthName(best.year, best.month, language)} with ${formatCurrency(best.profit, language)} in profit.`
+    answer += buildDocumentContext()
     sources = ['dashboard.json', 'business-metrics.json']
   } else if (includesAny(normalized, ['peor', 'worst', 'lowest', 'minimo', 'mínimo'])) {
     const worst = isRecord(dashboard.worstMonth) ? dashboard.worstMonth : {}
     answer = language === 'es'
       ? `El peor mes fue ${monthName(worst.year, worst.month, language)} con ganancia de ${formatCurrency(worst.profit, language)}.`
       : `The worst month was ${monthName(worst.year, worst.month, language)} with ${formatCurrency(worst.profit, language)} in profit.`
+    answer += buildDocumentContext()
     sources = ['dashboard.json', 'business-metrics.json']
   } else if (includesAny(normalized, ['profit', 'ganancia', 'utilidad', 'cost', 'costo', 'expense', 'gasto', 'rentab'])) {
     const totalSales = Number(dashboard.totalSales || 0)
@@ -404,6 +473,7 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     answer = language === 'es'
       ? `Ganancia total: ${formatCurrency(totalProfit, language)}. Margen neto aproximado: ${margin.toFixed(1)}%. Meses rentables: ${profitableMonths} de ${metrics.length}. Costos acumulados: ${formatCurrency(dashboard.totalCosts, language)}.`
       : `Total profit: ${formatCurrency(totalProfit, language)}. Approximate net margin: ${margin.toFixed(1)}%. Profitable months: ${profitableMonths} of ${metrics.length}. Total costs: ${formatCurrency(dashboard.totalCosts, language)}.`
+    answer += buildDocumentContext()
     sources = ['dashboard.json', 'business-metrics.json']
   } else if (includesAny(normalized, ['venta', 'sales', 'revenue', 'transacci', 'billing', 'factur'])) {
     const requestedYear = parseRequestedYear(normalized)
@@ -425,12 +495,17 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     answer = language === 'es'
       ? `Ventas para ${period}: ${formatCurrency(totalSales, language)} con ganancia de ${formatCurrency(totalProfit, language)}. El dataset contiene ${formatNumber(sales.length, language)} transacciones; la transaccion mas alta fue de ${formatCurrency(highestTransaction?.totalAmount, language)}.`
       : `Sales for ${period}: ${formatCurrency(totalSales, language)} with ${formatCurrency(totalProfit, language)} in profit. The dataset contains ${formatNumber(sales.length, language)} transactions; the highest transaction was ${formatCurrency(highestTransaction?.totalAmount, language)}.`
+    answer += buildDocumentContext()
     sources = ['sales-transactions.json', 'dashboard.json']
   } else {
+    // General fallback — still check documents for any relevant content
+    const docContext = buildDocumentContext()
     answer = language === 'es'
       ? `Puedo responder sobre ventas, ganancias, costos, productos, clientes, tendencias, pronosticos y documentos. Resumen: ventas ${formatCurrency(dashboard.totalSales, language)}, ganancia ${formatCurrency(dashboard.totalProfit, language)}, ${products.length} productos, ${customers.length} clientes y ${metrics.length} meses de metricas.`
       : `I can answer questions about sales, profit, costs, products, customers, trends, forecasts, and documents. Summary: ${formatCurrency(dashboard.totalSales, language)} in sales, ${formatCurrency(dashboard.totalProfit, language)} in profit, ${products.length} products, ${customers.length} customers, and ${metrics.length} months of metrics.`
+    answer += docContext
     sources = ['dashboard.json', 'business-metrics.json', 'products.json', 'customers.json']
+    if (docContext) sources.push('documents.json')
   }
 
   return {

@@ -20,6 +20,31 @@ export interface ChatbotResponse {
   readonly processing_time: number
 }
 
+const STATIC_DOCUMENTS_KEY = 'businessai.static.documents'
+
+interface StoredDocument {
+  readonly id: number
+  readonly filename: string
+  readonly extractedText?: string
+  readonly fileType?: string
+}
+
+/** Read localStorage documents so the live backend can also receive their text as context */
+function getLocalDocumentContext(): string {
+  try {
+    const raw = globalThis.localStorage?.getItem(STATIC_DOCUMENTS_KEY)
+    if (!raw) return ''
+    const docs = JSON.parse(raw) as StoredDocument[]
+    const withText = docs.filter((d) => d.extractedText?.trim())
+    if (withText.length === 0) return ''
+    return withText
+      .map((d) => `[${d.filename}]: ${d.extractedText?.slice(0, 500)}`)
+      .join('\n---\n')
+  } catch {
+    return ''
+  }
+}
+
 // Query keys
 export const chatKeys = {
   all: ['chat'] as const,
@@ -42,8 +67,14 @@ export function useChatbot() {
 
   // Mutation for sending message
   const mutation = useMutation({
-    mutationFn: (question: string) =>
-      api.post<ChatbotResponse>('/api/ai/chatbot/query', { question }),
+    mutationFn: (question: string) => {
+      const documentContext = getLocalDocumentContext()
+      return api.post<ChatbotResponse>('/api/ai/chatbot/query', {
+        question,
+        // Pass document context to live backend when documents have been uploaded
+        ...(documentContext ? { documentContext } : {}),
+      })
+    },
     onMutate: async (question) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: chatKeys.history() })
