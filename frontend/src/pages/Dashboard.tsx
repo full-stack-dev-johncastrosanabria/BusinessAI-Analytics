@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion } from 'motion/react'
 import { useDashboardSummary, useBusinessMetrics } from '../hooks/useAnalytics'
 import { useChartExport } from '../hooks/useChartExport'
 import { InteractiveChart } from '../components/ui/InteractiveChart'
@@ -19,6 +20,16 @@ const PROFIT_COLOR = '#ffc658'
 const BAR_COLOR = '#8884d8'
 
 const MONTH_PADDING = 2
+
+// Shared animation variants for KPI cards
+const cardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+}
 
 function Dashboard() {
   const { t } = useTranslation()
@@ -155,32 +166,34 @@ function Dashboard() {
       {/* ── KPI Cards ── */}
       {summary && (
         <div className="metrics-grid">
-          <div className="metric-card">
-            <h3>{t('dashboard.totalSales')}</h3>
-            <p className="metric-value">${summary.totalSales.toFixed(2)}</p>
-          </div>
-          <div className="metric-card">
-            <h3>{t('dashboard.totalCosts')}</h3>
-            <p className="metric-value">${summary.totalCosts.toFixed(2)}</p>
-          </div>
-          <div className="metric-card">
-            <h3>{t('dashboard.totalProfit')}</h3>
-            <p className="metric-value">${summary.totalProfit.toFixed(2)}</p>
-          </div>
-          <div className="metric-card">
-            <h3>{t('dashboard.bestMonth')}</h3>
-            <p className="metric-value">
-              {summary.bestMonth?.year}-{String(summary.bestMonth?.month).padStart(2, '0')}
-            </p>
-            <p className="metric-subtext">${summary.bestMonth?.profit.toFixed(2)}</p>
-          </div>
-          <div className="metric-card">
-            <h3>{t('dashboard.worstMonth')}</h3>
-            <p className="metric-value">
-              {summary.worstMonth?.year}-{String(summary.worstMonth?.month).padStart(MONTH_PADDING, '0')}
-            </p>
-            <p className="metric-subtext">${summary.worstMonth?.profit.toFixed(2)}</p>
-          </div>
+          {[
+            { label: t('dashboard.totalSales'),  value: `$${summary.totalSales.toFixed(2)}` },
+            { label: t('dashboard.totalCosts'),  value: `$${summary.totalCosts.toFixed(2)}` },
+            { label: t('dashboard.totalProfit'), value: `$${summary.totalProfit.toFixed(2)}` },
+            {
+              label: t('dashboard.bestMonth'),
+              value: `${summary.bestMonth?.year}-${String(summary.bestMonth?.month).padStart(2, '0')}`,
+              sub: `$${summary.bestMonth?.profit.toFixed(2)}`,
+            },
+            {
+              label: t('dashboard.worstMonth'),
+              value: `${summary.worstMonth?.year}-${String(summary.worstMonth?.month).padStart(MONTH_PADDING, '0')}`,
+              sub: `$${summary.worstMonth?.profit.toFixed(2)}`,
+            },
+          ].map((card, i) => (
+            <motion.div
+              key={card.label}
+              className="metric-card"
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <h3>{card.label}</h3>
+              <p className="metric-value">{card.value}</p>
+              {card.sub && <p className="metric-subtext">{card.sub}</p>}
+            </motion.div>
+          ))}
         </div>
       )}
 
