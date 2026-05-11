@@ -95,11 +95,27 @@
     "fileName": "Nombre del Archivo",
     "type": "Tipo",
     "size": "Tamaño",
-    "uploadDate": "Fecha de Subida"
+    "uploadDate": "Fecha de Subida",
+    "status": "Estado",
+    "actions": "Acciones",
+    "chooseFile": "Elegir archivo (TXT, DOCX, PDF, XLSX)",
+    "uploading": "Subiendo...",
+    "loading": "Cargando documentos...",
+    "empty": "Todavía no hay documentos cargados",
+    "invalidFileType": "Tipo de archivo inválido. Permitidos: TXT, DOCX, PDF, XLSX",
+    "uploadFailed": "No se pudo subir el documento",
+    "deleteFailed": "No se pudo eliminar el documento",
+    "deleteConfirm": "¿Seguro que quieres eliminar este documento?",
+    "statuses": {
+      "PENDING": "Pendiente",
+      "SUCCESS": "Completado",
+      "FAILED": "Fallido"
+    }
   },
   "chatbot": {
     "title": "Asistente de IA Empresarial",
     "askQuestion": "Haz una pregunta sobre tu negocio...",
+    "statusOnline": "En línea",
     "send": "Enviar",
     "examples": "Preguntas de ejemplo:",
     "example1": "¿Cuáles fueron nuestras ventas el mes pasado?",
@@ -107,7 +123,14 @@
     "example3": "Muéstrame el rendimiento de productos",
     "example4": "¿Cuál es el pronóstico de ventas?",
     "typing": "La IA está escribiendo...",
-    "error": "Lo siento, no pude procesar tu solicitud. Inténtalo de nuevo."
+    "thinking": "Analizando...",
+    "error": "Lo siento, no pude procesar tu solicitud. Inténtalo de nuevo.",
+    "sources": "Fuentes:",
+    "processingTime": "{{seconds}}s",
+    "validation": {
+      "required": "Escribe una pregunta",
+      "failed": "No se pudo enviar el mensaje"
+    }
   },
   "common": {
     "loading": "Cargando...",

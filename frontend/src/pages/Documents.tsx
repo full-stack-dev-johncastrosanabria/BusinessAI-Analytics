@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import documentService, { Document } from '../services/documentService'
 import './Documents.css'
 
 function Documents() {
+  const { t } = useTranslation()
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +34,7 @@ function Documents() {
 
     const allowedTypes = ['text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
     if (!allowedTypes.includes(file.type)) {
-      setError('Invalid file type. Allowed: TXT, DOCX, PDF, XLSX')
+      setError(t('documents.invalidFileType'))
       return
     }
 
@@ -43,31 +45,31 @@ function Documents() {
       await fetchDocuments()
       e.target.value = ''
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload document')
+      setError(err instanceof Error ? err.message : t('documents.uploadFailed'))
     } finally {
       setUploading(false)
     }
   }
 
   const handleDelete = async (id: number) => {
-    if (!globalThis.confirm('Are you sure you want to delete this document?')) return
+    if (!globalThis.confirm(t('documents.deleteConfirm'))) return
     try {
       await documentService.deleteDocument(id)
       await fetchDocuments()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete document')
+      setError(err instanceof Error ? err.message : t('documents.deleteFailed'))
     }
   }
 
   return (
     <div className="documents">
-      <h1>Documents</h1>
+      <h1>{t('documents.title')}</h1>
 
       {error && <div className="error-message">{error}</div>}
 
       <div className="upload-section">
         <label htmlFor="file-input" className="upload-label">
-          {uploading ? 'Uploading...' : 'Choose File (TXT, DOCX, PDF, XLSX)'}
+          {uploading ? t('documents.uploading') : t('documents.chooseFile')}
         </label>
         <input
           id="file-input"
@@ -78,21 +80,21 @@ function Documents() {
         />
       </div>
 
-      {loading && <div className="loading">Loading documents...</div>}
+      {loading && <div className="loading">{t('documents.loading')}</div>}
       {!loading && documents.length === 0 && (
-        <div className="empty">No documents uploaded yet</div>
+        <div className="empty">{t('documents.empty')}</div>
       )}
       {!loading && documents.length > 0 && (
         <div className="documents-list">
           <table>
             <thead>
               <tr>
-                <th>Filename</th>
-                <th>Type</th>
-                <th>Size</th>
-                <th>Upload Date</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t('documents.fileName')}</th>
+                <th>{t('documents.type')}</th>
+                <th>{t('documents.size')}</th>
+                <th>{t('documents.uploadDate')}</th>
+                <th>{t('documents.status')}</th>
+                <th>{t('documents.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -104,12 +106,12 @@ function Documents() {
                   <td>{new Date(doc.uploadDate).toLocaleDateString()}</td>
                   <td>
                     <span className={`status status-${doc.extractionStatus.toLowerCase()}`}>
-                      {doc.extractionStatus}
+                      {t(`documents.statuses.${doc.extractionStatus}`)}
                     </span>
                   </td>
                   <td>
                     <button onClick={() => handleDelete(doc.id)} className="btn-delete">
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </td>
                 </tr>

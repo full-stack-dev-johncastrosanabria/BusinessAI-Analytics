@@ -95,11 +95,27 @@
     "fileName": "File Name",
     "type": "Type",
     "size": "Size",
-    "uploadDate": "Upload Date"
+    "uploadDate": "Upload Date",
+    "status": "Status",
+    "actions": "Actions",
+    "chooseFile": "Choose file (TXT, DOCX, PDF, XLSX)",
+    "uploading": "Uploading...",
+    "loading": "Loading documents...",
+    "empty": "No documents uploaded yet",
+    "invalidFileType": "Invalid file type. Allowed: TXT, DOCX, PDF, XLSX",
+    "uploadFailed": "Failed to upload document",
+    "deleteFailed": "Failed to delete document",
+    "deleteConfirm": "Are you sure you want to delete this document?",
+    "statuses": {
+      "PENDING": "Pending",
+      "SUCCESS": "Complete",
+      "FAILED": "Failed"
+    }
   },
   "chatbot": {
     "title": "AI Business Assistant",
     "askQuestion": "Ask a question about your business...",
+    "statusOnline": "Online",
     "send": "Send",
     "examples": "Example questions:",
     "example1": "What were our sales last month?",
@@ -107,7 +123,14 @@
     "example3": "Show me product performance",
     "example4": "What's the sales forecast?",
     "typing": "AI is typing...",
-    "error": "Sorry, I couldn't process your request. Please try again."
+    "thinking": "Thinking...",
+    "error": "Sorry, I couldn't process your request. Please try again.",
+    "sources": "Sources:",
+    "processingTime": "{{seconds}}s",
+    "validation": {
+      "required": "Enter a question",
+      "failed": "Failed to send message"
+    }
   },
   "common": {
     "loading": "Loading...",

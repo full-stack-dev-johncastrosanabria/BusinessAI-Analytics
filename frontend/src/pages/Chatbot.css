@@ -172,13 +172,21 @@
 }
 
 .suggestion-chip {
+  font-family: inherit;
   padding: 6px 14px;
   border-radius: var(--radius-full, 9999px);
   background: var(--color-bg-secondary, #f9fafb);
   border: 1px solid var(--color-border-default, #e5e7eb);
   font-size: var(--font-size-xs, 0.75rem);
   color: var(--color-text-secondary, #6b7280);
-  cursor: default;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+.suggestion-chip:hover {
+  background: var(--color-primary-50, #eff6ff);
+  border-color: var(--color-primary-500, #3b82f6);
+  color: var(--color-primary-700, #1d4ed8);
 }
 
 /* ---- Message Group ---- */

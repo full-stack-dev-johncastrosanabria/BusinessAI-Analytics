@@ -74,7 +74,7 @@ function Chatbot() {
             <h1 className="chatbot__title">{t('chatbot.title')}</h1>
             <span className="chatbot__status">
               <span className="chatbot__status-dot" aria-hidden="true" />
-              Online
+              {t('chatbot.statusOnline')}
             </span>
           </div>
         </div>
@@ -90,7 +90,20 @@ function Chatbot() {
               <p className="empty-state__hint">{t('chatbot.examples')}</p>
               <div className="empty-state__suggestions">
                 {(['example1', 'example2', 'example3', 'example4'] as const).map((key) => (
-                  <span key={key} className="suggestion-chip">{t(`chatbot.${key}`)}</span>
+                  <button
+                    key={key}
+                    type="button"
+                    className="suggestion-chip"
+                    onClick={() => {
+                      const input = formRef.current?.elements.namedItem('question')
+                      if (input instanceof HTMLInputElement) {
+                        input.value = t(`chatbot.${key}`)
+                        input.focus()
+                      }
+                    }}
+                  >
+                    {t(`chatbot.${key}`)}
+                  </button>
                 ))}
               </div>
             </div>
@@ -115,7 +128,7 @@ function Chatbot() {
                       {message.answer}
                       {message.processingTime && (
                         <div className="message__meta">
-                          ⚡ {message.processingTime.toFixed(2)}s
+                          {t('chatbot.processingTime', { seconds: message.processingTime.toFixed(2) })}
                         </div>
                       )}
                     </div>
@@ -124,7 +137,7 @@ function Chatbot() {
                     </time>
                     {message.sources.length > 0 && (
                       <div className="message-sources">
-                        <strong>Sources:</strong>
+                        <strong>{t('chatbot.sources')}</strong>
                         <ul>
                           {message.sources.map((source) => (
                             <li key={source}>{source}</li>

@@ -1,6 +1,7 @@
 import { useActionState } from 'react'
 // Note: useActionState is used in useChatForm below
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { api } from '../lib/api'
 
 export interface ChatMessage {
@@ -30,6 +31,7 @@ export const chatKeys = {
  */
 export function useChatbot() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   // Get current chat history from cache
   const { data: messages = [] } = useQuery({
@@ -53,7 +55,7 @@ export function useChatbot() {
       const tempMessage: ChatMessage = {
         id: `temp-${Date.now()}`,
         question,
-        answer: 'Thinking...',
+        answer: t('chatbot.thinking'),
         sources: [],
         timestamp: Date.now(),
       }
@@ -101,6 +103,7 @@ export function useChatbot() {
  */
 export function useChatForm() {
   const { sendMessage } = useChatbot()
+  const { t } = useTranslation()
 
   const submitAction = async (
     _prevState: { error?: string } | undefined,
@@ -109,7 +112,7 @@ export function useChatForm() {
     const question = formData.get('question') as string
 
     if (!question?.trim()) {
-      return { error: 'Please enter a question' }
+      return { error: t('chatbot.validation.required') }
     }
 
     try {
@@ -117,7 +120,7 @@ export function useChatForm() {
       return {}
     } catch (error) {
       return {
-        error: error instanceof Error ? error.message : 'Failed to send message',
+        error: error instanceof Error ? error.message : t('chatbot.validation.failed'),
       }
     }
   }
