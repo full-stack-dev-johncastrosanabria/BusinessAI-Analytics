@@ -27,11 +27,23 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
-          query: ['@tanstack/react-query', '@tanstack/react-query-devtools'],
-          charts: ['recharts'],
-          i18n: ['i18next', 'i18next-browser-languagedetector', 'react-i18next'],
+        manualChunks(id) {
+          // Keep motion bundled with react to avoid dynamic import path issues on GH Pages
+          if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) {
+            return 'react'
+          }
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+            return 'react'
+          }
+          if (id.includes('node_modules/@tanstack')) {
+            return 'query'
+          }
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3') || id.includes('node_modules/victory')) {
+            return 'charts'
+          }
+          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+            return 'i18n'
+          }
         },
       },
     },
