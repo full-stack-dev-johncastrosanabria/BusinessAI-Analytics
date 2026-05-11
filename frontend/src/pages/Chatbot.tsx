@@ -1,6 +1,7 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { useChatbot, useChatForm } from '../hooks/useChatbot'
 import './Chatbot.css'
 
@@ -48,12 +49,84 @@ function formatTimestamp(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+/**
+ * Render bot message text with basic markdown:
+ * - **bold**
+ * - [link text](route) → clickable internal navigation
+ * - \n → line break
+ * - Lines starting with 📄 or 📂 get a subtle block style
+ */
+function renderMessageText(text: string, onNavigate: (route: string) => void): React.ReactNode {
+  // Split into lines first, then process each line
+  const lines = text.split('\n')
+  return lines.map((line, lineIdx) => {
+    // Process inline markdown within each line: **bold** and [text](route)
+    const parts: React.ReactNode[] = []
+    let remaining = line
+    let key = 0
+
+    while (remaining.length > 0) {
+      // Match **bold**
+      const boldMatch = remaining.match(/\*\*(.+?)\*\*/)
+      // Match [text](route)
+      const linkMatch = remaining.match(/\[(.+?)\]\((.+?)\)/)
+
+      const boldIdx = boldMatch?.index ?? Infinity
+      const linkIdx = linkMatch?.index ?? Infinity
+
+      if (boldIdx === Infinity && linkIdx === Infinity) {
+        // No more markdown — push remaining text
+        parts.push(<span key={key++}>{remaining}</span>)
+        break
+      }
+
+      if (boldIdx <= linkIdx && boldMatch) {
+        // Text before bold
+        if (boldIdx > 0) parts.push(<span key={key++}>{remaining.slice(0, boldIdx)}</span>)
+        parts.push(<strong key={key++}>{boldMatch[1]}</strong>)
+        remaining = remaining.slice(boldIdx + boldMatch[0].length)
+      } else if (linkMatch) {
+        // Text before link
+        if (linkIdx > 0) parts.push(<span key={key++}>{remaining.slice(0, linkIdx)}</span>)
+        const route = linkMatch[2]
+        parts.push(
+          <button
+            key={key++}
+            className="chat-doc-link"
+            onClick={() => onNavigate(route)}
+            type="button"
+          >
+            {linkMatch[1]}
+          </button>
+        )
+        remaining = remaining.slice(linkIdx + linkMatch[0].length)
+      }
+    }
+
+    const isDocLine = line.startsWith('📄') || line.startsWith('📂')
+    return (
+      <span
+        key={lineIdx}
+        className={isDocLine ? 'chat-doc-block' : undefined}
+      >
+        {parts}
+        {lineIdx < lines.length - 1 && <br />}
+      </span>
+    )
+  })
+}
+
 function Chatbot() {
   const { messages, isLoading } = useChatbot()
   const { formAction, error } = useChatForm()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
+
+  const handleNavigate = useCallback((route: string) => {
+    navigate(`/${route}`)
+  }, [navigate])
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -125,7 +198,7 @@ function Chatbot() {
                   <div className="message-bot-avatar" aria-hidden="true">AI</div>
                   <div className="message message--bot">
                     <div className="message__bubble">
-                      {message.answer}
+                      {renderMessageText(message.answer, handleNavigate)}
                       {message.processingTime && (
                         <div className="message__meta">
                           {t('chatbot.processingTime', { seconds: message.processingTime.toFixed(2) })}

@@ -3,6 +3,7 @@
  * In GitHub Pages builds, selected endpoints are served from static JSON files
  * and browser-local storage because there is no backend process.
  */
+import { extractPdfText } from './pdfExtract'
 
 const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:8080'
 const STATIC_DATA_MODE = import.meta.env?.VITE_STATIC_DATA === 'true'
@@ -290,7 +291,15 @@ async function handleStaticDocuments<T>(
       throw new APIError('Upload requires a file', 400, undefined, endpoint)
     }
 
-    const extractedText = file.type === 'text/plain' ? await file.text() : ''
+    // Extract text based on file type
+    let extractedText = ''
+    if (file.type === 'text/plain') {
+      extractedText = await file.text()
+    } else if (file.type === 'application/pdf') {
+      extractedText = await extractPdfText(file)
+    }
+    // DOCX / XLSX: no client-side extraction — extractedText stays ''
+
     const now = new Date().toISOString()
     const document: StaticDocument = {
       id: Date.now(),
@@ -299,7 +308,7 @@ async function handleStaticDocuments<T>(
       fileSize: file.size,
       fileType: getDocumentType(file),
       extractedText,
-      extractionStatus: extractedText || file.type !== 'text/plain' ? 'SUCCESS' : 'PENDING',
+      extractionStatus: extractedText ? 'SUCCESS' : 'PENDING',
       local: true,
     }
     writeStoredDocuments([document, ...localDocuments])
@@ -354,14 +363,15 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
     if (documentHits.length === 0) return ''
     const snippets = documentHits.map((doc) => {
       const text = doc.extractedText || ''
-      // Find the first sentence/paragraph containing a matching term
+      const docLink = language === 'es' ? `[Ver en Documentos](documents)` : `[View in Documents](documents)`
+      if (!text) return `📄 ${doc.filename} — ${docLink}`
       const matchingTerm = queryTerms.find((term) => text.toLowerCase().includes(term))
-      if (!matchingTerm) return `📄 ${doc.filename}`
+      if (!matchingTerm) return `📄 ${doc.filename} — ${docLink}`
       const idx = text.toLowerCase().indexOf(matchingTerm)
       const start = Math.max(0, idx - 60)
       const end = Math.min(text.length, idx + 200)
       const excerpt = text.slice(start, end).replace(/\s+/g, ' ').trim()
-      return `📄 **${doc.filename}**: "…${excerpt}…"`
+      return `📄 **${doc.filename}**: "…${excerpt}…" — ${docLink}`
     })
     return language === 'es'
       ? `\n\n📂 *Encontré información relevante en ${documentHits.length} documento(s):*\n${snippets.join('\n')}`
@@ -371,41 +381,54 @@ async function handleStaticChatbot<T>(body?: BodyInit): Promise<T> {
   let answer = ''
   let sources = ['dashboard.json']
 
-  if (includesAny(normalized, ['document', 'archivo', 'documento', 'file', 'fichero', 'adjunto'])) {
+  if (includesAny(normalized, ['document', 'archivo', 'documento', 'file', 'fichero', 'adjunto',
+    'resumen', 'summary', 'resume', 'contenido', 'content', 'que dice', 'what does', 'que hay en',
+    'what is in', 'cuales documentos', 'what documents', 'tienes documentos', 'have documents'])) {
     // Explicit document query — search by filename and content
     const searchableTerms = queryTerms.filter(
       (term) => !['document', 'documents', 'documento', 'documentos', 'archivo', 'archivos',
-        'search', 'buscar', 'file', 'fichero', 'adjunto'].includes(term)
+        'search', 'buscar', 'file', 'fichero', 'adjunto', 'resumen', 'summary', 'resume',
+        'contenido', 'content', 'dice', 'what', 'have', 'tienes', 'cuales', 'which'].includes(term)
     )
     const matches = allDocuments.filter((doc) => {
       const haystack = `${doc.filename || ''} ${doc.extractedText || ''}`.toLowerCase()
       return searchableTerms.length === 0 || searchableTerms.some((term) => haystack.includes(term))
     })
 
-    if (matches.length > 0) {
-      const matchDetails = matches.slice(0, 5).map((doc) => {
-        const text = doc.extractedText || ''
-        if (!text) return `📄 ${doc.filename} (${doc.fileType})`
-        const firstTerm = searchableTerms.find((term) => text.toLowerCase().includes(term))
-        if (!firstTerm) return `📄 ${doc.filename} (${doc.fileType})`
-        const idx = text.toLowerCase().indexOf(firstTerm)
-        const start = Math.max(0, idx - 40)
-        const end = Math.min(text.length, idx + 180)
-        const excerpt = text.slice(start, end).replace(/\s+/g, ' ').trim()
-        return `📄 **${doc.filename}**: "…${excerpt}…"`
+    const docsToShow = (matches.length > 0 ? matches : allDocuments).slice(0, 5)
+
+    if (docsToShow.length > 0) {
+      const docEntries = docsToShow.map((doc) => {
+        const text = doc.extractedText?.trim() || ''
+        const docLink = language === 'es'
+          ? `🔗 [Ver en Documentos](documents)`
+          : `🔗 [View in Documents](documents)`
+
+        if (!text) {
+          // No extracted text (DOCX/XLSX or encrypted PDF)
+          const noTextNote = language === 'es'
+            ? `_(Sin texto extraído — abre el archivo para leerlo)_`
+            : `_(No text extracted — open the file to read it)_`
+          return `📄 **${doc.filename}** (${doc.fileType || 'FILE'})\n${noTextNote}\n${docLink}`
+        }
+
+        // Build a summary: first 400 chars, trimmed at sentence boundary
+        const raw = text.slice(0, 500)
+        const lastPeriod = Math.max(raw.lastIndexOf('. '), raw.lastIndexOf('.\n'))
+        const summary = (lastPeriod > 80 ? raw.slice(0, lastPeriod + 1) : raw).trim()
+
+        return `📄 **${doc.filename}** (${doc.fileType || 'FILE'})\n${summary}…\n${docLink}`
       })
-      answer = language === 'es'
-        ? `Encontré ${matches.length} documento(s) relevante(s) de ${allDocuments.length} en total:\n\n${matchDetails.join('\n\n')}`
-        : `Found ${matches.length} relevant document(s) out of ${allDocuments.length} total:\n\n${matchDetails.join('\n\n')}`
-    } else if (allDocuments.length > 0) {
-      const docList = allDocuments.slice(0, 5).map((d) => `📄 ${d.filename}`).join('\n')
-      answer = language === 'es'
-        ? `No encontré coincidencias para esos términos. Hay ${allDocuments.length} documento(s) disponible(s):\n\n${docList}`
-        : `No matches found for those terms. There are ${allDocuments.length} document(s) available:\n\n${docList}`
+
+      const header = language === 'es'
+        ? `Encontré ${docsToShow.length} documento(s):`
+        : `Found ${docsToShow.length} document(s):`
+
+      answer = `${header}\n\n${docEntries.join('\n\n')}`
     } else {
       answer = language === 'es'
-        ? 'No hay documentos cargados todavía. Puedes subir documentos TXT, DOCX, PDF o XLSX desde la sección Documentos.'
-        : 'No documents uploaded yet. You can upload TXT, DOCX, PDF or XLSX files from the Documents section.'
+        ? 'No hay documentos cargados todavía. Puedes subir documentos TXT, PDF, DOCX o XLSX desde la sección Documentos.'
+        : 'No documents uploaded yet. You can upload TXT, PDF, DOCX or XLSX files from the Documents section.'
     }
     sources = ['documents.json', 'localStorage']
   } else if (includesAny(normalized, ['forecast', 'pronostico', 'pronóstico', 'predic', 'projection', 'proyeccion'])) {

@@ -423,6 +423,70 @@
   to { transform: rotate(360deg); }
 }
 
+/* ---- Document link button inside bot messages ---- */
+.chat-doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full, 9999px);
+  border: 1.5px solid var(--color-primary-400, #60a5fa);
+  background: var(--color-primary-50, #eff6ff);
+  color: var(--color-primary-700, #1d4ed8);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-semibold, 600);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              transform var(--transition-fast, 150ms ease);
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+.chat-doc-link:hover {
+  background: var(--color-primary-100, #dbeafe);
+  border-color: var(--color-primary-600, #2563eb);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .chat-doc-link {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--color-primary-400, #60a5fa);
+  color: var(--color-primary-300, #93c5fd);
+}
+
+[data-theme="dark"] .chat-doc-link:hover {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+/* ---- Document block line (lines starting with 📄 or 📂) ---- */
+.chat-doc-block {
+  display: block;
+  margin-top: var(--spacing-3, 12px);
+  padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+  background: var(--color-bg-tertiary, #f3f4f6);
+  border-left: 3px solid var(--color-primary-400, #60a5fa);
+  border-radius: 0 var(--radius-md, 6px) var(--radius-md, 6px) 0;
+  font-size: var(--font-size-xs, 0.75rem);
+  line-height: var(--line-height-relaxed, 1.625);
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.chat-doc-block strong {
+  color: var(--color-text-primary, #111827);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+[data-theme="dark"] .chat-doc-block {
+  background: var(--color-bg-tertiary, #374151);
+  border-left-color: var(--color-primary-400, #60a5fa);
+}
+
+[data-theme="dark"] .chat-doc-block strong {
+  color: var(--color-text-primary, #f9fafb);
+}
+
 /* ---- Dark Mode ---- */
 [data-theme="dark"] .chat-container {
   background-color: var(--color-bg-primary);
