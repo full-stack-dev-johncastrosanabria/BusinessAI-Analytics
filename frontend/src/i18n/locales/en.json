@@ -105,10 +105,11 @@
   },
   "documents": {
     "title": "Document Management",
+    "subtitle": "{{count}} document(s) uploaded",
     "totalDocuments": "Total Documents",
     "recentUploads": "Recent Uploads",
     "documentTypes": "Document Types",
-    "searchDocuments": "Search Documents",
+    "searchDocuments": "Search documents…",
     "uploadDocument": "Upload Document",
     "fileName": "File Name",
     "type": "Type",
@@ -117,9 +118,10 @@
     "status": "Status",
     "actions": "Actions",
     "chooseFile": "Choose file (TXT, DOCX, PDF, XLSX)",
-    "uploading": "Uploading...",
-    "loading": "Loading documents...",
-    "empty": "No documents uploaded yet",
+    "uploading": "Uploading…",
+    "loading": "Loading documents…",
+    "empty": "No documents yet",
+    "emptyHint": "Upload a TXT, PDF, DOCX or XLSX file to get started.",
     "invalidFileType": "Invalid file type. Allowed: TXT, DOCX, PDF, XLSX",
     "uploadFailed": "Failed to upload document",
     "deleteFailed": "Failed to delete document",
@@ -128,6 +130,12 @@
       "PENDING": "Pending",
       "SUCCESS": "Complete",
       "FAILED": "Failed"
+    },
+    "preview": {
+      "open": "Preview",
+      "title": "Preview — {{name}}",
+      "noPreview": "No preview available",
+      "noPreviewHint": "{{type}} files cannot be previewed in the browser. Download the file to view its contents."
     }
   },
   "chatbot": {

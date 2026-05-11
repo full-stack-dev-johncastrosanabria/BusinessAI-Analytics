@@ -105,10 +105,11 @@
   },
   "documents": {
     "title": "Gestión de Documentos",
+    "subtitle": "{{count}} documento(s) cargado(s)",
     "totalDocuments": "Documentos Totales",
     "recentUploads": "Subidas Recientes",
     "documentTypes": "Tipos de Documentos",
-    "searchDocuments": "Buscar Documentos",
+    "searchDocuments": "Buscar documentos…",
     "uploadDocument": "Subir Documento",
     "fileName": "Nombre del Archivo",
     "type": "Tipo",
@@ -117,9 +118,10 @@
     "status": "Estado",
     "actions": "Acciones",
     "chooseFile": "Elegir archivo (TXT, DOCX, PDF, XLSX)",
-    "uploading": "Subiendo...",
-    "loading": "Cargando documentos...",
-    "empty": "Todavía no hay documentos cargados",
+    "uploading": "Subiendo…",
+    "loading": "Cargando documentos…",
+    "empty": "Aún no hay documentos",
+    "emptyHint": "Sube un archivo TXT, PDF, DOCX o XLSX para comenzar.",
     "invalidFileType": "Tipo de archivo inválido. Permitidos: TXT, DOCX, PDF, XLSX",
     "uploadFailed": "No se pudo subir el documento",
     "deleteFailed": "No se pudo eliminar el documento",
@@ -128,6 +130,12 @@
       "PENDING": "Pendiente",
       "SUCCESS": "Completado",
       "FAILED": "Fallido"
+    },
+    "preview": {
+      "open": "Vista previa",
+      "title": "Vista previa — {{name}}",
+      "noPreview": "Vista previa no disponible",
+      "noPreviewHint": "Los archivos {{type}} no se pueden previsualizar en el navegador. Descarga el archivo para ver su contenido."
     }
   },
   "chatbot": {
