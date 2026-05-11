@@ -2,9 +2,16 @@
   padding: 0;
   margin: 0;
   width: 100%;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: var(--color-bg-secondary, var(--bg-secondary));
+  color: var(--color-text-primary, var(--text-primary));
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard__title {
+  margin: 0 0 var(--spacing-6, 24px) 0;
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--color-text-primary, #111827);
 }
 
 .dashboard.loading,
@@ -116,6 +123,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+  margin-bottom: 20px;
 }
 
 @media (min-width: 768px) {
@@ -128,6 +136,22 @@
   .charts-section {
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   }
+}
+
+/* 2-column layout for row 2 */
+.charts-section--2col {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .charts-section--2col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Full-width single chart */
+.charts-section--full {
+  grid-template-columns: 1fr;
 }
 
 .chart-container {

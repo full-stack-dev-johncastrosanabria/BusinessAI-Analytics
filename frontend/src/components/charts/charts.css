@@ -1,0 +1,159 @@
+/* ============================================================
+   Shared Chart Component Styles
+   ============================================================ */
+
+/* CSS variables bridging design tokens to chart internals */
+:root {
+  --chart-grid:          rgba(0, 0, 0, 0.06);
+  --chart-axis-text:     var(--color-text-secondary, #6b7280);
+  --chart-treemap-border: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] {
+  --chart-grid:          rgba(255, 255, 255, 0.07);
+  --chart-axis-text:     var(--color-text-secondary, #9ca3af);
+  --chart-treemap-border: rgba(0, 0, 0, 0.25);
+}
+
+/* ---- Wrapper ---- */
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+  height: 100%;
+}
+
+/* ---- Header ---- */
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2, 8px);
+  flex-wrap: wrap;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: var(--font-size-base, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #111827);
+  line-height: var(--line-height-tight, 1.25);
+}
+
+/* ---- Badges ---- */
+.chart-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-medium, 500);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.chart-badge--blue {
+  background-color: var(--color-primary-100, #dbeafe);
+  color: var(--color-primary-700, #1d4ed8);
+}
+
+.chart-badge--violet {
+  background-color: var(--color-secondary-100, #ede9fe);
+  color: var(--color-secondary-700, #6d28d9);
+}
+
+.chart-badge--green {
+  background-color: var(--color-success-100, #dcfce7);
+  color: var(--color-success-700, #15803d);
+}
+
+.chart-badge--amber {
+  background-color: var(--color-warning-100, #fef3c7);
+  color: var(--color-warning-700, #b45309);
+}
+
+[data-theme="dark"] .chart-badge--blue {
+  background-color: rgba(99, 102, 241, 0.18);
+  color: var(--color-primary-300, #93c5fd);
+}
+
+[data-theme="dark"] .chart-badge--violet {
+  background-color: rgba(139, 92, 246, 0.18);
+  color: var(--color-secondary-300, #c4b5fd);
+}
+
+[data-theme="dark"] .chart-badge--green {
+  background-color: rgba(52, 211, 153, 0.15);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .chart-badge--amber {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #fcd34d;
+}
+
+/* ---- Custom Tooltip ---- */
+.chart-tooltip {
+  background-color: var(--color-bg-primary, #fff);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: var(--radius-lg, 8px);
+  padding: var(--spacing-3, 12px);
+  box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+  min-width: 160px;
+  backdrop-filter: blur(8px);
+}
+
+.chart-tooltip__label {
+  margin: 0 0 6px 0;
+  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-primary, #111827);
+  border-bottom: 1px solid var(--color-border-default, #e5e7eb);
+  padding-bottom: 6px;
+}
+
+.chart-tooltip__row {
+  margin: 5px 0 0 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-4, 16px);
+  align-items: center;
+}
+
+.chart-tooltip__name {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: var(--font-size-xs, 0.75rem);
+}
+
+.chart-tooltip__value {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #111827);
+}
+
+[data-theme="dark"] .chart-tooltip {
+  background-color: var(--color-bg-secondary, #1f2937);
+  border-color: var(--color-border-default, #374151);
+}
+
+[data-theme="dark"] .chart-tooltip__label {
+  border-bottom-color: var(--color-border-default, #374151);
+}
+
+[data-theme="dark"] .chart-tooltip__value {
+  color: var(--color-text-primary, #f9fafb);
+}
+
+/* ---- Recharts dark mode overrides ---- */
+[data-theme="dark"] .recharts-cartesian-grid-horizontal line,
+[data-theme="dark"] .recharts-cartesian-grid-vertical line {
+  stroke: var(--chart-grid);
+}
+
+[data-theme="dark"] .recharts-text {
+  fill: var(--chart-axis-text);
+}
+
+[data-theme="dark"] .recharts-legend-item-text {
+  color: var(--color-text-secondary) !important;
+}

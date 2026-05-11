@@ -173,9 +173,9 @@ export function InteractiveChart({
       <ResponsiveContainer width="100%" height={height}>
         {chartType === 'bar' ? (
           <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xDataKey} />
-            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid, rgba(0,0,0,0.06))" vertical={false} />
+            <XAxis dataKey={xDataKey} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {series.map((s) => (
@@ -184,6 +184,8 @@ export function InteractiveChart({
                 dataKey={s.dataKey}
                 fill={s.color}
                 name={s.name ?? s.dataKey}
+                radius={[10, 10, 0, 0]}
+                maxBarSize={40}
                 onClick={(entry) => handleClick(entry as Record<string, unknown>, s.dataKey)}
                 style={{ cursor: onDataPointClick ? 'pointer' : 'default' }}
               />
@@ -194,9 +196,9 @@ export function InteractiveChart({
           </BarChart>
         ) : (
           <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xDataKey} />
-            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid, rgba(0,0,0,0.06))" vertical={false} />
+            <XAxis dataKey={xDataKey} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             {series.map((s) => (
@@ -205,10 +207,12 @@ export function InteractiveChart({
                 type="monotone"
                 dataKey={s.dataKey}
                 stroke={s.color}
+                strokeWidth={2}
                 name={s.name ?? s.dataKey}
-                dot={{ r: 3 }}
+                dot={false}
                 activeDot={{
                   r: 6,
+                  strokeWidth: 0,
                   onClick: (_event, payload) => {
                     const p = payload as { payload?: Record<string, unknown> }
                     if (p?.payload) handleClick(p.payload, s.dataKey)

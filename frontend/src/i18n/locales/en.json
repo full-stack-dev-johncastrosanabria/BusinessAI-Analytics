@@ -11,13 +11,31 @@
   "dashboard": {
     "title": "Business Analytics Dashboard",
     "totalSales": "Total Sales",
+    "totalCosts": "Total Costs",
     "totalProfit": "Total Profit",
     "totalCustomers": "Total Customers",
     "totalProducts": "Total Products",
+    "bestMonth": "Best Month",
+    "worstMonth": "Worst Month",
     "salesTrend": "Sales Trend",
     "profitMargin": "Profit Margin",
     "topProducts": "Top Products",
-    "recentTransactions": "Recent Transactions"
+    "recentTransactions": "Recent Transactions",
+    "charts": {
+      "revenueGrowth": "Revenue Growth",
+      "salesByCategory": "Sales by Category",
+      "salesCostProfit": "Sales vs Costs vs Profit",
+      "productDistribution": "Product Distribution",
+      "cumulative": "Cumulative",
+      "distribution": "Distribution",
+      "composed": "Composed",
+      "byRevenue": "By Revenue",
+      "sales": "Sales",
+      "costs": "Costs",
+      "profit": "Profit",
+      "revenue": "Revenue",
+      "monthlySales": "Monthly Sales"
+    }
   },
   "sales": {
     "title": "Sales Analytics",

@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDashboardSummary, useBusinessMetrics } from '../hooks/useAnalytics'
 import { useChartExport } from '../hooks/useChartExport'
 import { InteractiveChart } from '../components/ui/InteractiveChart'
 import { SkeletonCard } from '../components/Skeleton'
+import {
+  RevenueGrowthChart,
+  SalesByCategoryChart,
+  SalesCostProfitChart,
+  ProductTreemapChart,
+} from '../components/charts'
 import './Dashboard.css'
 
-// Chart colors
+// Chart color palette — consistent with existing charts
 const SALES_COLOR = '#8884d8'
 const COSTS_COLOR = '#82ca9d'
 const PROFIT_COLOR = '#ffc658'
@@ -37,6 +43,7 @@ function Dashboard() {
   const summary = summaryQuery.data
   const metrics = metricsQuery.data || []
 
+  // ── Existing chart data ──────────────────────────────────────────────────
   const chartData = metrics.map((m) => ({
     month: `${m.year}-${String(m.month).padStart(2, '0')}`,
     sales: m.totalSales,
@@ -49,21 +56,57 @@ function Dashboard() {
     totalRevenue: p.totalRevenue,
   }))
 
-  // Export hooks
+  // ── New chart data ───────────────────────────────────────────────────────
+
+  // 1. Revenue Growth — cumulative sum of sales over time
+  const revenueGrowthData = useMemo(() => {
+    let cumulative = 0
+    return chartData.map((d) => {
+      cumulative += d.sales
+      return { month: d.month, sales: d.sales, cumulative }
+    })
+  }, [chartData])
+
+  // 2. Sales by Category — derived from topProducts (group by category)
+  const salesByCategoryData = useMemo(() => {
+    const categoryMap = new Map<string, number>()
+    for (const p of summary?.topProducts || []) {
+      const cat = p.category || 'Other'
+      categoryMap.set(cat, (categoryMap.get(cat) ?? 0) + p.totalRevenue)
+    }
+    return Array.from(categoryMap.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+  }, [summary])
+
+  // 3. Composed chart — same chartData (sales / costs / profit)
+  const composedData = chartData
+
+  // 4. Treemap — top products by revenue
+  const treemapData = useMemo(
+    () =>
+      (summary?.topProducts || []).map((p) => ({
+        name: p.name,
+        value: p.totalRevenue,
+        category: p.category,
+      })),
+    [summary]
+  )
+
+  // ── Export hooks ─────────────────────────────────────────────────────────
   const trendExport = useChartExport({ data: chartData, filename: 'sales-trend' })
   const productsExport = useChartExport({ data: topProductsData, filename: 'top-products' })
 
+  // ── Loading state ─────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="dashboard">
-        <h1>{t('dashboard.title')}</h1>
-        {/* Skeleton metrics grid */}
-        <div className="metrics-grid" aria-busy="true" aria-label="Loading dashboard metrics">
+        <h1 className="dashboard__title">{t('dashboard.title')}</h1>
+        <div className="metrics-grid" aria-busy="true" aria-label={t('common.loading')}>
           {Array.from({ length: 5 }, (_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
-        {/* Skeleton charts */}
         <div className="charts-section">
           <div className="chart-container skeleton-chart-placeholder" aria-hidden="true" />
           <div className="chart-container skeleton-chart-placeholder" aria-hidden="true" />
@@ -75,19 +118,19 @@ function Dashboard() {
   if (error) {
     return (
       <div className="dashboard error">
-        {t('common.error')}: {error instanceof Error ? error.message : 'Failed to load dashboard data'}
+        {t('common.error')}: {error instanceof Error ? error.message : t('common.error')}
       </div>
     )
   }
 
   return (
     <div className="dashboard">
-      <h1>{t('dashboard.title')}</h1>
+      <h1 className="dashboard__title">{t('dashboard.title')}</h1>
 
       {/* Date Range Filter */}
       <div className="filter-section">
         <div className="filter-group">
-          <label htmlFor="date-from">From Date:</label>
+          <label htmlFor="date-from">{t('sales.date')} ({t('common.filter')} from):</label>
           <input
             id="date-from"
             type="date"
@@ -96,7 +139,7 @@ function Dashboard() {
           />
         </div>
         <div className="filter-group">
-          <label htmlFor="date-to">To Date:</label>
+          <label htmlFor="date-to">{t('sales.date')} ({t('common.filter')} to):</label>
           <input
             id="date-to"
             type="date"
@@ -109,7 +152,7 @@ function Dashboard() {
         </button>
       </div>
 
-      {/* Key Metrics */}
+      {/* ── KPI Cards ── */}
       {summary && (
         <div className="metrics-grid">
           <div className="metric-card">
@@ -117,7 +160,7 @@ function Dashboard() {
             <p className="metric-value">${summary.totalSales.toFixed(2)}</p>
           </div>
           <div className="metric-card">
-            <h3>Total Costs</h3>
+            <h3>{t('dashboard.totalCosts')}</h3>
             <p className="metric-value">${summary.totalCosts.toFixed(2)}</p>
           </div>
           <div className="metric-card">
@@ -125,14 +168,14 @@ function Dashboard() {
             <p className="metric-value">${summary.totalProfit.toFixed(2)}</p>
           </div>
           <div className="metric-card">
-            <h3>Best Month</h3>
+            <h3>{t('dashboard.bestMonth')}</h3>
             <p className="metric-value">
               {summary.bestMonth?.year}-{String(summary.bestMonth?.month).padStart(2, '0')}
             </p>
             <p className="metric-subtext">${summary.bestMonth?.profit.toFixed(2)}</p>
           </div>
           <div className="metric-card">
-            <h3>Worst Month</h3>
+            <h3>{t('dashboard.worstMonth')}</h3>
             <p className="metric-value">
               {summary.worstMonth?.year}-{String(summary.worstMonth?.month).padStart(MONTH_PADDING, '0')}
             </p>
@@ -144,18 +187,18 @@ function Dashboard() {
       {/* Clicked point feedback */}
       {clickedPoint && (
         <div className="dashboard-click-info" role="status" aria-live="polite">
-          Selected: {clickedPoint}
+          {clickedPoint}
           <button
             className="dashboard-click-dismiss"
             onClick={() => setClickedPoint(null)}
-            aria-label="Dismiss"
+            aria-label={t('common.close')}
           >
             ×
           </button>
         </div>
       )}
 
-      {/* Charts */}
+      {/* ── Row 1: Existing charts (Sales Trend + Top Products) ── */}
       <div className="charts-section">
         <div className="chart-container">
           <InteractiveChart
@@ -164,9 +207,9 @@ function Dashboard() {
             xDataKey="month"
             chartType="line"
             series={[
-              { dataKey: 'sales', color: SALES_COLOR, name: 'Sales' },
-              { dataKey: 'costs', color: COSTS_COLOR, name: 'Costs' },
-              { dataKey: 'profit', color: PROFIT_COLOR, name: 'Profit' },
+              { dataKey: 'sales', color: SALES_COLOR, name: t('dashboard.charts.sales') },
+              { dataKey: 'costs', color: COSTS_COLOR, name: t('dashboard.charts.costs') },
+              { dataKey: 'profit', color: PROFIT_COLOR, name: t('dashboard.charts.profit') },
             ]}
             onDataPointClick={(dataKey, value, entry) =>
               setClickedPoint(`${entry.month} — ${dataKey}: ${value}`)
@@ -176,7 +219,6 @@ function Dashboard() {
           />
         </div>
 
-        {/* Top Products */}
         {topProductsData.length > 0 && (
           <div className="chart-container">
             <InteractiveChart
@@ -184,7 +226,7 @@ function Dashboard() {
               data={topProductsData}
               xDataKey="name"
               chartType="bar"
-              series={[{ dataKey: 'totalRevenue', color: BAR_COLOR, name: 'Revenue' }]}
+              series={[{ dataKey: 'totalRevenue', color: BAR_COLOR, name: t('dashboard.charts.revenue') }]}
               onDataPointClick={(dataKey, value, entry) =>
                 setClickedPoint(`${entry.name} — ${dataKey}: ${value}`)
               }
@@ -194,6 +236,38 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* ── Row 2: Revenue Growth + Sales by Category ── */}
+      {revenueGrowthData.length > 0 && (
+        <div className="charts-section charts-section--2col">
+          <div className="chart-container">
+            <RevenueGrowthChart data={revenueGrowthData} height={280} />
+          </div>
+          {salesByCategoryData.length > 0 && (
+            <div className="chart-container">
+              <SalesByCategoryChart data={salesByCategoryData} height={280} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Row 3: Composed Chart (full width) ── */}
+      {composedData.length > 0 && (
+        <div className="charts-section charts-section--full">
+          <div className="chart-container">
+            <SalesCostProfitChart data={composedData} height={320} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Row 4: Treemap (full width) ── */}
+      {treemapData.length > 0 && (
+        <div className="charts-section charts-section--full">
+          <div className="chart-container">
+            <ProductTreemapChart data={treemapData} height={320} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -11,13 +11,31 @@
   "dashboard": {
     "title": "Panel de Análisis Empresarial",
     "totalSales": "Ventas Totales",
+    "totalCosts": "Costos Totales",
     "totalProfit": "Ganancia Total",
     "totalCustomers": "Clientes Totales",
     "totalProducts": "Productos Totales",
+    "bestMonth": "Mejor Mes",
+    "worstMonth": "Peor Mes",
     "salesTrend": "Tendencia de Ventas",
     "profitMargin": "Margen de Ganancia",
     "topProducts": "Productos Principales",
-    "recentTransactions": "Transacciones Recientes"
+    "recentTransactions": "Transacciones Recientes",
+    "charts": {
+      "revenueGrowth": "Crecimiento de Ingresos",
+      "salesByCategory": "Ventas por Categoría",
+      "salesCostProfit": "Ventas vs Costos vs Ganancia",
+      "productDistribution": "Distribución de Productos",
+      "cumulative": "Acumulado",
+      "distribution": "Distribución",
+      "composed": "Compuesto",
+      "byRevenue": "Por Ingresos",
+      "sales": "Ventas",
+      "costs": "Costos",
+      "profit": "Ganancia",
+      "revenue": "Ingresos",
+      "monthlySales": "Ventas Mensuales"
+    }
   },
   "sales": {
     "title": "Análisis de Ventas",
