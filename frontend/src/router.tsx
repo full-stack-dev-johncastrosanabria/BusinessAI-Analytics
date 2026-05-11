@@ -1,31 +1,25 @@
-import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
-import { PageLoader } from './components/PageLoader'
 
-// Lazy-loaded page components — each becomes a separate JS chunk
-const Login = lazy(() => import('./pages/Login'))
-const Dashboard = lazy(() => import('./pages/Dashboard'))
-const Forecasts = lazy(() => import('./pages/Forecasts'))
-const Chatbot = lazy(() => import('./pages/Chatbot'))
-const Documents = lazy(() => import('./pages/Documents'))
-const Products = lazy(() => import('./pages/Products'))
-const Customers = lazy(() => import('./pages/Customers'))
-const Sales = lazy(() => import('./pages/Sales'))
-const SalesTable = lazy(() => import('./pages/SalesTable'))
-const SalesInfinite = lazy(() => import('./pages/SalesInfinite'))
-
-const withSuspense = (element: React.ReactNode) => (
-  <Suspense fallback={<PageLoader />}>{element}</Suspense>
-)
+// Direct imports to avoid dynamic import issues on GitHub Pages
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Forecasts from './pages/Forecasts'
+import Chatbot from './pages/Chatbot'
+import Documents from './pages/Documents'
+import Products from './pages/Products'
+import Customers from './pages/Customers'
+import Sales from './pages/Sales'
+import SalesTable from './pages/SalesTable'
+import SalesInfinite from './pages/SalesInfinite'
 
 export const router = createBrowserRouter(
   [
     {
       path: '/login',
-      element: withSuspense(<Login />),
+      element: <Login />,
       errorElement: <ErrorBoundary />,
     },
     {
@@ -39,39 +33,39 @@ export const router = createBrowserRouter(
       children: [
         {
           index: true,
-          element: withSuspense(<Dashboard />),
+          element: <Dashboard />,
         },
         {
           path: 'forecasts',
-          element: withSuspense(<Forecasts />),
+          element: <Forecasts />,
         },
         {
           path: 'chatbot',
-          element: withSuspense(<Chatbot />),
+          element: <Chatbot />,
         },
         {
           path: 'documents',
-          element: withSuspense(<Documents />),
+          element: <Documents />,
         },
         {
           path: 'products',
-          element: withSuspense(<Products />),
+          element: <Products />,
         },
         {
           path: 'customers',
-          element: withSuspense(<Customers />),
+          element: <Customers />,
         },
         {
           path: 'sales',
-          element: withSuspense(<Sales />),
+          element: <Sales />,
         },
         {
           path: 'sales-table',
-          element: withSuspense(<SalesTable />),
+          element: <SalesTable />,
         },
         {
           path: 'sales-infinite',
-          element: withSuspense(<SalesInfinite />),
+          element: <SalesInfinite />,
         },
       ],
     },
