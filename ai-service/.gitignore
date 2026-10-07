@@ -39,8 +39,11 @@ env/
 htmlcov/
 .tox/
 
-# Models
-models/
+# Trained model artifacts (weights, checkpoints).
+# NOTE: the Python source package ai-service/models/ (hybrid_forecast.py,
+# sales_forecast.py, cost_forecast*.py) required by main.py, train_models.py
+# and tests/ must stay tracked. Do not re-add a bare `models/` rule here.
+trained_models/
 *.pth
 *.h5
 *.pkl
