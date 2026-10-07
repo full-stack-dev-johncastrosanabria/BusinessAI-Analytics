@@ -93,10 +93,11 @@ const codeIssueArb: fc.Arbitrary<CodeIssue> = fc.record({
   updateDate: fc.date({ min: new Date('2020-01-01'), max: new Date('2025-12-31') }),
 });
 
-/** Generates a list of CodeIssues (0–30 items). */
-const codeIssueListArb: fc.Arbitrary<CodeIssue[]> = fc.array(codeIssueArb, {
+/** Generates a list of CodeIssues with unique IDs (0–30 items). */
+const codeIssueListArb: fc.Arbitrary<CodeIssue[]> = fc.uniqueArray(codeIssueArb, {
   minLength: 0,
   maxLength: 30,
+  selector: issue => issue.id,
 });
 
 /** Generates a list with at least one VULNERABILITY issue. */
