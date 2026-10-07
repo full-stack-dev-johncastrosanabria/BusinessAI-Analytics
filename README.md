@@ -1,6 +1,6 @@
 # BusinessAI-Analytics Platform
 
-Enterprise-grade business analytics platform with AI-powered forecasting, real-time dashboards, and bilingual chatbot support.
+Business analytics portfolio platform with forecasting, dashboards and bilingual chatbot workflows.
 
 ## 🛠️ Tech Stack
 
@@ -988,7 +988,7 @@ Configure per environment:
 
 ---
 
-**Status**: ✅ Production Ready
+**Status**: Portfolio project. Deployment and quality checks depend on the configured environment.
 
 All features implemented, tested, and documented. CI/CD pipeline configured with quality gates. Security vulnerabilities fixed. Ready for deployment and demo recording.
 
